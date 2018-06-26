@@ -1,0 +1,25 @@
+{
+	"name": "ecomailcz/flexibee-client",
+	"description": "Basic client for make flexibee requests",
+	"author": "Petr Král (petr@ecomail.cz)",
+	"license": ["MIT"],
+	"minimum-stability": "dev",
+	"prefer-stable": true,
+	"require": {
+		"php": "~7.1",
+		"consistence/consistence": "^1.0"
+	},
+	"require-dev": {
+		"slevomat/coding-standard": "^4.6",
+		"phpstan/phpstan": "^0.10.0",
+		"phpunit/phpunit": "^7.2",
+		"phing/phing": "^2.16",
+		"fzaninotto/faker": "^1.7"
+	},
+	"autoload": {
+		"psr-4": {"EcomailFlexibee\\": ["src/"]}
+	},
+	"autoload-dev": {
+		"classmap": ["tests/"]
+	}
+}
