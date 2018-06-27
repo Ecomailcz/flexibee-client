@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Ecomailcz/flexibee-client.svg?branch=master)](https://travis-ci.org/Ecomailcz/flexibee-client)
+
 # flexibee-client
 Jednoduchý curl client, který se stará o správné složení requestu do systému Flexibee a následného vráceni výsledků.
 
