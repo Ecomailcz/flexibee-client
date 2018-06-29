@@ -1,14 +1,21 @@
 [![Build Status](https://travis-ci.org/Ecomailcz/flexibee-client.svg?branch=master)](https://travis-ci.org/Ecomailcz/flexibee-client)
 
 # flexibee-client
-Jednoduchý curl client, který se stará o správné složení requestu do systému Flexibee a následného vráceni výsledků.
+Jednoduchý curl client, který se stará o správné složení requestu do systému Flexibee a následné vrácení výsledků.
 
 ## Instalace
 ```composer require ecomailcz/flexibee-client```
 
 ## Implementace
 ```
-$client = new Client($accountUrl, $comapnyCode, $restApiUserName, $restApiPassword, $evidenceName);
+$client = new Client(
+$accountUrl, 
+$comapnyCode, 
+$restApiUserName, 
+$restApiPassword, 
+$evidenceName, 
+$enableSelfSignedCertificate
+);
 ```
 
 ## Vytvoření či editace záznamu
@@ -18,16 +25,16 @@ $evidenceData['kod'] = 'prvnizaznam'
 $evidenceData['nazev'] = 'První kontaktní adresa'
 $evidenceItemId = $client->save($evidenceData, null);
 ```
-Pokud vše proběhne v pořádku, vratí se ID záznamu ze systému Flexibeee. Nastane-li chyba vyhodí se vyjímka
+Pokud vše proběhne v pořádku, vratí se ID záznamu ze systému Flexibee. Nastane-li chyba, vyhodí se výjimka
 `EcomailFlexibeeRequestError::class`. Pro editaci záznamu stačí vyplnit druhý parametr `$id`.
 
 ## Vrácení záznamu dle parmetrů
-Nalezení záznamu dle id s vyhozením vyjímky, pokud záznam neexistuje  
+Nalezení záznamu dle id s vyhozením výjimky, pokud záznam neexistuje  
 ```
 $evidenceItem = $client->getById($evidenceItemId);
 ```
 
-Vrácení prázného záznamu, pokud neexistuje ve Flexibee (bez vyhození vyjímky)  
+Vrácení prázného záznamu, pokud neexistuje ve Flexibee (bez vyhození výjimky)  
 ```
 $evidenceItem = $client->findById($evidenceItemId);
 ```
@@ -47,7 +54,7 @@ Client nabízí možnost vytváření vlastních requestů. Stačí zavolat:
 ```
 $responseData = $client->makeRequest(Method $httpMethod, string $uri, array $postFields);
 ```
-Následně máte k dispozici data vrácená z Flexibee. Chyby jsou ošetřeny vyhozením kontrétních vyjímek.
+Následně máte k dispozici data vrácená z Flexibee. Chyby jsou ošetřeny vyhozením kontrétních výjimek.
 
 ## Flexibee API
 https://www.flexibee.eu/api/dokumentace/
