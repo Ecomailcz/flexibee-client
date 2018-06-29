@@ -57,7 +57,7 @@ class ClientTest extends TestCase
                 [
                     'kod' => $code,
                     'typDokl' => 'code:FAKTURA',
-                    'cisDosle' => '1234'
+                    'cisDosle' => '1234',
                 ],
                 [
                     'cisDosle' => '1234',

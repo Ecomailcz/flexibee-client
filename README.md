@@ -6,7 +6,7 @@ Jednoduchý curl client, který se stará o správné složení requestu do syst
 
 ## Implementace
 ```
-$client = new Client($accountUrl, $comapnyCode, $restApiUserName, $restApiPassword, $evidenceName);
+$client = new Client($accountUrl, $comapnyCode, $restApiUserName, $restApiPassword, $evidenceName, $selfSignedCertificate);
 ```
 
 ## Vytvoření či editace záznamu

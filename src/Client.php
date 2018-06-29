@@ -46,13 +46,21 @@ class Client extends ObjectPrototype
      */
     private $evidence;
 
-    public function __construct(string $url, string $company, string $user, string $password, string $evidence)
+    /**
+     * Enable self signed certificates
+     *
+     * @var bool
+     */
+    private $selfSignedCertificate;
+
+    public function __construct(string $url, string $company, string $user, string $password, string $evidence, bool $selfSignedCertificate = false)
     {
         $this->url = $url;
         $this->company = $company;
         $this->user = $user;
         $this->password = $password;
         $this->evidence = $evidence;
+        $this->selfSignedCertificate = $selfSignedCertificate;
     }
 
     public function deleteById(int $id): void
@@ -150,6 +158,12 @@ class Client extends ObjectPrototype
         curl_setopt($ch, CURLOPT_USERPWD, sprintf('%s:%s', $this->user, $this->password));
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $httpMethod->getValue());
+
+        if ($this->selfSignedCertificate) {
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+        }
+
         $postData = [];
         if (count($postFields) !== 0) {
             $postData['winstrom'] = $postFields;
