@@ -8,6 +8,12 @@ use PHPUnit\Framework\TestCase;
 class ClientTest extends TestCase
 {
 
+    private const URL = 'https://demo.flexibee.eu:5434';
+    private const COMPANY = 'demo';
+    private const USER = 'winstrom';
+    private const PASSWORD = 'winstrom';
+    private const DEFAULT_EVIDENCE_FOR_TESTING = 'adresar';
+
     /**
      * @dataProvider getEvidences
      * @param string $evidence
@@ -18,7 +24,7 @@ class ClientTest extends TestCase
      */
     public function testCRUDOperations(string $evidence, array $evidenceData, array $expectedDataAfterUpdate): void
     {
-        $client = new Client('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', $evidence);
+        $client = new Client(self::URL, self::COMPANY, self::USER, self::PASSWORD, $evidence);
         $addressBookId = $client->save($evidenceData, null);
         $client->save($expectedDataAfterUpdate, $addressBookId);
         $addressBookRefreshed = $client->getById($addressBookId);
@@ -32,6 +38,13 @@ class ClientTest extends TestCase
         $client->getById($addressBookId);
     }
 
+    public function testSessionAuthToken(): void
+    {
+        $client = new Client(self::URL, self::COMPANY, self::USER, self::PASSWORD, self::DEFAULT_EVIDENCE_FOR_TESTING);
+        $sessionAuthToken = $client->generateSessionAuthToken();
+        var_dump($sessionAuthToken);
+    }
+
     /**
      * @return mixed[][]
      */
@@ -43,7 +56,7 @@ class ClientTest extends TestCase
 
         return [
             [
-                'adresar',
+                self::DEFAULT_EVIDENCE_FOR_TESTING,
                 [
                     'kod' => $code,
                     'nazev' => $name,
