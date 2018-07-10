@@ -17,7 +17,10 @@ $evidenceName,
 $enableSelfSignedCertificate
 );
 ```
-
+## Autorizační token
+```
+$client->setAuthSessionId($authToken);
+```
 ## Vytvoření či editace záznamu
 ```
 $client = new Client('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', 'adresar');
