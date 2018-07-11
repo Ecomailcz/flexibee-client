@@ -56,17 +56,20 @@ class Client extends ObjectPrototype
 
     public function deleteById(int $id): void
     {
-        $this->makeRequest(Method::get(Method::DELETE), $this->queryBuilder->createUriByIdOnly($id, false), []);
+        $this->makeRequest(Method::get(Method::DELETE), $this->queryBuilder->createUriByIdOnly($id), []);
     }
 
     /**
      * @param int $id
+     * @param string[] $queryParams
      * @return mixed[]
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
-    public function findById(int $id): array
+    public function findById(int $id, array $queryParams = []): array
     {
         try {
-            return $this->getById($id);
+            return $this->getById($id, $queryParams);
         } catch (EcomailFlexibeeNoEvidenceResult $exception) {
             return [];
         }
@@ -74,35 +77,40 @@ class Client extends ObjectPrototype
 
     /**
      * @param string $code
+     * @param mixed[] $queryParams
      * @return mixed[]
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
-    public function getByCode(string $code): array
+    public function getByCode(string $code, array $queryParams = []): array
     {
-        $result = $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByCodeOnly(strtoupper($code)), []);
+        $result = $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByCodeOnly(strtoupper($code), $queryParams), []);
         return (!isset($result[0])) ? [] : $result[0] ;
     }
 
     /**
      * @param int $id
+     * @param string[] $queryParams
      * @return mixed[]
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
-    public function getById(int $id): array
+    public function getById(int $id, array $queryParams = []): array
     {
-        return $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByIdOnly($id), [])[0];
+        return $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByIdOnly($id, $queryParams), [])[0];
     }
 
     /**
      * @param string $code
+     * @param mixed[] $queryParams
      * @return mixed[]
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
-    public function findByCode(string $code): array
+    public function findByCode(string $code, array $queryParams = []): array
     {
         try {
-            return $this->getByCode($code);
+            return $this->getByCode($code, $queryParams);
         } catch (EcomailFlexibeeNoEvidenceResult $exception) {
             return [];
         }
@@ -125,9 +133,16 @@ class Client extends ObjectPrototype
         return (int) $result[0]['id'];
     }
 
-    public function getPdfById(int $id): string
+    /**
+     * @param int $id
+     * @param mixed[] $queryParams
+     * @return string
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     */
+    public function getPdfById(int $id, array $queryParams = []): string
     {
-        return $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriPdf($id), [])['result'];
+        return $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriPdf($id, $queryParams), [])['result'];
     }
 
     /**
