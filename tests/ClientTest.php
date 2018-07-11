@@ -1,5 +1,7 @@
 <?php declare(strict_types = 1);
 
+namespace EcomailFlexibeeTest;
+
 use EcomailFlexibee\Client;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
 use Faker\Factory;
@@ -18,7 +20,7 @@ class ClientTest extends TestCase
      */
     public function testCRUDOperations(string $evidence, array $evidenceData, array $expectedDataAfterUpdate): void
     {
-        $client = new Client('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', $evidence);
+        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, $evidence);
         $addressBookId = $client->save($evidenceData, null);
         $client->save($expectedDataAfterUpdate, $addressBookId);
         $addressBookRefreshed = $client->getById($addressBookId);

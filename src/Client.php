@@ -7,23 +7,10 @@ use EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestError;
 use EcomailFlexibee\Http\Method;
+use EcomailFlexibee\Http\QueryBuilder;
 
 class Client extends ObjectPrototype
 {
-
-    /**
-     * This field contain URL of Flexibee (https://youraccount.flexibee.eu:5434)
-     *
-     * @var string
-     */
-    private $url;
-
-    /**
-     * Generated name of the company in Flexibee
-     *
-     * @var string
-     */
-    private $company;
 
     /**
      * REST API user
@@ -53,19 +40,23 @@ class Client extends ObjectPrototype
      */
     private $selfSignedCertificate;
 
+    /**
+     * @var \EcomailFlexibee\Http\QueryBuilder
+     */
+    private $queryBuilder;
+
     public function __construct(string $url, string $company, string $user, string $password, string $evidence, bool $selfSignedCertificate = false)
     {
-        $this->url = $url;
-        $this->company = $company;
         $this->user = $user;
         $this->password = $password;
         $this->evidence = $evidence;
         $this->selfSignedCertificate = $selfSignedCertificate;
+        $this->queryBuilder = new QueryBuilder($company, $evidence, $url);
     }
 
     public function deleteById(int $id): void
     {
-        $this->makeRequest(Method::get(Method::DELETE), sprintf('%s/%d.json', $this->evidence, $id), []);
+        $this->makeRequest(Method::get(Method::DELETE), $this->queryBuilder->createUriByIdOnly($id, false), []);
     }
 
     /**
@@ -89,7 +80,7 @@ class Client extends ObjectPrototype
      */
     public function getByCode(string $code): array
     {
-        $result = $this->makeRequest(Method::get(Method::GET), sprintf('%s/(kod=\'%s\').json?detail=full', $this->evidence, strtoupper($code)), []);
+        $result = $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByCodeOnly(strtoupper($code)), []);
         return (!isset($result[0])) ? [] : $result[0] ;
     }
 
@@ -101,7 +92,7 @@ class Client extends ObjectPrototype
      */
     public function getById(int $id): array
     {
-        return $this->makeRequest(Method::get(Method::GET), sprintf('%s/%d.json?detail=full', $this->evidence, $id), [])[0];
+        return $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByIdOnly($id), [])[0];
     }
 
     /**
@@ -130,26 +121,25 @@ class Client extends ObjectPrototype
             $evidenceData['id'] = $id;
         }
         $postData[$this->evidence] = $evidenceData;
-        $result = $this->makeRequest(Method::get(Method::PUT), sprintf('%s.json', $this->evidence), $postData);
+        $result = $this->makeRequest(Method::get(Method::PUT), $this->queryBuilder->createUriByEvidenceOnly(), $postData);
         return (int) $result[0]['id'];
     }
 
     public function getPdfById(int $id): string
     {
-        return $this->makeRequest(Method::get(Method::GET), sprintf('%s/%d.pdf', $this->evidence, $id), [])['result'];
+        return $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriPdf($id), [])['result'];
     }
 
     /**
      * @param \EcomailFlexibee\Http\Method $httpMethod
-     * @param string $uri
+     * @param string $url
      * @param mixed[] $postFields
      * @return mixed[]
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
-    public function makeRequest(Method $httpMethod, string $uri, array $postFields): array
+    public function makeRequest(Method $httpMethod, string $url, array $postFields): array
     {
-        $url = sprintf('%s/c/%s/%s', $this->url, $this->company, $uri);
         /** @var resource $ch */
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
@@ -176,7 +166,7 @@ class Client extends ObjectPrototype
         $output = curl_exec($ch);
         $result = null;
 
-        if (mb_strpos($uri, '.pdf') !== false) {
+        if (mb_strpos($url, '.pdf') !== false) {
             return ['result' => $output];
         }
 
@@ -191,7 +181,7 @@ class Client extends ObjectPrototype
             }
             // Check authorization
             elseif (curl_getinfo($ch, CURLINFO_HTTP_CODE) === 401) {
-                throw new EcomailFlexibeeInvalidAuthorization($this->user, $this->password, $this->url);
+                throw new EcomailFlexibeeInvalidAuthorization($this->user, $this->password, $url);
             } elseif (curl_getinfo($ch, CURLINFO_HTTP_CODE) === 400) {
                 if ($result['success'] === 'false') {
                     foreach ($result['results'] as $response) {

@@ -7,5 +7,6 @@
 		<exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedExceptions"/>
 		<exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalConstants"/>
 		<exclude name="SlevomatCodingStandard.ControlStructures.RequireYodaComparison"/>
+		<exclude name="SlevomatCodingStandard.Commenting.RequireOneLinePropertyDocComment"/>
 	</rule>
 </ruleset>

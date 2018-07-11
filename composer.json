@@ -7,7 +7,8 @@
 	"prefer-stable": true,
 	"require": {
 		"php": "~7.1",
-		"consistence/consistence": "^1.0"
+		"consistence/consistence": "^1.0",
+		"jwage/purl": "^0.0.10"
 	},
 	"require-dev": {
 		"slevomat/coding-standard": "^4.6",
@@ -17,7 +18,10 @@
 		"fzaninotto/faker": "^1.7"
 	},
 	"autoload": {
-		"psr-4": {"EcomailFlexibee\\": ["src/"]}
+		"psr-4": {
+			"EcomailFlexibee\\": ["src/"],
+			"EcomailFlexibeeTest\\": ["tests/"]
+		}
 	},
 	"autoload-dev": {
 		"classmap": ["tests/"]
