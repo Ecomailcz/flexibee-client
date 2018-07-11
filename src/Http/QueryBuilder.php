@@ -27,19 +27,32 @@ class QueryBuilder extends Url
         $this->evidence = $evidence;
     }
 
-    public function createUriByIdOnly(int $id, bool $withFullDetail = true): string
+    /**
+     * @param int $id
+     * @param mixed[] $queryParams
+     * @return string
+     */
+    public function createUriByIdOnly(int $id, array $queryParams = []): string
     {
         $this->setPath(new Path(sprintf('c/%s/%s/%d.json', $this->company, $this->evidence, $id)));
-        if ($withFullDetail) {
-            $this->createFullDetailQuery();
+        if (count($queryParams) !== 0) {
+            $this->createQueryParams($queryParams);
         }
 
         return $this->getUrl();
     }
 
-    public function createUriPdf(int $id): string
+    /**
+     * @param int $id
+     * @param mixed[] $queryParams
+     * @return string
+     */
+    public function createUriPdf(int $id, array $queryParams = []): string
     {
         $this->setPath(new Path(sprintf('c/%s/%s/%d.pdf', $this->company, $this->evidence, $id)));
+        if (count($queryParams) !== 0) {
+            $this->createQueryParams($queryParams);
+        }
 
         return $this->getUrl();
     }
@@ -51,12 +64,16 @@ class QueryBuilder extends Url
         return $this->getUrl();
     }
 
-
-    public function createUriByCodeOnly(string $code, bool $withFullDetail = true): string
+    /**
+     * @param string $code
+     * @param mixed[] $queryParams
+     * @return string
+     */
+    public function createUriByCodeOnly(string $code, array $queryParams = []): string
     {
         $this->setPath(new Path(sprintf('c/%s/%s/(kod=\'%s\').json', $this->company, $this->evidence, $code)));
-        if ($withFullDetail) {
-            $this->createFullDetailQuery();
+        if (count($queryParams) !== 0) {
+            $this->createQueryParams($queryParams);
         }
 
         return $this->getUrl();
@@ -70,9 +87,12 @@ class QueryBuilder extends Url
         return $result;
     }
 
-    private function createFullDetailQuery(): void
+    /**
+     * @param mixed[] $params
+     */
+    private function createQueryParams(array $params): void
     {
-        $this->setQuery(new Query('detail=full'));
+        $this->setQuery(new Query(http_build_query($params)));
     }
 
 }

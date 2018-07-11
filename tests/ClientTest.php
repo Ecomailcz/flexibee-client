@@ -28,6 +28,7 @@ class ClientTest extends TestCase
             $this->assertEquals($value, $addressBookRefreshed[$key]);
         }
         $this->assertNotEmpty($client->getPdfById($addressBookId));
+        $this->assertNotEmpty($client->getPdfById($addressBookId, ['report-name' => 'FAKTURA-BLUE-FAV', 'report-lang' => 'en']));
         $client->deleteById($addressBookId);
         $this->assertCount(0, $client->findById($addressBookId));
         $this->expectException(EcomailFlexibeeNoEvidenceResult::class);
