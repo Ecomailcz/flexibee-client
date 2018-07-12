@@ -188,11 +188,13 @@ class Client extends ObjectPrototype
      * @param \EcomailFlexibee\Http\Method $httpMethod
      * @param string $url
      * @param mixed[] $postFields
+     * @param string[] $headers
      * @return mixed[]
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
-    public function makeRequest(Method $httpMethod, string $url, array $postFields): array
+    public function makeRequest(Method $httpMethod, string $url, array $postFields = [], array $headers = []): array
     {
         /** @var resource $ch */
         $ch = curl_init();
@@ -213,10 +215,13 @@ class Client extends ObjectPrototype
             $postData['winstrom'] = $postFields;
             (json_encode($postData));
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                'Accept: application/xmln',
-            ));
+            $headers[] = 'Accept: application/xmln';
         }
+
+        if (count($headers) !== 0) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        }
+
         $output = curl_exec($ch);
         $result = null;
 
