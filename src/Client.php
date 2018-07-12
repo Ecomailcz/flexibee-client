@@ -6,6 +6,7 @@ use Consistence\ObjectPrototype;
 use EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestError;
+use EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed;
 use EcomailFlexibee\Http\Method;
 use EcomailFlexibee\Http\QueryBuilder;
 
@@ -59,9 +60,42 @@ class Client extends ObjectPrototype
         $this->makeRequest(Method::get(Method::DELETE), $this->queryBuilder->createUriByIdOnly($id), []);
     }
 
+    public function deleteByCustomId(string $id): void
+    {
+        $this->makeRequest(Method::get(Method::DELETE), $this->queryBuilder->createUriByCustomId($id), []);
+    }
+
+    /**
+     * @param string $id
+     * @param mixed[] $queryParams
+     * @return mixed[]
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     */
+    public function findByCustomId(string $id, array $queryParams = []): array
+    {
+        try {
+            return $this->getByCustomId($id, $queryParams);
+        } catch (EcomailFlexibeeNoEvidenceResult $exception) {
+            return [];
+        }
+    }
+
+    /**
+     * @param string $id
+     * @param mixed[] $queryParams
+     * @return mixed[]
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     */
+    public function getByCustomId(string $id, array $queryParams = []): array
+    {
+        return $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByCustomId($id, $queryParams), []);
+    }
+
     /**
      * @param int $id
-     * @param string[] $queryParams
+     * @param mixed[] $queryParams
      * @return mixed[]
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
@@ -130,6 +164,11 @@ class Client extends ObjectPrototype
         }
         $postData[$this->evidence] = $evidenceData;
         $result = $this->makeRequest(Method::get(Method::PUT), $this->queryBuilder->createUriByEvidenceOnly(), $postData);
+
+        if (count($result) === 0) {
+            throw new EcomailFlexibeeSaveFailed();
+        }
+
         return (int) $result[0]['id'];
     }
 

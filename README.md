@@ -31,23 +31,26 @@ Pokud vše proběhne v pořádku, vratí se ID záznamu ze systému Flexibee. Na
 ## Vrácení záznamu dle parmetrů
 Nalezení záznamu dle id s vyhozením výjimky, pokud záznam neexistuje  
 ```
-$evidenceItem = $client->getById($evidenceItemId);
+$evidenceItem = $client->getById($evidenceItemId, $queryParams);
+$evidenceItem = $client->getByCustomId($evidenceItemId, $queryParams);
 ```
 
 Vrácení prázného záznamu, pokud neexistuje ve Flexibee (bez vyhození výjimky)  
 ```
-$evidenceItem = $client->findById($evidenceItemId);
+$evidenceItem = $client->findById($evidenceItemId, $queryParams);
+$evidenceItem = $client->findByCustomId($evidenceItemId, $queryParams);
 ```
 
 ## Smazání záznamu
 ```
-$client->deleteById($id)
+$client->deleteById($id);
+$client->deleteByCustomId($id);
 ```
 
 ## Generování PDF
 Systém Flexibee umožňuje vrátit vygenerované faktury.
 ```
-$client->getPdfById($id);
+$client->getPdfById($id, $queryParams);
 ```
 ## Vytváření vlastních requestů
 Client nabízí možnost vytváření vlastních requestů. Stačí zavolat:  

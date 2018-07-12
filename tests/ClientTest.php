@@ -4,11 +4,43 @@ namespace EcomailFlexibeeTest;
 
 use EcomailFlexibee\Client;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
+use EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed;
 use Faker\Factory;
 use PHPUnit\Framework\TestCase;
 
 class ClientTest extends TestCase
 {
+
+    /**
+     * @var \EcomailFlexibee\Client
+     */
+    private $client;
+
+    /**
+     * @var \Faker\Generator
+     */
+    private $faker;
+
+    public function setUp()
+    {
+        parent::setUp();
+        $this->faker = Factory::create();
+        $this->client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, Config::EVIDENCE);
+    }
+
+    public function testCRUDForCustomIds(): void
+    {
+        $evidenceData = [
+            'nazev' => $this->faker->company,
+        ];
+        $id = $this->client->save($evidenceData, null);
+        $code = $this->client->getById($id)['kod'];
+        $evidenceItem = $this->client->getByCustomId(sprintf('code:%s', $code));
+        $this->assertCount(1, $evidenceItem);
+        $this->assertEquals($id, (int) $evidenceItem[0]['id']);
+        $this->client->deleteByCustomId(sprintf('code:%s', $code));
+        $this->assertCount(0, $this->client->findByCustomId(sprintf('code:%s', $code)));
+    }
 
     /**
      * @dataProvider getEvidences
@@ -33,6 +65,9 @@ class ClientTest extends TestCase
         $this->assertCount(0, $client->findById($addressBookId));
         $this->expectException(EcomailFlexibeeNoEvidenceResult::class);
         $client->getById($addressBookId);
+        $this->expectException(EcomailFlexibeeSaveFailed::class);
+        $evidenceData = [];
+        $this->client->save($evidenceData, null);
     }
 
     /**
