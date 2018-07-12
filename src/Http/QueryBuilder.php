@@ -34,12 +34,7 @@ class QueryBuilder extends Url
      */
     public function createUriByIdOnly(int $id, array $queryParams = []): string
     {
-        $this->setPath(new Path(sprintf('c/%s/%s/%d.json', $this->company, $this->evidence, $id)));
-        if (count($queryParams) !== 0) {
-            $this->createQueryParams($queryParams);
-        }
-
-        return $this->getUrl();
+        return $this->createUriByAnyoneId($id, $queryParams);
     }
 
     /**
@@ -79,12 +74,37 @@ class QueryBuilder extends Url
         return $this->getUrl();
     }
 
+    /**
+     * @param string $id
+     * @param mixed[] $queryParams
+     * @return string
+     */
+    public function createUriByCustomId(string $id, array $queryParams = []): string
+    {
+        return $this->createUriByAnyoneId($id, $queryParams);
+    }
+
     public function getUrl(): string
     {
         $result =  parent::getUrl();
         $this->setQuery(new Query());
         $this->setPath(new Path());
         return $result;
+    }
+
+    /**
+     * @param mixed $id
+     * @param mixed[] $queryParams
+     * @return string
+     */
+    private function createUriByAnyoneId($id, array $queryParams = []): string
+    {
+        $this->setPath(new Path(sprintf('c/%s/%s/%s.json', $this->company, $this->evidence, $id)));
+        if (count($queryParams) !== 0) {
+            $this->createQueryParams($queryParams);
+        }
+
+        return $this->getUrl();
     }
 
     /**
