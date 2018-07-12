@@ -21,7 +21,7 @@ class ClientTest extends TestCase
      */
     private $faker;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->faker = Factory::create();
