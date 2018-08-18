@@ -27,6 +27,13 @@ class QueryBuilder extends Url
         $this->evidence = $evidence;
     }
 
+    public function createAuthTokenUrl(): string
+    {
+        $this->setPath(new Path('/login-logout/login.json'));
+
+        return $this->getUrl();
+    }
+
     /**
      * @param int $id
      * @param mixed[] $queryParams
