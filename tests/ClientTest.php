@@ -28,6 +28,26 @@ class ClientTest extends TestCase
         $this->client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, Config::EVIDENCE);
     }
 
+    public function testGetAuthToken(): void
+    {
+        $authToken = $this->client->getAuthAndRefreshToken();
+        $this->assertCount(2, $authToken);
+        $this->assertArrayHasKey('refreshToken', $authToken);
+        $this->assertArrayHasKey('authSessionId', $authToken);
+        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, Config::EVIDENCE,false, $authToken['authSessionId']);
+        $evidenceData = [
+            'nazev' => $this->faker->company,
+        ];
+        $id = $client->save($evidenceData, null);
+        $code = $client->getById($id)['kod'];
+        $evidenceItem = $client->getByCustomId(sprintf('code:%s', $code));
+        $this->assertCount(1, $evidenceItem);
+        $this->assertEquals($id, (int) $evidenceItem[0]['id']);
+        $client->deleteByCustomId(sprintf('code:%s', $code));
+        $this->assertCount(0, $client->findByCustomId(sprintf('code:%s', $code)));
+
+    }
+
     public function testCRUDForCustomIds(): void
     {
         $evidenceData = [

@@ -18,6 +18,12 @@ $enableSelfSignedCertificate
 );
 ```
 
+## Vygenerování autorizačního tokenu
+```
+$client = new Client('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', 'adresar');
+$tokens = $client->getAuthAndRefreshToken();
+```
+
 ## Vytvoření či editace záznamu
 ```
 $client = new Client('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', 'adresar');
