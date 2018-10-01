@@ -3,6 +3,7 @@
 namespace EcomailFlexibee;
 
 use Consistence\ObjectPrototype;
+use EcomailFlexibee\Exception\EcomailConnectionError;
 use EcomailFlexibee\Exception\EcomailFlexibeeAnotherError;
 use EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
@@ -294,6 +295,9 @@ class Client extends ObjectPrototype
         }
 
         if (!$result) {
+            if(curl_errno($ch) !== CURLE_OK) {
+                throw new EcomailConnectionError(sprintf('cURL error (%s): %s', curl_errno($ch), curl_error($ch)));
+            }
             return [];
         }
 
