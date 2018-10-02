@@ -3,8 +3,8 @@
 namespace EcomailFlexibee;
 
 use Consistence\ObjectPrototype;
-use EcomailFlexibee\Exception\EcomailConnectionError;
 use EcomailFlexibee\Exception\EcomailFlexibeeAnotherError;
+use EcomailFlexibee\Exception\EcomailFlexibeeConnectionError;
 use EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestError;
@@ -69,6 +69,7 @@ class Client extends ObjectPrototype
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      */
     public function getAuthAndRefreshToken(): array
     {
@@ -82,12 +83,28 @@ class Client extends ObjectPrototype
 
         return $result;
     }
-
+    
+    /**
+     * @param int $id
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     */
     public function deleteById(int $id): void
     {
         $this->makeRequest(Method::get(Method::DELETE), $this->queryBuilder->createUriByIdOnly($id), []);
     }
-
+    
+    /**
+     * @param string $id
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     */
     public function deleteByCustomId(string $id): void
     {
         $this->makeRequest(Method::get(Method::DELETE), $this->queryBuilder->createUriByCustomId($id), []);
@@ -99,6 +116,7 @@ class Client extends ObjectPrototype
      * @return mixed[]
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      */
     public function findByCustomId(string $id, array $queryParams = []): array
     {
@@ -115,6 +133,7 @@ class Client extends ObjectPrototype
      * @return mixed[]
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      */
     public function getByCustomId(string $id, array $queryParams = []): array
     {
@@ -127,6 +146,7 @@ class Client extends ObjectPrototype
      * @return mixed[]
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      */
     public function findById(int $id, array $queryParams = []): array
     {
@@ -143,6 +163,7 @@ class Client extends ObjectPrototype
      * @return mixed[]
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      */
     public function getByCode(string $code, array $queryParams = []): array
     {
@@ -156,6 +177,7 @@ class Client extends ObjectPrototype
      * @return mixed[]
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      */
     public function getById(int $id, array $queryParams = []): array
     {
@@ -168,6 +190,7 @@ class Client extends ObjectPrototype
      * @return mixed[]
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      */
     public function findByCode(string $code, array $queryParams = []): array
     {
@@ -184,6 +207,7 @@ class Client extends ObjectPrototype
      * @return int
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      */
     public function save(array $evidenceData, ?int $id): int
     {
@@ -206,6 +230,7 @@ class Client extends ObjectPrototype
      * @return string
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      */
     public function getPdfById(int $id, array $queryParams = []): string
     {
@@ -223,6 +248,7 @@ class Client extends ObjectPrototype
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      */
     public function makeRequest(Method $httpMethod, string $url, array $postFields = [], array $headers = [], array $queryParameters = []): array
     {
@@ -293,11 +319,12 @@ class Client extends ObjectPrototype
 
             }
         }
+    
+        if(curl_errno($ch) !== CURLE_OK) {
+            throw new EcomailFlexibeeConnectionError(sprintf('cURL error (%s): %s', curl_errno($ch), curl_error($ch)));
+        }
 
         if (!$result) {
-            if(curl_errno($ch) !== CURLE_OK) {
-                throw new EcomailConnectionError(sprintf('cURL error (%s): %s', curl_errno($ch), curl_error($ch)));
-            }
             return [];
         }
 
