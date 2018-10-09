@@ -129,9 +129,10 @@ class Client extends ObjectPrototype
      * @param int $id
      * @param mixed[] $queryParams
      * @return mixed[]
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      */
     public function findById(int $id, array $queryParams = []): array
     {
@@ -178,9 +179,10 @@ class Client extends ObjectPrototype
      * @param string $code
      * @param mixed[] $queryParams
      * @return mixed[]
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      */
     public function findByCode(string $code, array $queryParams = []): array
     {
