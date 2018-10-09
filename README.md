@@ -3,30 +3,34 @@
 # flexibee-client
 Jednoduchý curl client, který se stará o správné složení requestu do systému Flexibee a následné vrácení výsledků.
 
-## Instalace
+## Instalace přes composer
 ```composer require ecomailcz/flexibee-client```
 
 ## Implementace
 ```
 $client = new Client(
 $accountUrl, 
-$comapnyCode, 
+$companyCode, 
 $restApiUserName, 
 $restApiPassword, 
 $evidenceName, 
-$enableSelfSignedCertificate
+$enableSelfSignedCertificate,
+$authSessionId,
 );
 ```
+`$enableSelfSignedCertificate - Vyžadání self signed certifikátu`
+
+`$authSessionId - Hodnota authentikační session id fro Flexibee`
 
 ## Vygenerování autorizačního tokenu
 ```
-$client = new Client('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', 'adresar');
+$client = new Client('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', 'adresar', false, null);
 $tokens = $client->getAuthAndRefreshToken();
 ```
 
 ## Vytvoření či editace záznamu
 ```
-$client = new Client('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', 'adresar');
+$client = new Client('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', 'adresar', false, null);
 $evidenceData['kod'] = 'prvnizaznam'
 $evidenceData['nazev'] = 'První kontaktní adresa'
 $evidenceItemId = $client->save($evidenceData, null);
