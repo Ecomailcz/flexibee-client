@@ -49,11 +49,11 @@ class Client extends ObjectPrototype
     private $queryBuilder;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     private $authSessionId;
 
-    public function __construct(string $url, string $company, string $user, string $password, string $evidence, bool $selfSignedCertificate = false, ?string $authSessionId = null)
+    public function __construct(string $url, string $company, string $user, string $password, string $evidence, bool $selfSignedCertificate, ?string $authSessionId = null)
     {
         $this->user = $user;
         $this->password = $password;
@@ -76,6 +76,7 @@ class Client extends ObjectPrototype
         $headers = [
             'Content-Type: application/x-www-form-urlencoded',
         ];
+        $queryParameters = [];
         $queryParameters['username'] = $this->user;
         $queryParameters['password'] = $this->password;
         $result = $this->makeRequest(Method::get(Method::POST), $this->queryBuilder->createAuthTokenUrl(), [], $headers, $queryParameters);
@@ -84,27 +85,11 @@ class Client extends ObjectPrototype
         return $result;
     }
     
-    /**
-     * @param int $id
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
-     */
     public function deleteById(int $id): void
     {
         $this->makeRequest(Method::get(Method::DELETE), $this->queryBuilder->createUriByIdOnly($id), []);
     }
     
-    /**
-     * @param string $id
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
-     */
     public function deleteByCustomId(string $id): void
     {
         $this->makeRequest(Method::get(Method::DELETE), $this->queryBuilder->createUriByCustomId($id), []);
@@ -161,21 +146,26 @@ class Client extends ObjectPrototype
      * @param string $code
      * @param mixed[] $queryParams
      * @return mixed[]
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      */
     public function getByCode(string $code, array $queryParams = []): array
     {
         $result = $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByCodeOnly(strtoupper($code), $queryParams), []);
-        return (!isset($result[0])) ? [] : $result[0] ;
+
+        return !isset($result[0]) ? [] : $result[0] ;
     }
 
     /**
      * @param int $id
      * @param string[] $queryParams
      * @return mixed[]
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      */
@@ -205,15 +195,20 @@ class Client extends ObjectPrototype
      * @param mixed[] $evidenceData
      * @param int|null $id
      * @return int
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed
      */
     public function save(array $evidenceData, ?int $id): int
     {
         if ($id) {
             $evidenceData['id'] = $id;
         }
+
+        $postData = [];
         $postData[$this->evidence] = $evidenceData;
         $result = $this->makeRequest(Method::get(Method::PUT), $this->queryBuilder->createUriByEvidenceOnly(), $postData);
 
@@ -228,9 +223,11 @@ class Client extends ObjectPrototype
      * @param int $id
      * @param mixed[] $queryParams
      * @return string
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
     public function getPdfById(int $id, array $queryParams = []): string
     {
@@ -256,6 +253,7 @@ class Client extends ObjectPrototype
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+
         if ($this->authSessionId !== null) {
             curl_setopt($ch, CURLOPT_HTTPAUTH, FALSE);
             $headers[] = sprintf('X-authSessionId: %s', $this->authSessionId);
@@ -263,10 +261,10 @@ class Client extends ObjectPrototype
             curl_setopt($ch, CURLOPT_HTTPAUTH, TRUE);
             curl_setopt($ch, CURLOPT_USERPWD, sprintf('%s:%s', $this->user, $this->password));
         }
+
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $httpMethod->getValue());
         curl_setopt($ch, CURLOPT_USERAGENT, 'Ecomail.cz Flexibee client (https://github.com/Ecomailcz/flexibee-client)');
-
 
         if ($this->selfSignedCertificate || $this->authSessionId !== null) {
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
@@ -274,6 +272,7 @@ class Client extends ObjectPrototype
         }
 
         $postData = [];
+
         if (count($postFields) !== 0) {
             $postData['winstrom'] = $postFields;
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
@@ -300,7 +299,6 @@ class Client extends ObjectPrototype
         }
 
         if (curl_getinfo($ch, CURLINFO_HTTP_CODE) !== 200 && curl_getinfo($ch, CURLINFO_HTTP_CODE) !== 201) {
-
             if (curl_getinfo($ch, CURLINFO_HTTP_CODE) === 404) {
                 throw new EcomailFlexibeeNoEvidenceResult();
             }
@@ -314,9 +312,7 @@ class Client extends ObjectPrototype
                             throw new EcomailFlexibeeRequestError($error['message']);
                         }
                     }
-
                 }
-
             }
         }
     
@@ -338,6 +334,7 @@ class Client extends ObjectPrototype
 
         if (isset($result['@version'])) {
             unset($result['@version']);
+
             return array_values($result)[0];
         }
 

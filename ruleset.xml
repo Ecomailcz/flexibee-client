@@ -8,5 +8,8 @@
 		<exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalConstants"/>
 		<exclude name="SlevomatCodingStandard.ControlStructures.RequireYodaComparison"/>
 		<exclude name="SlevomatCodingStandard.Commenting.RequireOneLinePropertyDocComment"/>
+		<exclude name="SlevomatCodingStandard.ControlStructures.NewWithoutParentheses"/>
+		<exclude name="SlevomatCodingStandard.ControlStructures.RequireShortTernaryOperator"/>
+		<exclude name="SlevomatCodingStandard.ControlStructures.RequireMultiLineTernaryOperator"/>
 	</rule>
 </ruleset>

@@ -6,6 +6,7 @@
 	"minimum-stability": "dev",
 	"prefer-stable": true,
 	"require": {
+		"ext-curl": "*",
 		"php": "~7.1",
 		"consistence/consistence": "^1.0",
 		"jwage/purl": "^0.0.10"

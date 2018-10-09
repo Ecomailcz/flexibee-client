@@ -25,7 +25,7 @@ class ClientTest extends TestCase
     {
         parent::setUp();
         $this->faker = Factory::create();
-        $this->client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, Config::EVIDENCE);
+        $this->client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, Config::EVIDENCE, false, null);
     }
 
     public function testGetAuthToken(): void
@@ -67,18 +67,24 @@ class ClientTest extends TestCase
      * @param string $evidence
      * @param mixed[] $evidenceData
      * @param mixed[] $expectedDataAfterUpdate
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed
      */
     public function testCRUDOperations(string $evidence, array $evidenceData, array $expectedDataAfterUpdate): void
     {
-        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, $evidence);
+        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, $evidence, false, null);
         $addressBookId = $client->save($evidenceData, null);
         $client->save($expectedDataAfterUpdate, $addressBookId);
         $addressBookRefreshed = $client->getById($addressBookId);
+
         foreach ($expectedDataAfterUpdate as $key => $value) {
             $this->assertEquals($value, $addressBookRefreshed[$key]);
         }
+
         $this->assertNotEmpty($client->getPdfById($addressBookId));
         $this->assertNotEmpty($client->getPdfById($addressBookId, ['report-name' => 'FAKTURA-BLUE-FAV', 'report-lang' => 'en']));
         $client->deleteById($addressBookId);

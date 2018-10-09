@@ -52,6 +52,7 @@ class QueryBuilder extends Url
     public function createUriPdf(int $id, array $queryParams = []): string
     {
         $this->setPath(new Path(sprintf('c/%s/%s/%d.pdf', $this->company, $this->evidence, $id)));
+
         if (count($queryParams) !== 0) {
             $this->createQueryParams($queryParams);
         }
@@ -74,6 +75,7 @@ class QueryBuilder extends Url
     public function createUriByCodeOnly(string $code, array $queryParams = []): string
     {
         $this->setPath(new Path(sprintf('c/%s/%s/(kod=\'%s\').json', $this->company, $this->evidence, $code)));
+
         if (count($queryParams) !== 0) {
             $this->createQueryParams($queryParams);
         }
@@ -96,6 +98,7 @@ class QueryBuilder extends Url
         $result =  parent::getUrl();
         $this->setQuery(new Query());
         $this->setPath(new Path());
+
         return $result;
     }
 
@@ -107,6 +110,7 @@ class QueryBuilder extends Url
     private function createUriByAnyoneId($id, array $queryParams = []): string
     {
         $this->setPath(new Path(sprintf('c/%s/%s/%s.json', $this->company, $this->evidence, $id)));
+
         if (count($queryParams) !== 0) {
             $this->createQueryParams($queryParams);
         }

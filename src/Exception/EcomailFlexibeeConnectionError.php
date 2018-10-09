@@ -4,4 +4,7 @@ namespace EcomailFlexibee\Exception;
 
 use Consistence\PhpException;
 
-class EcomailFlexibeeConnectionError extends PhpException {}
+class EcomailFlexibeeConnectionError extends PhpException
+{
+
+}
