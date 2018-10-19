@@ -3,6 +3,7 @@
 namespace EcomailFlexibeeTest;
 
 use EcomailFlexibee\Client;
+use EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
 use EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed;
 use Faker\Factory;
@@ -26,6 +27,13 @@ class ClientTest extends TestCase
         parent::setUp();
         $this->faker = Factory::create();
         $this->client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, Config::EVIDENCE, false, null);
+    }
+
+    public function testInvalidAuthorization(): void
+    {
+        $client = new Client(Config::HOST, Config::COMPANY, 'xxx', 'xxx', Config::EVIDENCE, false, null);
+        $this->expectException(EcomailFlexibeeInvalidAuthorization::class);
+        $client->findById($this->faker->numberBetween());
     }
 
     public function testGetAuthToken(): void
