@@ -138,4 +138,24 @@ class ClientTest extends TestCase
         ];
     }
 
+    public function testAllAndChunkInEvidence(): void
+    {
+        $result = $this->client->allInEvidence();
+        $this->assertTrue(count($result) > 0);
+
+        $firstResult = $this->client->chunkInEvidence(0, 1);
+        $this->assertCount(1, $firstResult);
+
+        $resultOther = $this->client->chunkInEvidence(1, 1);
+        $this->assertCount(1, $resultOther);
+
+        $this->assertNotEquals($firstResult[0]['id'], $resultOther[0]['id']);
+    }
+
+    public function testSearchInEvidence(): void
+    {
+        $result  =$this->client->searchInEvidence('(kod=\'JAN\')');
+        $this->assertTrue(count($result) > 0);
+    }
+
 }

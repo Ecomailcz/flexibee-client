@@ -222,6 +222,52 @@ class Client extends ObjectPrototype
     }
 
     /**
+     * @return  mixed[]
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     */
+    public function allInEvidence(): array
+    {
+        return $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByEvidenceWithQueryParameters(['limit' => 0]), [], [], []);
+    }
+
+    /**
+     * @param int $start
+     * @param int $limit
+     * @return mixed[]
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     */
+    public function chunkInEvidence(int $start, int $limit): array
+    {
+        $queryParameters = [];
+        $queryParameters['limit'] = $limit;
+        $queryParameters['start'] = $start;
+
+        return $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByEvidenceWithQueryParameters($queryParameters), [], [], []);
+    }
+
+    /**
+     * @param string $query
+     * @return mixed[]
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     */
+    public function searchInEvidence(string $query): array
+    {
+        return $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByEvidenceForSearchQuery($query), [], [], []);
+    }
+
+    /**
      * @param int $id
      * @param mixed[] $queryParams
      * @return string
@@ -241,7 +287,7 @@ class Client extends ObjectPrototype
      * @param string $url
      * @param mixed[] $postFields
      * @param string[] $headers
-     * @param string[] $queryParameters
+     * @param mixed[] $queryParameters
      * @return mixed[]
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
@@ -309,6 +355,10 @@ class Client extends ObjectPrototype
                 throw new EcomailFlexibeeInvalidAuthorization($this->user, $this->password, $url);
             } elseif (curl_getinfo($ch, CURLINFO_HTTP_CODE) === 400) {
                 if ($result['success'] === 'false') {
+                    if (!isset($result['results'])) {
+                        throw new EcomailFlexibeeRequestError($result['message']);
+                    }
+
                     foreach ($result['results'] as $response) {
                         foreach ($response['errors'] as $error) {
                             throw new EcomailFlexibeeRequestError($error['message']);
@@ -318,7 +368,7 @@ class Client extends ObjectPrototype
             }
         }
     
-        if(curl_errno($ch) !== CURLE_OK) {
+        if (curl_errno($ch) !== CURLE_OK) {
             throw new EcomailFlexibeeConnectionError(sprintf('cURL error (%s): %s', curl_errno($ch), curl_error($ch)));
         }
 

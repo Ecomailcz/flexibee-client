@@ -62,6 +62,12 @@ Systém Flexibee umožňuje vrátit vygenerované faktury.
 ```
 $client->getPdfById($id, $queryParams);
 ```
+
+## Vyhledávání v evidenci
+Systém Flexibee umožňuje vyhledávat nas evidencí. (https://www.flexibee.eu/api/dokumentace/ref/filters/)
+```
+$client->searchInEvidence($query);
+```
 ## Vytváření vlastních requestů
 Client nabízí možnost vytváření vlastních requestů. Stačí zavolat:  
 ```

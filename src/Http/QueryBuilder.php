@@ -68,6 +68,29 @@ class QueryBuilder extends Url
     }
 
     /**
+     * @param mixed[] $queryParameters
+     * @return string
+     */
+    public function createUriByEvidenceWithQueryParameters(array $queryParameters): string
+    {
+        $this->setPath(new Path(sprintf('c/%s/%s.json', $this->company, $this->evidence)));
+        $this->createQueryParams($queryParameters);
+
+        return $this->getUrl();
+    }
+
+    public function createUriByEvidenceForSearchQuery(string $query): string
+    {
+        if (mb_strlen(trim($query)) === 0) {
+            return $this->createUriByEvidenceOnly();
+        }
+
+        $this->setPath(new Path(sprintf('c/%s/%s/(%s).json', $this->company, $this->evidence, $query)));
+
+        return $this->getUrl();
+    }
+
+    /**
      * @param string $code
      * @param mixed[] $queryParams
      * @return string
