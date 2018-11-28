@@ -102,6 +102,7 @@ class Client extends ObjectPrototype
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      */
     public function findByCustomId(string $id, array $queryParams = []): array
     {
@@ -116,9 +117,11 @@ class Client extends ObjectPrototype
      * @param string $id
      * @param mixed[] $queryParams
      * @return mixed[]
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
     public function getByCustomId(string $id, array $queryParams = []): array
     {
@@ -348,7 +351,10 @@ class Client extends ObjectPrototype
 
         if (curl_getinfo($ch, CURLINFO_HTTP_CODE) !== 200 && curl_getinfo($ch, CURLINFO_HTTP_CODE) !== 201) {
             if (curl_getinfo($ch, CURLINFO_HTTP_CODE) === 404) {
-                throw new EcomailFlexibeeNoEvidenceResult();
+                $result = is_array($result) ? implode(',', $result): $result;
+                $message =  sprintf('%s - %s ', $url, $result);
+
+                throw new EcomailFlexibeeNoEvidenceResult($message);
             }
             // Check authorization
             elseif (curl_getinfo($ch, CURLINFO_HTTP_CODE) === 401) {
