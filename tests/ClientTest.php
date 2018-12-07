@@ -154,7 +154,11 @@ class ClientTest extends TestCase
 
     public function testSearchInEvidence(): void
     {
-        $result  =$this->client->searchInEvidence('(kod=\'JAN\')');
+        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false, null);
+        $result = $client->searchInEvidence('kod<>\'JAN\'');
+        $this->assertTrue(count($result) > 0);
+
+        $result = $client->searchInEvidence('datSplat<\'2018-12-04\'%20and%20zuctovano=false');
         $this->assertTrue(count($result) > 0);
     }
 

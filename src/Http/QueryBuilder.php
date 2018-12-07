@@ -2,6 +2,7 @@
 
 namespace EcomailFlexibee\Http;
 
+use EcomailFlexibee\Enum\SearchQueryOperator;
 use Purl\ParserInterface;
 use Purl\Path;
 use Purl\Query;
@@ -85,7 +86,7 @@ class QueryBuilder extends Url
             return $this->createUriByEvidenceOnly();
         }
 
-        $this->setPath(new Path(sprintf('c/%s/%s/(%s).json', $this->company, $this->evidence, $query)));
+        $this->setPath(new Path(sprintf('c/%s/%s/(%s).json', $this->company, $this->evidence, $this->normalizeSearchQuery($query))));
 
         return $this->getUrl();
     }
@@ -147,6 +148,11 @@ class QueryBuilder extends Url
     private function createQueryParams(array $params): void
     {
         $this->setQuery(new Query(http_build_query($params)));
+    }
+
+    private function normalizeSearchQuery(string $query): string
+    {
+        return SearchQueryOperator::convertOperatorsInQuery($query);
     }
 
 }

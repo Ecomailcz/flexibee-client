@@ -346,20 +346,22 @@ class Client extends ObjectPrototype
 
         if (is_string($output) && !$httpMethod->equalsValue(Method::DELETE)) {
             $resultData = json_decode($output, true);
-            $result = array_key_exists('winstrom', $resultData) ? $resultData['winstrom'] : $resultData;
+            $result = is_array($resultData) && array_key_exists('winstrom', $resultData) ? $resultData['winstrom'] : $resultData;
         }
 
-        if (curl_getinfo($ch, CURLINFO_HTTP_CODE) !== 200 && curl_getinfo($ch, CURLINFO_HTTP_CODE) !== 201) {
-            if (curl_getinfo($ch, CURLINFO_HTTP_CODE) === 404) {
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if ($httpCode !== 200 && $httpCode !== 201) {
+            if ($httpCode === 404) {
                 $result = is_array($result) ? implode(',', $result): $result;
                 $message =  sprintf('%s - %s ', $url, $result);
 
                 throw new EcomailFlexibeeNoEvidenceResult($message);
             }
             // Check authorization
-            elseif (curl_getinfo($ch, CURLINFO_HTTP_CODE) === 401) {
+            elseif ($httpCode === 401) {
                 throw new EcomailFlexibeeInvalidAuthorization($this->user, $this->password, $url);
-            } elseif (curl_getinfo($ch, CURLINFO_HTTP_CODE) === 400) {
+            } elseif ($httpCode === 400) {
                 if ($result['success'] === 'false') {
                     if (!isset($result['results'])) {
                         throw new EcomailFlexibeeRequestError($result['message']);
