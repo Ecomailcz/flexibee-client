@@ -9,7 +9,7 @@ final class SearchQueryOperatorTest extends TestCase
 {
 
     /**
-     * @dataProvider getQueryStrings
+     * @dataProvider  getQueryStrings
      * @param string $query
      * @param string $expectedQuery
      */

@@ -68,6 +68,13 @@ class QueryBuilder extends Url
         return $this->getUrl();
     }
 
+    public function createBaseUrl(string $uri): string
+    {
+        $this->setPath(new Path(sprintf('c/%s/%s/%s', $this->company, $this->evidence, $uri)));
+
+        return $this->getUrl();
+    }
+
     /**
      * @param mixed[] $queryParameters
      * @return string

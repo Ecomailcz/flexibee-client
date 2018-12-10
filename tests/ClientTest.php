@@ -6,6 +6,7 @@ use EcomailFlexibee\Client;
 use EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
 use EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed;
+use EcomailFlexibee\Http\Method;
 use Faker\Factory;
 use PHPUnit\Framework\TestCase;
 
@@ -160,6 +161,13 @@ class ClientTest extends TestCase
 
         $result = $client->searchInEvidence('datSplat<\'2018-12-04\'%20and%20zuctovano=false');
         $this->assertTrue(count($result) > 0);
+    }
+
+    public function testMakePreparedUrl(): void
+    {
+        $this->markTestSkipped();
+        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'smlouva', false, null);
+        $client->makeRequestPrepared(Method::get(Method::POST), 'generovani-faktur.json');
     }
 
 }

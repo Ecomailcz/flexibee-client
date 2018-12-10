@@ -96,6 +96,21 @@ class Client extends ObjectPrototype
     }
 
     /**
+     * @param \EcomailFlexibee\Http\Method $method
+     * @param string $url
+     * @return mixed[]
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     */
+    public function makeRequestPrepared(Method $method, string $url): array
+    {
+        return $this->makeRequest($method, $this->queryBuilder->createBaseUrl($url));
+    }
+
+    /**
      * @param string $id
      * @param mixed[] $queryParams
      * @return mixed[]
@@ -361,7 +376,7 @@ class Client extends ObjectPrototype
             // Check authorization
             elseif ($httpCode === 401) {
                 throw new EcomailFlexibeeInvalidAuthorization($this->user, $this->password, $url);
-            } elseif ($httpCode === 400) {
+            } elseif ($httpCode === 400 || $httpCode === 500) {
                 if ($result['success'] === 'false') {
                     if (!isset($result['results'])) {
                         throw new EcomailFlexibeeRequestError($result['message']);
