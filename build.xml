@@ -9,6 +9,6 @@
 		<exec command="vendor/bin/phpunit tests" checkreturn="true" passthru="true"/>
 	</target>
 	<target name="phpcsfix">
-		<exec command="vendor/bin/phpcbf --standard=ruleset.xml --extensions=php --tab-width=4 -sp src tests" checkreturn="true" passthru="true"/>
+		<exec command="vendor/bin/phpcbf --standard=ruleset.xml --extensions=php --tab-width=4 -sp src" checkreturn="true" passthru="true"/>
 	</target>
 </project>

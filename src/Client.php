@@ -410,7 +410,9 @@ class Client extends ObjectPrototype
         if (isset($result['@version'])) {
             unset($result['@version']);
 
-            return array_values($result)[0];
+            $resultFormatted = array_values($result)[0];
+
+            return is_string($resultFormatted) ? $result : $resultFormatted;
         }
 
         return $result;
