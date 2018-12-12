@@ -170,4 +170,11 @@ class ClientTest extends TestCase
         $client->makeRequestPrepared(Method::get(Method::POST), 'generovani-faktur.json');
     }
 
+    public function testMakeRawRequest(): void
+    {
+        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false, null);
+        $result = $client->makeRawRequest(Method::get(Method::GET), '/c/demo/faktura-vydana/1.json');
+        $this->assertTrue(count($result) > 0);
+    }
+
 }

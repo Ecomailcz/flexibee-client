@@ -73,6 +73,7 @@ Client nabízí možnost vytváření vlastních requestů. Stačí zavolat:
 ```
 $responseData = $client->makeRequest(Method $httpMethod, string $uri, array $postFields);
 $responseData = $client->makeRequestPrepared(Method $httpMethod, string $uri);
+$responseData = $client->makeRawPrepared(Method $httpMethod, string $uri);
 ```
 Následně máte k dispozici data vrácená z Flexibee. Chyby jsou ošetřeny vyhozením kontrétních výjimek.
 

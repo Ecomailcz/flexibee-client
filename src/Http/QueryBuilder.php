@@ -68,6 +68,13 @@ class QueryBuilder extends Url
         return $this->getUrl();
     }
 
+    public function createUriByDomainOnly(string $uri): string
+    {
+        $this->setPath(new Path($uri));
+
+        return $this->getUrl();
+    }
+
     public function createBaseUrl(string $uri): string
     {
         $this->setPath(new Path(sprintf('c/%s/%s/%s', $this->company, $this->evidence, $uri)));

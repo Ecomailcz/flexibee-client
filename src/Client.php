@@ -286,6 +286,21 @@ class Client extends ObjectPrototype
     }
 
     /**
+     * @param \EcomailFlexibee\Http\Method $method
+     * @param string $uri
+     * @return mixed[]
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     */
+    public function makeRawRequest(Method $method, string $uri): array
+    {
+        return $this->makeRequest($method, $this->queryBuilder->createUriByDomainOnly($uri), [], [], []);
+    }
+
+    /**
      * @param int $id
      * @param mixed[] $queryParams
      * @return string
