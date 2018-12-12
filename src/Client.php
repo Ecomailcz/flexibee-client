@@ -330,6 +330,7 @@ class Client extends ObjectPrototype
      */
     public function makeRequest(Method $httpMethod, string $url, array $postFields = [], array $headers = [], array $queryParameters = []): array
     {
+        $url = urldecode($url);
         /** @var resource $ch */
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
