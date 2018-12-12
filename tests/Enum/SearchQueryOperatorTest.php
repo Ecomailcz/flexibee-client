@@ -48,6 +48,10 @@ final class SearchQueryOperatorTest extends TestCase
                 'datSplat<\'2018-12-04\' and zuctovano=false',
                 'datSplat lt \'2018-12-04\' and zuctovano eq false',
             ],
+            [
+                'sparovano = true and lastUpdate <= \'2018-12-11\'',
+                'sparovano eq true and lastUpdate lte \'2018-12-11\'',
+            ],
         ];
     }
 

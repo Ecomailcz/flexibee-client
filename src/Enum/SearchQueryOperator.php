@@ -12,13 +12,13 @@ class SearchQueryOperator extends Enum
      */
     private static $operators = [
         '==' => ' eq ',
-        '=' => ' eq ',
-        '<>' => ' neq ',
-        '!=' => ' neq ',
-        '<' => ' lt ',
         '<=' => ' lte ',
-        '>' => ' gt ',
+        '<>' => ' neq ',
         '>=' => ' gte ',
+        '!=' => ' neq ',
+        '=' => ' eq ',
+        '<' => ' lt ',
+        '>' => ' gt ',
     ];
 
     public static function convertOperatorsInQuery(string $query): string
