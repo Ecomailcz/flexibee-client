@@ -251,6 +251,17 @@ class Client extends ObjectPrototype
     {
         return $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByEvidenceWithQueryParameters(['limit' => 0]), [], [], []);
     }
+    
+    public function allDetails(): array
+    {
+        return $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByEvidenceWithQueryParameters(['detail' => 'full', 'limit' => 0 ]), [], [], []);
+    }
+
+    public function searchInEvidenceWithParams(string $query, array $queryParams = [] ): array
+    {
+        return $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByEvidenceWithQueryParametersForSearch($query,$queryParams), [], [], []);
+    }
+    
 
     /**
      * @param int $start
