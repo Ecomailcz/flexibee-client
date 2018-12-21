@@ -173,6 +173,7 @@ class Client extends ObjectPrototype
      */
     public function getByCode(string $code, array $queryParams = []): array
     {
+        $code = mb_substr($code, 0, 20);
         $result = $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByCodeOnly(strtoupper($code), $queryParams), []);
 
         return !isset($result[0]) ? [] : $result[0] ;
