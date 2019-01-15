@@ -376,7 +376,7 @@ class Client extends ObjectPrototype
             return ['result' => $output];
         }
 
-        if (is_string($output) && !$httpMethod->equalsValue(Method::DELETE)) {
+        if (is_string($output)) {
             $resultData = json_decode($output, true);
             $result = is_array($resultData) && array_key_exists('winstrom', $resultData) ? $resultData['winstrom'] : $resultData;
         }
