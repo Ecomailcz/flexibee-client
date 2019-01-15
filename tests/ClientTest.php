@@ -2,9 +2,12 @@
 
 namespace EcomailFlexibeeTest;
 
+use function Docopt\dump;
+use function Docopt\dump_scalar;
 use EcomailFlexibee\Client;
 use EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
+use EcomailFlexibee\Exception\EcomailFlexibeeRequestError;
 use EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed;
 use EcomailFlexibee\Http\Method;
 use Faker\Factory;
@@ -175,6 +178,46 @@ class ClientTest extends TestCase
         $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false, null);
         $result = $client->makeRawRequest(Method::get(Method::GET), '/c/demo/faktura-vydana/1.json');
         $this->assertTrue(count($result) > 0);
+    }
+
+    public function testWithExampleFlexibeeData(): void
+    {
+        $xmlData = json_decode(json_encode((array) simplexml_load_string(file_get_contents(sprintf('%s/_Resources/smlouva.xml', __DIR__)))), true);
+        foreach ($xmlData as $evidenceName => $evidenceData) {
+            if (in_array($evidenceName, ['@attributes'], true)) {
+                continue;
+            }
+            $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, $evidenceName, false, null);
+            if (array_key_exists('@attributes', $evidenceData)) {
+                unset($evidenceData['@attributes']);
+            }
+
+            if (array_key_exists('id', $evidenceData)) {
+                unset($evidenceData['id']);
+            }
+
+            try {
+                if ($evidenceName === 'smlouva' && isset($evidenceData['polozkySmlouvy'])) {
+                    unset($evidenceData['polozkySmlouvy']['@attributes']);
+                    $evidenceData['polozkySmlouvy']['kod'] = uniqid();
+                    foreach ($evidenceData['polozkySmlouvy']["smlouva-polozka"] as &$item) {
+                        $item['kod'] = uniqid();
+
+                    }
+                }
+                $idEvidence = $client->save($evidenceData, null);
+                $client->deleteById($idEvidence);
+            } catch (EcomailFlexibeeRequestError $exception) {
+                if (mb_stripos($exception->getMessage(), 'již používá jiný záznam')) {
+                    continue;
+                }
+
+                throw $exception;
+            }
+
+            $this->assertTrue(true);
+
+        }
     }
 
 }

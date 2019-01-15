@@ -1,0 +1,21 @@
+<winstrom version="1.0">
+	<typ-smlouvy>
+		<id>code:TEST</id>
+		<kod>TEST</kod>
+		<nazev>Smlouva za služby</nazev>
+	</typ-smlouvy>
+	<smlouva>
+		<typSml>code:TEST</typSml>
+		<firma>code:FLEXIBEE</firma>
+		<polozkySmlouvy>
+			<smlouva-polozka>
+				<kod>XR ROSTFLOOR-750</kod>
+				<nazev>test</nazev>
+			</smlouva-polozka>
+			<smlouva-polozka>
+				<kod>XR 3267AA CR</kod>
+				<nazev>test2</nazev>
+			</smlouva-polozka>
+		</polozkySmlouvy>
+	</smlouva>
+</winstrom>

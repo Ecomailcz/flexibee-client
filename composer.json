@@ -6,6 +6,7 @@
 	"minimum-stability": "dev",
 	"prefer-stable": true,
 	"require": {
+		"ext-simplexml": "*",
 		"ext-curl": "*",
 		"ext-json": "*",
 		"php": "~7.1",

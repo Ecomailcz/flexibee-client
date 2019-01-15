@@ -401,7 +401,25 @@ class Client extends ObjectPrototype
 
                     foreach ($result['results'] as $response) {
                         foreach ($response['errors'] as $error) {
-                            throw new EcomailFlexibeeRequestError($error['message']);
+                            $messageLines = [];
+
+                            if (isset($error['code'])) {
+                                $messageLines[] = sprintf('code: %s',$error['code']);
+                            }
+
+                            if (isset($error['for'])) {
+                                $messageLines[] = sprintf('for attribute: %s', $error['for']);
+                            }
+
+                            if (isset($error['path'])) {
+                                $messageLines[] = sprintf('path: %s',$error['path']);
+                            }
+
+                            if (isset($error['message'])) {
+                                $messageLines[] = sprintf('message: %s', $error['message']);
+                            }
+
+                            throw new EcomailFlexibeeRequestError(implode("\n", $messageLines));
                         }
                     }
                 }
