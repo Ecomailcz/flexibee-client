@@ -43,9 +43,9 @@ class ClientTest extends TestCase
     public function testGetAuthToken(): void
     {
         $authToken = $this->client->getAuthAndRefreshToken();
-        $this->assertCount(2, $authToken);
         $this->assertArrayHasKey('refreshToken', $authToken);
         $this->assertArrayHasKey('authSessionId', $authToken);
+        $this->assertArrayHasKey('csrfToken', $authToken);
         $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, Config::EVIDENCE,false, $authToken['authSessionId']);
         $evidenceData = [
             'nazev' => $this->faker->company,
