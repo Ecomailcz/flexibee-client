@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/Ecomailcz/flexibee-client.svg?branch=master)](https://travis-ci.org/Ecomailcz/flexibee-client)
 
 # flexibee-client
-Jednoduchý curl client, který se stará o správné složení requestu do systému Flexibee a následné vrácení výsledků.
+Jednoduchý cURL client, který se stará o správné složení requestu do systému Flexibee a následné vrácení výsledků.
 
 ## Instalace přes composer
 ```composer require ecomailcz/flexibee-client```
@@ -20,7 +20,7 @@ $authSessionId,
 ```
 `$enableSelfSignedCertificate - Vyžadání self signed certifikátu`
 
-`$authSessionId - Hodnota authentikační session id fro Flexibee`
+`$authSessionId - Hodnota authentikačního id pro Flexibee`
 
 ## Vygenerování autorizačního tokenu
 ```
@@ -35,7 +35,7 @@ $evidenceData['kod'] = 'prvnizaznam'
 $evidenceData['nazev'] = 'První kontaktní adresa'
 $evidenceItemId = $client->save($evidenceData, null);
 ```
-Pokud vše proběhne v pořádku, vratí se ID záznamu ze systému Flexibee. Nastane-li chyba, vyhodí se výjimka
+Pokud vše proběhne v pořádku, vratí se třída `\EcomailFlexibee\Http\Response\Response:class` s daty ze systému Flexibee. Nastane-li chyba, vyhodí se výjimka
 `EcomailFlexibeeRequestError::class`. Pro editaci záznamu stačí vyplnit druhý parametr `$id`.
 
 ## Vrácení záznamu dle parmetrů
@@ -77,5 +77,5 @@ $responseData = $client->makeRawPrepared(Method $httpMethod, string $uri);
 ```
 Následně máte k dispozici data vrácená z Flexibee. Chyby jsou ošetřeny vyhozením kontrétních výjimek.
 
-## Flexibee API
+## Oficiální API dokumentace
 https://www.flexibee.eu/api/dokumentace/

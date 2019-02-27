@@ -40,7 +40,7 @@ class ClientTest extends TestCase
 
     public function testGetAuthToken(): void
     {
-        $authToken = $this->client->getAuthAndRefreshToken();
+        $authToken = $this->client->getAuthAndRefreshToken()->getData();
         $this->assertArrayHasKey('refreshToken', $authToken);
         $this->assertArrayHasKey('authSessionId', $authToken);
         $this->assertArrayHasKey('csrfToken', $authToken);
@@ -48,11 +48,11 @@ class ClientTest extends TestCase
         $evidenceData = [
             'nazev' => $this->faker->company,
         ];
-        $id = $client->save($evidenceData, null);
-        $code = $client->getById($id)['kod'];
+        $id = (int) $client->save($evidenceData, null)->getData()[0]['id'];
+        $code = $client->getById($id)->getData()[0]['kod'];
         $evidenceItem = $client->getByCustomId(sprintf('code:%s', $code));
         $this->assertCount(1, $evidenceItem);
-        $this->assertEquals($id, (int) $evidenceItem[0]['id']);
+        $this->assertEquals($id, (int) $evidenceItem[0]->getData()['id']);
         $client->deleteByCustomId(sprintf('code:%s', $code));
         $this->assertCount(0, $client->findByCustomId(sprintf('code:%s', $code)));
 
@@ -63,11 +63,11 @@ class ClientTest extends TestCase
         $evidenceData = [
             'nazev' => $this->faker->company,
         ];
-        $id = $this->client->save($evidenceData, null);
-        $code = $this->client->getById($id)['kod'];
+        $id = (int) $this->client->save($evidenceData, null)->getData()[0]['id'];
+        $code = $this->client->getById($id)->getData()[0]['kod'];
         $evidenceItem = $this->client->getByCustomId(sprintf('code:%s', $code));
         $this->assertCount(1, $evidenceItem);
-        $this->assertEquals($id, (int) $evidenceItem[0]['id']);
+        $this->assertEquals($id, (int) $evidenceItem[0]->getData()['id']);
         $this->client->deleteByCustomId(sprintf('code:%s', $code));
         $this->assertCount(0, $this->client->findByCustomId(sprintf('code:%s', $code)));
     }
@@ -87,18 +87,18 @@ class ClientTest extends TestCase
     public function testCRUDOperations(string $evidence, array $evidenceData, array $expectedDataAfterUpdate): void
     {
         $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, $evidence, false, null);
-        $addressBookId = $client->save($evidenceData, null);
+        $addressBookId = (int) $client->save($evidenceData, null)->getData()[0]['id'];
         $client->save($expectedDataAfterUpdate, $addressBookId);
         $addressBookRefreshed = $client->getById($addressBookId);
 
         foreach ($expectedDataAfterUpdate as $key => $value) {
-            $this->assertEquals($value, $addressBookRefreshed[$key]);
+            $this->assertEquals($value, $addressBookRefreshed->getData()[0][$key]);
         }
 
         $this->assertNotEmpty($client->getPdfById($addressBookId));
         $this->assertNotEmpty($client->getPdfById($addressBookId, ['report-name' => 'FAKTURA-BLUE-FAV', 'report-lang' => 'en']));
         $client->deleteById($addressBookId);
-        $this->assertCount(0, $client->findById($addressBookId));
+        $this->assertCount(0, $client->findById($addressBookId)->getData());
         $this->expectException(EcomailFlexibeeNoEvidenceResult::class);
         $client->getById($addressBookId);
         $this->expectException(EcomailFlexibeeSaveFailed::class);
@@ -150,8 +150,7 @@ class ClientTest extends TestCase
 
         $resultOther = $this->client->chunkInEvidence(1, 1);
         $this->assertCount(1, $resultOther);
-
-        $this->assertNotEquals($firstResult[0]['id'], $resultOther[0]['id']);
+        $this->assertNotEquals($firstResult[0]->getData()['id'], $resultOther[0]->getData()['id']);
     }
 
     public function testSearchInEvidence(): void
@@ -166,8 +165,9 @@ class ClientTest extends TestCase
 
     public function testMakePreparedUrl(): void
     {
-        $this->markTestSkipped();
         $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'smlouva', false, null);
+        // There was error on flexibee demo account
+        $this->expectException(EcomailFlexibeeRequestError::class);
         $client->makeRequestPrepared(Method::get(Method::POST), 'generovani-faktur.json');
     }
 
@@ -208,7 +208,7 @@ class ClientTest extends TestCase
                     }
                 }
 
-                $idEvidence = $client->save($evidenceData, null);
+                $idEvidence = (int) $client->save($evidenceData, null)->getData()[0]['id'];
                 $client->deleteById($idEvidence);
             } catch (EcomailFlexibeeRequestError $exception) {
                 if (mb_stripos($exception->getMessage(), 'již používá jiný záznam')) {
