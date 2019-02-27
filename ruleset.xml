@@ -11,5 +11,7 @@
 		<exclude name="SlevomatCodingStandard.ControlStructures.NewWithoutParentheses"/>
 		<exclude name="SlevomatCodingStandard.ControlStructures.RequireShortTernaryOperator"/>
 		<exclude name="SlevomatCodingStandard.ControlStructures.RequireMultiLineTernaryOperator"/>
+		<exclude name="SlevomatCodingStandard.Functions.TrailingCommaInCall"/> <!-- Enable for PHP 7.3 -->
+		<exclude name="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint"/>
 	</rule>
 </ruleset>

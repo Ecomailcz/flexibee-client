@@ -37,7 +37,7 @@ class QueryBuilder extends Url
 
     /**
      * @param int $id
-     * @param mixed[] $queryParams
+     * @param array<mixed> $queryParams
      * @return string
      */
     public function createUriByIdOnly(int $id, array $queryParams = []): string
@@ -47,7 +47,7 @@ class QueryBuilder extends Url
 
     /**
      * @param int $id
-     * @param mixed[] $queryParams
+     * @param array<mixed> $queryParams
      * @return string
      */
     public function createUriPdf(int $id, array $queryParams = []): string
@@ -83,7 +83,7 @@ class QueryBuilder extends Url
     }
 
     /**
-     * @param mixed[] $queryParameters
+     * @param array<mixed> $queryParameters
      * @return string
      */
     public function createUriByEvidenceWithQueryParameters(array $queryParameters): string
@@ -107,7 +107,7 @@ class QueryBuilder extends Url
 
     /**
      * @param string $code
-     * @param mixed[] $queryParams
+     * @param array<mixed> $queryParams
      * @return string
      */
     public function createUriByCodeOnly(string $code, array $queryParams = []): string
@@ -123,7 +123,7 @@ class QueryBuilder extends Url
 
     /**
      * @param string $id
-     * @param mixed[] $queryParams
+     * @param array<mixed> $queryParams
      * @return string
      */
     public function createUriByCustomId(string $id, array $queryParams = []): string
@@ -142,7 +142,7 @@ class QueryBuilder extends Url
 
     /**
      * @param mixed $id
-     * @param mixed[] $queryParams
+     * @param array<mixed> $queryParams
      * @return string
      */
     private function createUriByAnyoneId($id, array $queryParams = []): string
@@ -157,7 +157,7 @@ class QueryBuilder extends Url
     }
 
     /**
-     * @param mixed[] $params
+     * @param array<mixed> $params
      */
     private function createQueryParams(array $params): void
     {

@@ -8,7 +8,7 @@ class SearchQueryOperator extends Enum
 {
 
     /**
-     * @var mixed[]
+     * @var array<mixed>
      */
     private static $operators = [
         '==' => ' eq ',
@@ -24,7 +24,7 @@ class SearchQueryOperator extends Enum
     public static function convertOperatorsInQuery(string $query): string
     {
         $query = urldecode($query);
-        /** @var mixed[] $queryExploded */
+        /** @var array<mixed> $queryExploded */
         $queryExploded  = preg_split('/\s+/', $query);
 
         foreach($queryExploded as &$part) {

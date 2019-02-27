@@ -11,7 +11,7 @@ class EcomailFlexibeeAnotherError extends PhpException
     /**
      * EcomailFlexibeeAnotherError constructor.
      *
-     * @param mixed[] $responseData
+     * @param array<mixed> $responseData
      * @param \Throwable|null $previous
      */
     public function __construct(array $responseData, ?Throwable $previous = null)

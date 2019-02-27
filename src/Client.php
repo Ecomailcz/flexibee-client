@@ -64,7 +64,7 @@ class Client extends ObjectPrototype
     }
 
     /**
-     * @return string[]
+     * @return array<string>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
@@ -98,7 +98,7 @@ class Client extends ObjectPrototype
     /**
      * @param \EcomailFlexibee\Http\Method $method
      * @param string $url
-     * @return mixed[]
+     * @return array<mixed>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
@@ -112,8 +112,8 @@ class Client extends ObjectPrototype
 
     /**
      * @param string $id
-     * @param mixed[] $queryParams
-     * @return mixed[]
+     * @param array<mixed> $queryParams
+     * @return array<mixed>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
@@ -130,8 +130,8 @@ class Client extends ObjectPrototype
 
     /**
      * @param string $id
-     * @param mixed[] $queryParams
-     * @return mixed[]
+     * @param array<mixed> $queryParams
+     * @return array<mixed>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
@@ -145,8 +145,8 @@ class Client extends ObjectPrototype
 
     /**
      * @param int $id
-     * @param mixed[] $queryParams
-     * @return mixed[]
+     * @param array<mixed> $queryParams
+     * @return array<mixed>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
@@ -163,8 +163,8 @@ class Client extends ObjectPrototype
 
     /**
      * @param string $code
-     * @param mixed[] $queryParams
-     * @return mixed[]
+     * @param array<mixed> $queryParams
+     * @return array<mixed>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
@@ -181,8 +181,8 @@ class Client extends ObjectPrototype
 
     /**
      * @param int $id
-     * @param string[] $queryParams
-     * @return mixed[]
+     * @param array<string> $queryParams
+     * @return array<mixed>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
@@ -196,8 +196,8 @@ class Client extends ObjectPrototype
 
     /**
      * @param string $code
-     * @param mixed[] $queryParams
-     * @return mixed[]
+     * @param array<mixed> $queryParams
+     * @return array<mixed>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
@@ -213,7 +213,7 @@ class Client extends ObjectPrototype
     }
 
     /**
-     * @param mixed[] $evidenceData
+     * @param array<mixed> $evidenceData
      * @param int|null $id
      * @return int
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
@@ -241,7 +241,7 @@ class Client extends ObjectPrototype
     }
 
     /**
-     * @return  mixed[]
+     * @return array<mixed>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
@@ -256,7 +256,7 @@ class Client extends ObjectPrototype
     /**
      * @param int $start
      * @param int $limit
-     * @return mixed[]
+     * @return array<mixed>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
@@ -274,7 +274,7 @@ class Client extends ObjectPrototype
 
     /**
      * @param string $query
-     * @return mixed[]
+     * @return array<mixed>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
@@ -289,7 +289,7 @@ class Client extends ObjectPrototype
     /**
      * @param \EcomailFlexibee\Http\Method $method
      * @param string $uri
-     * @return mixed[]
+     * @return array<mixed>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
@@ -303,7 +303,7 @@ class Client extends ObjectPrototype
 
     /**
      * @param int $id
-     * @param mixed[] $queryParams
+     * @param array<mixed> $queryParams
      * @return string
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
@@ -319,10 +319,10 @@ class Client extends ObjectPrototype
     /**
      * @param \EcomailFlexibee\Http\Method $httpMethod
      * @param string $url
-     * @param mixed[] $postFields
-     * @param string[] $headers
-     * @param mixed[] $queryParameters
-     * @return mixed[]
+     * @param array<mixed> $postFields
+     * @param array<string> $headers
+     * @param array<mixed> $queryParameters
+     * @return array<mixed>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
@@ -390,10 +390,14 @@ class Client extends ObjectPrototype
 
                 throw new EcomailFlexibeeNoEvidenceResult($message);
             }
+
             // Check authorization
-            elseif ($httpCode === 401) {
+
+            if ($httpCode === 401) {
                 throw new EcomailFlexibeeInvalidAuthorization($this->user, $this->password, $url);
-            } elseif ($httpCode === 400 || $httpCode === 500) {
+            }
+
+            if ($httpCode === 400 || $httpCode === 500) {
                 if ($result['success'] === 'false') {
                     if (!isset($result['results'])) {
                         throw new EcomailFlexibeeRequestError($result['message']);
