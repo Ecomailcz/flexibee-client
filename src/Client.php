@@ -4,7 +4,6 @@ namespace EcomailFlexibee;
 
 use Consistence\ObjectPrototype;
 use EcomailFlexibee\Exception\EcomailFlexibeeConnectionError;
-use EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
 use EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed;
 use EcomailFlexibee\Http\Method;
@@ -109,7 +108,6 @@ class Client extends ObjectPrototype
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      */
     public function findByCustomId(string $id, array $queryParams = []): array
     {
@@ -167,7 +165,6 @@ class Client extends ObjectPrototype
      * @param int $id
      * @param array<mixed> $queryParams
      * @return \EcomailFlexibee\Result\EvidenceResult
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
@@ -395,13 +392,7 @@ class Client extends ObjectPrototype
             return new FlexibeePdfResponse($output);
         }
 
-        $response = ResponseFactory::createFromOutput($output, curl_getinfo($ch, CURLINFO_HTTP_CODE));
-
-        if ($response->getStatusCode() === 401) {
-            throw new EcomailFlexibeeInvalidAuthorization($this->user, $this->password, $url);
-        }
-
-        return $response;
+        return ResponseFactory::createFromOutput($output, curl_getinfo($ch, CURLINFO_HTTP_CODE));
     }
 
 }
