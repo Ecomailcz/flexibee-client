@@ -7,7 +7,7 @@
 		<exec command="vendor/bin/phpcf 7.3 -s 10000 src/ tests/" checkreturn="true" passthru="true"/>
 		<exec command="vendor/bin/phpcpd src tests" checkreturn="true" passthru="true"/>
 		<exec command="php vendor/bin/phpcs --standard=ruleset.xml --extensions=php --encoding=utf-8 src" passthru="true" checkreturn="true"/>
-		<exec command="php -d memory_limit=4G vendor/bin/phpstan analyse src/ -l max" checkreturn="true" passthru="true"/>
+		<exec command="php -d memory_limit=4G vendor/bin/phpstan analyse src/ -l max -c phpstan.neon" checkreturn="true" passthru="true"/>
 		<exec command="vendor/bin/phpunit tests" checkreturn="true" passthru="true"/>
 	</target>
 	<target name="phpcsfix">

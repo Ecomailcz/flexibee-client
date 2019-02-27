@@ -55,7 +55,7 @@ final class ResponseFactory extends ObjectPrototype
             throw new EcomailFlexibeeInvalidAuthorization();
         }
 
-        if (in_array($statusCode, [500, 400])) {
+        if (in_array($statusCode, [500, 400], true)) {
             foreach ($results as $resultData) {
                 if (!isset($resultData['errors'])) {
                     continue;

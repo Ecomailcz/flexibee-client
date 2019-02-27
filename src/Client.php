@@ -238,7 +238,7 @@ class Client extends ObjectPrototype
      */
     public function save(array $evidenceData, ?int $id): Response
     {
-        if ($id) {
+        if ($id !== null) {
             $evidenceData['id'] = $id;
         }
 
