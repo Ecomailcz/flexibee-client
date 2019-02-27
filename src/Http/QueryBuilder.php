@@ -61,9 +61,14 @@ class QueryBuilder extends Url
         return $this->getUrl();
     }
 
-    public function createUriByEvidenceOnly(): string
+    /**
+     * @param array<string> $queryParams
+     * @return string
+     */
+    public function createUriByEvidenceOnly(array $queryParams): string
     {
         $this->setPath(new Path(sprintf('c/%s/%s.json', $this->company, $this->evidence)));
+        $this->createQueryParams($queryParams);
 
         return $this->getUrl();
     }
@@ -94,13 +99,19 @@ class QueryBuilder extends Url
         return $this->getUrl();
     }
 
-    public function createUriByEvidenceForSearchQuery(string $query): string
+    /**
+     * @param string $query
+     * @param array<string> $queryParameters
+     * @return string
+     */
+    public function createUriByEvidenceForSearchQuery(string $query, array $queryParameters): string
     {
         if (mb_strlen(trim($query)) === 0) {
-            return $this->createUriByEvidenceOnly();
+            return $this->createUriByEvidenceOnly($queryParameters);
         }
 
         $this->setPath(new Path(sprintf('c/%s/%s/(%s).json', $this->company, $this->evidence, $this->normalizeSearchQuery($query))));
+        $this->createQueryParams($queryParameters);
 
         return $this->getUrl();
     }

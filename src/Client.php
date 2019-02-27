@@ -231,7 +231,7 @@ class Client extends ObjectPrototype
 
         $postData = [];
         $postData[$this->evidence] = $evidenceData;
-        $result = $this->makeRequest(Method::get(Method::PUT), $this->queryBuilder->createUriByEvidenceOnly(), $postData);
+        $result = $this->makeRequest(Method::get(Method::PUT), $this->queryBuilder->createUriByEvidenceOnly([]), $postData);
 
         if (count($result) === 0) {
             throw new EcomailFlexibeeSaveFailed();
@@ -274,6 +274,7 @@ class Client extends ObjectPrototype
 
     /**
      * @param string $query
+     * @param array<string> $queryParameters
      * @return array<mixed>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
@@ -281,9 +282,9 @@ class Client extends ObjectPrototype
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
-    public function searchInEvidence(string $query): array
+    public function searchInEvidence(string $query, array $queryParameters): array
     {
-        return $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByEvidenceForSearchQuery($query), [], [], []);
+        return $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByEvidenceForSearchQuery($query, $queryParameters), [], [], []);
     }
 
     /**
