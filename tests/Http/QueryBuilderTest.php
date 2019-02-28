@@ -27,7 +27,7 @@ class QueryBuilderTest extends TestCase
 
     public function testCreateUriByCodeOnly(): void
     {
-        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/(kod=\'CODE:TEST\').json', $this->queryBuilder->createUriByCodeOnly('CODE:TEST'));
+        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/(kod=\'CODE:TEST\').json', $this->queryBuilder->createUriByCodeOnly('CODE:TEST', []));
         Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/(kod=\'CODE:TEST\').json?test=1', $this->queryBuilder->createUriByCodeOnly('CODE:TEST', ['test' => true]));
     }
 
@@ -38,12 +38,12 @@ class QueryBuilderTest extends TestCase
 
     public function testCreateUriByCustomId(): void
     {
-        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/code:TEST.json', $this->queryBuilder->createUriByCode('TEST'));
+        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/code:TEST.json', $this->queryBuilder->createUriByCode('TEST', []));
     }
 
     public function testCreateUriPdf(): void
     {
-        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/11.pdf', $this->queryBuilder->createUriPdf(11));
+        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/11.pdf', $this->queryBuilder->createUriPdf(11, []));
         $queryParams = [];
         $queryParams['report-name'] = 'test';
         $queryParams['report-lang'] = 'en';

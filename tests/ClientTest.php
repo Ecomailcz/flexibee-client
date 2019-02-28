@@ -84,7 +84,7 @@ class ClientTest extends TestCase
             Assert::assertEquals($value, $addressBookRefreshed->getData()[0][$key]);
         }
 
-        Assert::assertNotEmpty($client->getPdfById($addressBookId));
+        Assert::assertNotEmpty($client->getPdfById($addressBookId, []));
         Assert::assertNotEmpty($client->getPdfById($addressBookId, ['report-name' => 'FAKTURA-BLUE-FAV', 'report-lang' => 'en']));
         $client->deleteById($addressBookId);
         Assert::assertCount(0, $client->findById($addressBookId)->getData());
@@ -157,7 +157,7 @@ class ClientTest extends TestCase
         $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'smlouva', false, null);
         // There was error on flexibee demo account
         $this->expectException(EcomailFlexibeeRequestError::class);
-        $client->makeRequestPrepared(Method::get(Method::POST), 'generovani-faktur.json');
+        $client->makePreparedRequest(Method::get(Method::POST), 'generovani-faktur.json');
     }
 
     public function testMakeRawRequest(): void

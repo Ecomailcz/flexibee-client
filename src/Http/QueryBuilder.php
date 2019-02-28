@@ -57,13 +57,10 @@ class QueryBuilder extends Url
      * @param array<mixed> $queryParams
      * @return string
      */
-    public function createUriPdf(int $id, array $queryParams = []): string
+    public function createUriPdf(int $id, array $queryParams): string
     {
         $this->setPath(new Path(sprintf('c/%s/%s/%d.pdf', $this->company, $this->evidence, $id)));
-
-        if (count($queryParams) !== 0) {
-            $this->createQueryParams($queryParams);
-        }
+        $this->createQueryParams($queryParams);
 
         return $this->getUrl();
     }
@@ -113,11 +110,16 @@ class QueryBuilder extends Url
      */
     public function createUriByEvidenceForSearchQuery(string $query, array $queryParameters): string
     {
-        if (mb_strlen(trim($query)) === 0) {
-            return $this->createUriByEvidenceOnly($queryParameters);
-        }
+        $this->setPath(
+            new Path(
+                sprintf('c/%s/%s/(%s).json',
+                $this->company,
+                $this->evidence,
+                SearchQueryOperator::convertOperatorsInQuery($query)
+                )
+            )
+        );
 
-        $this->setPath(new Path(sprintf('c/%s/%s/(%s).json', $this->company, $this->evidence, $this->normalizeSearchQuery($query))));
         $this->createQueryParams($queryParameters);
 
         return $this->getUrl();
@@ -129,14 +131,11 @@ class QueryBuilder extends Url
      * @return string
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
      */
-    public function createUriByCodeOnly(string $code, array $queryParams = []): string
+    public function createUriByCodeOnly(string $code, array $queryParams): string
     {
         $this->validator->validateFlexibeeRequestCodeParameter($code);
         $this->setPath(new Path(sprintf('c/%s/%s/(kod=\'%s\').json', $this->company, $this->evidence, $code)));
-
-        if (count($queryParams) !== 0) {
-            $this->createQueryParams($queryParams);
-        }
+        $this->createQueryParams($queryParams);
 
         return $this->getUrl();
     }
@@ -147,12 +146,14 @@ class QueryBuilder extends Url
      * @return string
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
      */
-    public function createUriByCode(string $code, array $queryParams = []): string
+    public function createUriByCode(string $code, array $queryParams): string
     {
         $this->validator->validateFlexibeeRequestCodeParameter($code);
-        $code = sprintf('code:%s', $code);
 
-        return $this->createUriByAnyoneId($code, $queryParams);
+        return $this->createUriByAnyoneId(
+            sprintf('code:%s', $code),
+            $queryParams
+        );
     }
 
     public function getUrl(): string
@@ -169,13 +170,15 @@ class QueryBuilder extends Url
      * @param array<mixed> $queryParams
      * @return string
      */
-    private function createUriByAnyoneId($id, array $queryParams = []): string
+    private function createUriByAnyoneId($id, array $queryParams): string
     {
-        $this->setPath(new Path(sprintf('c/%s/%s/%s.json', $this->company, $this->evidence, $id)));
+        $this->setPath(
+            new Path(
+                sprintf('c/%s/%s/%s.json', $this->company, $this->evidence,  $id)
+            )
+        );
 
-        if (count($queryParams) !== 0) {
-            $this->createQueryParams($queryParams);
-        }
+        $this->createQueryParams($queryParams);
 
         return $this->getUrl();
     }
@@ -186,11 +189,6 @@ class QueryBuilder extends Url
     private function createQueryParams(array $params): void
     {
         $this->setQuery(new Query(http_build_query($params)));
-    }
-
-    private function normalizeSearchQuery(string $query): string
-    {
-        return SearchQueryOperator::convertOperatorsInQuery($query);
     }
 
 }

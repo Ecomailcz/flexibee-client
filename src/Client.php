@@ -66,24 +66,36 @@ class Client extends ObjectPrototype
 
     public function getAuthAndRefreshToken(): Response
     {
-        $headers = [
-            'Content-Type: application/x-www-form-urlencoded',
-        ];
-        $queryParameters = [];
-        $queryParameters['username'] = $this->user;
-        $queryParameters['password'] = $this->password;
-
-        return $this->makeRequest(Method::get(Method::POST), $this->queryBuilder->createAuthTokenUrl(), [], $headers, $queryParameters);
+        return $this->makeRequest(
+            Method::get(Method::POST),
+            $this->queryBuilder->createAuthTokenUrl(),
+            [],
+            [
+                'Content-Type: application/x-www-form-urlencoded',
+            ],
+            [
+                'username' => $this->user,
+                'password' => $this->password,
+            ]
+        );
     }
     
     public function deleteById(int $id): Response
     {
-        return $this->makeRequest(Method::get(Method::DELETE), $this->queryBuilder->createUriByIdOnly($id), []);
+        return $this->makeRequest(
+            Method::get(Method::DELETE),
+            $this->queryBuilder->createUriByIdOnly($id),
+            []
+        );
     }
     
     public function deleteByCode(string $id): void
     {
-        $this->makeRequest(Method::get(Method::DELETE), $this->queryBuilder->createUriByCode($id), []);
+        $this->makeRequest(
+            Method::get(Method::DELETE),
+            $this->queryBuilder->createUriByCode($id, []),
+            []
+        );
     }
 
     /**
@@ -94,31 +106,38 @@ class Client extends ObjectPrototype
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
-    public function makeRequestPrepared(Method $method, string $url): array
+    public function makePreparedRequest(Method $method, string $url): array
     {
-        $response =  $this->makeRequest($method, $this->queryBuilder->createBaseUrl($url));
-
-        return $this->convertResponseToEvidenceResults($response);
+        return $this->convertResponseToEvidenceResults(
+            $this->makeRequest(
+                $method,
+                $this->queryBuilder->createBaseUrl($url)
+            )
+        );
     }
 
     /**
-     * @param \EcomailFlexibee\Http\Response\Response $Response
+     * @param \EcomailFlexibee\Http\Response\Response $response
      * @return array<\EcomailFlexibee\Result\EvidenceResult>
      */
-    private function convertResponseToEvidenceResults(Response $Response): array
+    private function convertResponseToEvidenceResults(Response $response): array
     {
-        if ($Response->getStatusCode() === 404 || count($Response->getData()) === 0) {
+        $data = $response->getData();
+
+        if ($response->getStatusCode() === 404 || count($data) === 0) {
             return [];
         }
 
         return array_map(static function (array $data){
             return new EvidenceResult($data);
-        }, $Response->getData()[$this->evidence]);
+        }, $data[$this->evidence]);
     }
 
-    private function convertResponseToEvidenceResult(Response $Response, bool $throwException): EvidenceResult
+    private function convertResponseToEvidenceResult(Response $response, bool $throwException): EvidenceResult
     {
-        if ($Response->getStatusCode() === 404 || count($Response->getData()) === 0) {
+        $data = $response->getData();
+
+        if ($response->getStatusCode() === 404 || count($data) === 0) {
             if ($throwException) {
                 throw new EcomailFlexibeeNoEvidenceResult();
             }
@@ -126,7 +145,7 @@ class Client extends ObjectPrototype
             return new EvidenceResult([]);
         }
 
-        return new EvidenceResult($Response->getData()[$this->evidence]);
+        return new EvidenceResult($data[$this->evidence]);
     }
 
     /**
@@ -158,9 +177,14 @@ class Client extends ObjectPrototype
      */
     public function getByCode(string $code, array $queryParams = []): EvidenceResult
     {
-        $response = $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByCodeOnly($code, $queryParams), []);
-
-        return $this->convertResponseToEvidenceResult($response, true);
+        return $this->convertResponseToEvidenceResult(
+            $this->makeRequest(
+                Method::get(Method::GET),
+                $this->queryBuilder->createUriByCodeOnly($code, $queryParams),
+                []
+            ) ,
+            true
+        );
     }
 
     /**
@@ -174,9 +198,14 @@ class Client extends ObjectPrototype
      */
     public function getById(int $id, array $queryParams = []): EvidenceResult
     {
-        $responseData = $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByIdOnly($id, $queryParams), []);
-
-        return $this->convertResponseToEvidenceResult($responseData, true);
+        return $this->convertResponseToEvidenceResult(
+            $this->makeRequest(
+                Method::get(Method::GET),
+                $this->queryBuilder->createUriByIdOnly($id, $queryParams),
+                []
+            ),
+            true
+        );
     }
 
     /**
@@ -234,7 +263,13 @@ class Client extends ObjectPrototype
      */
     public function allInEvidence(): array
     {
-        $response = $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByEvidenceWithQueryParameters(['limit' => 0]), [], [], []);
+        $response = $this->makeRequest(
+            Method::get(Method::GET),
+            $this->queryBuilder->createUriByEvidenceWithQueryParameters(['limit' => 0]),
+            [],
+            [],
+            []
+        );
 
         return $this->convertResponseToEvidenceResults($response);
     }
@@ -249,11 +284,13 @@ class Client extends ObjectPrototype
      */
     public function chunkInEvidence(int $start, int $limit): array
     {
-        $queryParameters = [];
-        $queryParameters['limit'] = $limit;
-        $queryParameters['start'] = $start;
-
-        $response = $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByEvidenceWithQueryParameters($queryParameters), [], [], []);
+        $response = $this->makeRequest(
+            Method::get(Method::GET),
+            $this->queryBuilder->createUriByEvidenceWithQueryParameters(['limit' => $limit, 'start' => $start]),
+            [],
+            [],
+            []
+        );
 
         return $this->convertResponseToEvidenceResults($response);
     }
@@ -268,7 +305,13 @@ class Client extends ObjectPrototype
      */
     public function searchInEvidence(string $query, array $queryParameters): array
     {
-        $response = $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByEvidenceForSearchQuery($query, $queryParameters), [], [], []);
+        $response = $this->makeRequest(
+            Method::get(Method::GET),
+            $this->queryBuilder->createUriByEvidenceForSearchQuery($query, $queryParameters),
+            [],
+            [],
+            []
+        );
 
         return $this->convertResponseToEvidenceResults($response);
     }
@@ -283,7 +326,13 @@ class Client extends ObjectPrototype
      */
     public function makeRawRequest(Method $method, string $uri): array
     {
-        $response = $this->makeRequest($method, $this->queryBuilder->createUriByDomainOnly($uri), [], [], []);
+        $response = $this->makeRequest(
+            $method,
+            $this->queryBuilder->createUriByDomainOnly($uri),
+            [],
+            [],
+            []
+        );
 
         return $this->convertResponseToEvidenceResults($response);
     }
@@ -296,9 +345,13 @@ class Client extends ObjectPrototype
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
-    public function getPdfById(int $id, array $queryParams = []): Response
+    public function getPdfById(int $id, array $queryParams): Response
     {
-        return $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriPdf($id, $queryParams), []);
+        return $this->makeRequest(
+            Method::get(Method::GET),
+            $this->queryBuilder->createUriPdf($id, $queryParams),
+            []
+        );
     }
 
     /**
