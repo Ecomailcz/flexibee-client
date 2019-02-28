@@ -3,6 +3,7 @@
 namespace EcomailFlexibeeTest\Enum;
 
 use EcomailFlexibee\Enum\SearchQueryOperator;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class SearchQueryOperatorTest extends TestCase
@@ -15,7 +16,7 @@ final class SearchQueryOperatorTest extends TestCase
      */
     public function testConvertOperators(string $query, string $expectedQuery): void
     {
-        $this->assertEquals($expectedQuery, SearchQueryOperator::convertOperatorsInQuery($query));
+        Assert::assertEquals($expectedQuery, SearchQueryOperator::convertOperatorsInQuery($query));
     }
 
     /**

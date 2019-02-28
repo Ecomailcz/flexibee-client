@@ -9,6 +9,7 @@ use EcomailFlexibee\Exception\EcomailFlexibeeRequestError;
 use EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed;
 use EcomailFlexibee\Http\Method;
 use Faker\Factory;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 class ClientTest extends TestCase
@@ -41,9 +42,9 @@ class ClientTest extends TestCase
     public function testGetAuthToken(): void
     {
         $authToken = $this->client->getAuthAndRefreshToken()->getData();
-        $this->assertArrayHasKey('refreshToken', $authToken);
-        $this->assertArrayHasKey('authSessionId', $authToken);
-        $this->assertArrayHasKey('csrfToken', $authToken);
+        Assert::assertArrayHasKey('refreshToken', $authToken);
+        Assert::assertArrayHasKey('authSessionId', $authToken);
+        Assert::assertArrayHasKey('csrfToken', $authToken);
         $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, Config::EVIDENCE,false, $authToken['authSessionId']);
         $evidenceData = [
             'nazev' => $this->faker->company,
@@ -51,10 +52,10 @@ class ClientTest extends TestCase
         $id = (int) $client->save($evidenceData, null)->getData()[0]['id'];
         $code = $client->getById($id)->getData()[0]['kod'];
         $evidenceItem = $client->getByCustomId(sprintf('code:%s', $code));
-        $this->assertCount(1, $evidenceItem);
-        $this->assertEquals($id, (int) $evidenceItem[0]->getData()['id']);
+        Assert::assertCount(1, $evidenceItem);
+        Assert::assertEquals($id, (int) $evidenceItem[0]->getData()['id']);
         $client->deleteByCustomId(sprintf('code:%s', $code));
-        $this->assertCount(0, $client->findByCustomId(sprintf('code:%s', $code)));
+        Assert::assertCount(0, $client->findByCustomId(sprintf('code:%s', $code)));
 
     }
 
@@ -66,10 +67,10 @@ class ClientTest extends TestCase
         $id = (int) $this->client->save($evidenceData, null)->getData()[0]['id'];
         $code = $this->client->getById($id)->getData()[0]['kod'];
         $evidenceItem = $this->client->getByCustomId(sprintf('code:%s', $code));
-        $this->assertCount(1, $evidenceItem);
-        $this->assertEquals($id, (int) $evidenceItem[0]->getData()['id']);
+        Assert::assertCount(1, $evidenceItem);
+        Assert::assertEquals($id, (int) $evidenceItem[0]->getData()['id']);
         $this->client->deleteByCustomId(sprintf('code:%s', $code));
-        $this->assertCount(0, $this->client->findByCustomId(sprintf('code:%s', $code)));
+        Assert::assertCount(0, $this->client->findByCustomId(sprintf('code:%s', $code)));
     }
 
     /**
@@ -77,7 +78,6 @@ class ClientTest extends TestCase
      * @param string $evidence
      * @param array<mixed> $evidenceData
      * @param array<mixed> $expectedDataAfterUpdate
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeAnotherError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
@@ -92,13 +92,13 @@ class ClientTest extends TestCase
         $addressBookRefreshed = $client->getById($addressBookId);
 
         foreach ($expectedDataAfterUpdate as $key => $value) {
-            $this->assertEquals($value, $addressBookRefreshed->getData()[0][$key]);
+            Assert::assertEquals($value, $addressBookRefreshed->getData()[0][$key]);
         }
 
-        $this->assertNotEmpty($client->getPdfById($addressBookId));
-        $this->assertNotEmpty($client->getPdfById($addressBookId, ['report-name' => 'FAKTURA-BLUE-FAV', 'report-lang' => 'en']));
+        Assert::assertNotEmpty($client->getPdfById($addressBookId));
+        Assert::assertNotEmpty($client->getPdfById($addressBookId, ['report-name' => 'FAKTURA-BLUE-FAV', 'report-lang' => 'en']));
         $client->deleteById($addressBookId);
-        $this->assertCount(0, $client->findById($addressBookId)->getData());
+        Assert::assertCount(0, $client->findById($addressBookId)->getData());
         $this->expectException(EcomailFlexibeeNoEvidenceResult::class);
         $client->getById($addressBookId);
         $this->expectException(EcomailFlexibeeSaveFailed::class);
@@ -143,24 +143,24 @@ class ClientTest extends TestCase
     public function testAllAndChunkInEvidence(): void
     {
         $result = $this->client->allInEvidence();
-        $this->assertTrue(count($result) > 0);
+        Assert::assertTrue(count($result) > 0);
 
         $firstResult = $this->client->chunkInEvidence(0, 1);
-        $this->assertCount(1, $firstResult);
+        Assert::assertCount(1, $firstResult);
 
         $resultOther = $this->client->chunkInEvidence(1, 1);
-        $this->assertCount(1, $resultOther);
-        $this->assertNotEquals($firstResult[0]->getData()['id'], $resultOther[0]->getData()['id']);
+        Assert::assertCount(1, $resultOther);
+        Assert::assertNotEquals($firstResult[0]->getData()['id'], $resultOther[0]->getData()['id']);
     }
 
     public function testSearchInEvidence(): void
     {
         $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false, null);
         $result = $client->searchInEvidence('kod<>\'JAN\'', []);
-        $this->assertTrue(count($result) > 0);
+        Assert::assertTrue(count($result) > 0);
 
         $result = $client->searchInEvidence('datSplat<\'2018-12-04\'%20and%20zuctovano=false', []);
-        $this->assertTrue(count($result) > 0);
+        Assert::assertTrue(count($result) > 0);
     }
 
     public function testMakePreparedUrl(): void
@@ -175,12 +175,18 @@ class ClientTest extends TestCase
     {
         $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false, null);
         $result = $client->makeRawRequest(Method::get(Method::GET), '/c/demo/faktura-vydana/1.json');
-        $this->assertTrue(count($result) > 0);
+        Assert::assertTrue(count($result) > 0);
     }
 
     public function testWithExampleFlexibeeData(): void
     {
-        $xmlData = json_decode(json_encode((array) simplexml_load_string(file_get_contents(sprintf('%s/_Resources/smlouva.xml', __DIR__)))), true);
+        /** @var string $content */
+        $content = file_get_contents(sprintf('%s/_Resources/smlouva.xml', __DIR__));
+        /** @var \SimpleXMLElement $content */
+        $content = simplexml_load_string($content);
+        /** @var string $content */
+        $content = json_encode((array) $content);
+        $xmlData = json_decode($content, true);
 
         foreach ($xmlData as $evidenceName => $evidenceData) {
             if (in_array($evidenceName, ['@attributes'], true)) {
@@ -211,14 +217,13 @@ class ClientTest extends TestCase
                 $idEvidence = (int) $client->save($evidenceData, null)->getData()[0]['id'];
                 $client->deleteById($idEvidence);
             } catch (EcomailFlexibeeRequestError $exception) {
-                if (mb_stripos($exception->getMessage(), 'již používá jiný záznam')) {
+                if (mb_stripos($exception->getMessage(), 'již používá jiný záznam') !== false) {
                     continue;
                 }
 
                 throw $exception;
             }
 
-            $this->assertTrue(true);
 
         }
     }

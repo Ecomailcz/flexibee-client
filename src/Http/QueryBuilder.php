@@ -101,7 +101,7 @@ class QueryBuilder extends Url
 
     /**
      * @param string $query
-     * @param array<string> $queryParameters
+     * @param array<mixed> $queryParameters
      * @return string
      */
     public function createUriByEvidenceForSearchQuery(string $query, array $queryParameters): string
