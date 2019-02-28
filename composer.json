@@ -11,7 +11,8 @@
 		"ext-json": "*",
 		"php": "^7.2",
 		"consistence/consistence": "^2.0",
-		"jwage/purl": "^0.0.10"
+		"jwage/purl": "^0.0.10",
+		"rakit/validation": "^1.1"
 	},
 	"require-dev": {
 		"slevomat/coding-standard": "^5.0",

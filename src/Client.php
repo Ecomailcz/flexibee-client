@@ -81,9 +81,9 @@ class Client extends ObjectPrototype
         return $this->makeRequest(Method::get(Method::DELETE), $this->queryBuilder->createUriByIdOnly($id), []);
     }
     
-    public function deleteByCustomId(string $id): void
+    public function deleteByCode(string $id): void
     {
-        $this->makeRequest(Method::get(Method::DELETE), $this->queryBuilder->createUriByCustomId($id), []);
+        $this->makeRequest(Method::get(Method::DELETE), $this->queryBuilder->createUriByCode($id), []);
     }
 
     /**
@@ -97,38 +97,6 @@ class Client extends ObjectPrototype
     public function makeRequestPrepared(Method $method, string $url): array
     {
         $response =  $this->makeRequest($method, $this->queryBuilder->createBaseUrl($url));
-
-        return $this->convertResponseToEvidenceResults($response);
-    }
-
-    /**
-     * @param string $id
-     * @param array<mixed> $queryParams
-     * @return array<mixed>
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
-     */
-    public function findByCustomId(string $id, array $queryParams = []): array
-    {
-        try {
-            return $this->getByCustomId($id, $queryParams);
-        } catch (EcomailFlexibeeNoEvidenceResult $exception) {
-            return [];
-        }
-    }
-
-    /**
-     * @param string $id
-     * @param array<mixed> $queryParams
-     * @return array<\EcomailFlexibee\Result\EvidenceResult>
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
-     */
-    public function getByCustomId(string $id, array $queryParams = []): array
-    {
-        $response = $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByCustomId($id, $queryParams), []);
 
         return $this->convertResponseToEvidenceResults($response);
     }
@@ -182,16 +150,17 @@ class Client extends ObjectPrototype
      * @param string $code
      * @param array<mixed> $queryParams
      * @return \EcomailFlexibee\Result\EvidenceResult
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
     public function getByCode(string $code, array $queryParams = []): EvidenceResult
     {
-        $code = mb_substr($code, 0, 20);
-        $response = $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByCodeOnly(strtoupper($code), $queryParams), []);
+        $response = $this->makeRequest(Method::get(Method::GET), $this->queryBuilder->createUriByCodeOnly($code, $queryParams), []);
 
-        return new EvidenceResult($response->getData()[$this->evidence]);
+        return $this->convertResponseToEvidenceResult($response, true);
     }
 
     /**
@@ -216,6 +185,7 @@ class Client extends ObjectPrototype
      * @return \EcomailFlexibee\Result\EvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
     public function findByCode(string $code, array $queryParams = []): EvidenceResult

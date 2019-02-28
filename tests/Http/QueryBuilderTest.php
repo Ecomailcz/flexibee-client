@@ -38,7 +38,7 @@ class QueryBuilderTest extends TestCase
 
     public function testCreateUriByCustomId(): void
     {
-        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/CODE:TEST.json', $this->queryBuilder->createUriByCustomId('CODE:TEST'));
+        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/code:TEST.json', $this->queryBuilder->createUriByCode('TEST'));
     }
 
     public function testCreateUriPdf(): void

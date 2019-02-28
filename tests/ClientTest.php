@@ -45,32 +45,21 @@ class ClientTest extends TestCase
         Assert::assertArrayHasKey('refreshToken', $authToken);
         Assert::assertArrayHasKey('authSessionId', $authToken);
         Assert::assertArrayHasKey('csrfToken', $authToken);
-        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, Config::EVIDENCE,false, $authToken['authSessionId']);
-        $evidenceData = [
-            'nazev' => $this->faker->company,
-        ];
-        $id = (int) $client->save($evidenceData, null)->getData()[0]['id'];
-        $code = $client->getById($id)->getData()[0]['kod'];
-        $evidenceItem = $client->getByCustomId(sprintf('code:%s', $code));
-        Assert::assertCount(1, $evidenceItem);
-        Assert::assertEquals($id, (int) $evidenceItem[0]->getData()['id']);
-        $client->deleteByCustomId(sprintf('code:%s', $code));
-        Assert::assertCount(0, $client->findByCustomId(sprintf('code:%s', $code)));
 
     }
 
     public function testCRUDForCustomIds(): void
     {
         $evidenceData = [
-            'nazev' => $this->faker->company,
+            'nazev' => $this->faker->firstName,
         ];
         $id = (int) $this->client->save($evidenceData, null)->getData()[0]['id'];
         $code = $this->client->getById($id)->getData()[0]['kod'];
-        $evidenceItem = $this->client->getByCustomId(sprintf('code:%s', $code));
-        Assert::assertCount(1, $evidenceItem);
-        Assert::assertEquals($id, (int) $evidenceItem[0]->getData()['id']);
-        $this->client->deleteByCustomId(sprintf('code:%s', $code));
-        Assert::assertCount(0, $this->client->findByCustomId(sprintf('code:%s', $code)));
+        $evidenceItem = $this->client->getByCode($code);
+        Assert::assertCount(1, $evidenceItem->getData());
+        Assert::assertEquals($id, (int) $evidenceItem->getData()[0]['id']);
+        $this->client->deleteByCode($code);
+        Assert::assertCount(0, $this->client->findByCode($code)->getData());
     }
 
     /**

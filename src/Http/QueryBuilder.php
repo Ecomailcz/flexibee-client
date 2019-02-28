@@ -3,6 +3,7 @@
 namespace EcomailFlexibee\Http;
 
 use EcomailFlexibee\Enum\SearchQueryOperator;
+use EcomailFlexibee\Validator\ParameterValidator;
 use Purl\ParserInterface;
 use Purl\Path;
 use Purl\Query;
@@ -21,11 +22,17 @@ class QueryBuilder extends Url
      */
     private $evidence;
 
+    /**
+     * @var \EcomailFlexibee\Validator\ParameterValidator
+     */
+    private $validator;
+
     public function __construct(string $company, string $evidence, string $host, ?ParserInterface $parser = null)
     {
         parent::__construct($host, $parser);
         $this->company = $company;
         $this->evidence = $evidence;
+        $this->validator = new ParameterValidator();
     }
 
     public function createAuthTokenUrl(): string
@@ -120,9 +127,11 @@ class QueryBuilder extends Url
      * @param string $code
      * @param array<mixed> $queryParams
      * @return string
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
      */
     public function createUriByCodeOnly(string $code, array $queryParams = []): string
     {
+        $this->validator->validateFlexibeeRequestCodeParameter($code);
         $this->setPath(new Path(sprintf('c/%s/%s/(kod=\'%s\').json', $this->company, $this->evidence, $code)));
 
         if (count($queryParams) !== 0) {
@@ -133,13 +142,17 @@ class QueryBuilder extends Url
     }
 
     /**
-     * @param string $id
+     * @param string $code
      * @param array<mixed> $queryParams
      * @return string
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
      */
-    public function createUriByCustomId(string $id, array $queryParams = []): string
+    public function createUriByCode(string $code, array $queryParams = []): string
     {
-        return $this->createUriByAnyoneId($id, $queryParams);
+        $this->validator->validateFlexibeeRequestCodeParameter($code);
+        $code = sprintf('code:%s', $code);
+
+        return $this->createUriByAnyoneId($code, $queryParams);
     }
 
     public function getUrl(): string

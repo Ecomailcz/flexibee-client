@@ -42,19 +42,19 @@ Pokud vše proběhne v pořádku, vratí se třída `\EcomailFlexibee\Http\Respo
 Nalezení záznamu dle id s vyhozením výjimky, pokud záznam neexistuje  
 ```
 $evidenceItem = $client->getById($evidenceItemId, $queryParams);
-$evidenceItem = $client->getByCustomId($evidenceItemId, $queryParams);
+$evidenceItem = $client->getByCode($evidenceItemCode, $queryParams);
 ```
 
 Vrácení prázného záznamu, pokud neexistuje ve Flexibee (bez vyhození výjimky)  
 ```
 $evidenceItem = $client->findById($evidenceItemId, $queryParams);
-$evidenceItem = $client->findByCustomId($evidenceItemId, $queryParams);
+$evidenceItem = $client->findByCode($evidenceItemCode, $queryParams);
 ```
 
 ## Smazání záznamu
 ```
 $client->deleteById($id);
-$client->deleteByCustomId($id);
+$client->deleteByCode($code);
 ```
 
 ## Generování PDF
