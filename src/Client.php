@@ -7,61 +7,45 @@ use EcomailFlexibee\Exception\EcomailFlexibeeConnectionError;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
 use EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed;
 use EcomailFlexibee\Http\Method;
-use EcomailFlexibee\Http\QueryBuilder;
 use EcomailFlexibee\Http\Response\FlexibeePdfResponse;
 use EcomailFlexibee\Http\Response\Response;
 use EcomailFlexibee\Http\ResponseFactory;
+use EcomailFlexibee\Http\UrlBuilder;
 use EcomailFlexibee\Result\EvidenceResult;
 
 class Client extends ObjectPrototype
 {
 
     /**
-     * REST API user
-     *
-     * @var string
-     */
-    private $user;
-
-    /**
-     * REST API password
-     *
-     * @var string
-     */
-    private $password;
-
-    /**
-     * Name of the evidence section (adresar, faktura-vydana ...)
-     *
-     * @var string
-     */
-    private $evidence;
-
-    /**
-     * Enable self signed certificates
-     *
-     * @var bool
-     */
-    private $selfSignedCertificate;
-
-    /**
-     * @var \EcomailFlexibee\Http\QueryBuilder
+     * @var \EcomailFlexibee\Http\UrlBuilder
      */
     private $queryBuilder;
 
     /**
-     * @var string|null
+     * @var \EcomailFlexibee\Config
      */
-    private $authSessionId;
+    private $config;
 
-    public function __construct(string $url, string $company, string $user, string $password, string $evidence, bool $selfSignedCertificate, ?string $authSessionId = null)
+    public function __construct(
+        string $url,
+        string $company,
+        string $user,
+        string $password,
+        string $evidence,
+        bool $selfSignedCertificate,
+        ?string $authSessionId = null
+    )
     {
-        $this->user = $user;
-        $this->password = $password;
-        $this->evidence = $evidence;
-        $this->selfSignedCertificate = $selfSignedCertificate;
-        $this->queryBuilder = new QueryBuilder($company, $evidence, $url);
-        $this->authSessionId = $authSessionId;
+        $this->config = new Config(
+            $url,
+            $company,
+            $user,
+            $password,
+            $evidence,
+            $selfSignedCertificate,
+            $authSessionId
+        );
+        $this->queryBuilder = new UrlBuilder($this->config);
     }
 
     public function getAuthAndRefreshToken(): Response
@@ -74,8 +58,8 @@ class Client extends ObjectPrototype
                 'Content-Type: application/x-www-form-urlencoded',
             ],
             [
-                'username' => $this->user,
-                'password' => $this->password,
+                'username' => $this->config->getUser(),
+                'password' => $this->config->getPassword(),
             ]
         );
     }
@@ -130,7 +114,7 @@ class Client extends ObjectPrototype
 
         return array_map(static function (array $data){
             return new EvidenceResult($data);
-        }, $data[$this->evidence]);
+        }, $data[$this->config->getEvidence()]);
     }
 
     private function convertResponseToEvidenceResult(Response $response, bool $throwException): EvidenceResult
@@ -145,7 +129,7 @@ class Client extends ObjectPrototype
             return new EvidenceResult([]);
         }
 
-        return new EvidenceResult($data[$this->evidence]);
+        return new EvidenceResult($data[$this->config->getEvidence()]);
     }
 
     /**
@@ -242,7 +226,7 @@ class Client extends ObjectPrototype
         }
 
         $postData = [];
-        $postData[$this->evidence] = $evidenceData;
+        $postData[$this->config->getEvidence()] = $evidenceData;
 
         $response = $this->makeRequest(Method::get(Method::PUT), $this->queryBuilder->createUriByEvidenceOnly([]), $postData);
 
@@ -373,19 +357,19 @@ class Client extends ObjectPrototype
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 
-        if ($this->authSessionId !== null) {
+        if ($this->config->getAuthSessionId() !== null) {
             curl_setopt($ch, CURLOPT_HTTPAUTH, FALSE);
-            $headers[] = sprintf('X-authSessionId: %s', $this->authSessionId);
+            $headers[] = sprintf('X-authSessionId: %s', $this->config->getAuthSessionId());
         } else {
             curl_setopt($ch, CURLOPT_HTTPAUTH, TRUE);
-            curl_setopt($ch, CURLOPT_USERPWD, sprintf('%s:%s', $this->user, $this->password));
+            curl_setopt($ch, CURLOPT_USERPWD, sprintf('%s:%s', $this->config->getUser(), $this->config->getPassword()));
         }
 
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $httpMethod->getValue());
         curl_setopt($ch, CURLOPT_USERAGENT, 'Ecomail.cz Flexibee client (https://github.com/Ecomailcz/flexibee-client)');
 
-        if ($this->selfSignedCertificate || $this->authSessionId !== null) {
+        if ($this->config->isSelfSignedCertificate() || $this->config->getAuthSessionId() !== null) {
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
         }

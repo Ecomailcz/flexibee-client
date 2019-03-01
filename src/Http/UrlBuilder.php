@@ -2,6 +2,7 @@
 
 namespace EcomailFlexibee\Http;
 
+use EcomailFlexibee\Config;
 use EcomailFlexibee\Enum\SearchQueryOperator;
 use EcomailFlexibee\Validator\ParameterValidator;
 use Purl\ParserInterface;
@@ -9,7 +10,7 @@ use Purl\Path;
 use Purl\Query;
 use Purl\Url;
 
-class QueryBuilder extends Url
+class UrlBuilder extends Url
 {
 
     /**
@@ -27,11 +28,11 @@ class QueryBuilder extends Url
      */
     private $validator;
 
-    public function __construct(string $company, string $evidence, string $host, ?ParserInterface $parser = null)
+    public function __construct(Config $config, ?ParserInterface $parser = null)
     {
-        parent::__construct($host, $parser);
-        $this->company = $company;
-        $this->evidence = $evidence;
+        parent::__construct($config->getUrl(), $parser);
+        $this->company = $config->getCompany();
+        $this->evidence = $config->getEvidence();
         $this->validator = new ParameterValidator();
     }
 
