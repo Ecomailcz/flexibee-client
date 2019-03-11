@@ -39,13 +39,14 @@ class ClientTest extends TestCase
         $client->findById($this->faker->numberBetween());
     }
 
-    public function testGetAuthToken(): void
+    public function testGetAuthTokenAndMakeSuccessCallWithSessionAuthId(): void
     {
         $authToken = $this->client->getAuthAndRefreshToken()->getData();
         Assert::assertArrayHasKey('refreshToken', $authToken);
         Assert::assertArrayHasKey('authSessionId', $authToken);
         Assert::assertArrayHasKey('csrfToken', $authToken);
-
+        $client = new Client(Config::HOST, Config::COMPANY, 'xxx', 'xxx', Config::EVIDENCE, false, $authToken['authSessionId']);
+        Assert::assertNotEmpty($client->allInEvidence());
     }
 
     public function testCRUDForCustomIds(): void
