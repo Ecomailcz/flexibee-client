@@ -44,6 +44,18 @@ class UrlBuilder extends Url
     }
 
     /**
+     * @param array<mixed> $queryParameters
+     * @return string
+     */
+    public function createLoginFormUrl(array $queryParameters): string
+    {
+        $this->setPath(new Path('/login-logout/login.html'));
+        $this->createQueryParams($queryParameters);
+
+        return $this->getUrl();
+    }
+
+    /**
      * @param int $id
      * @param array<mixed> $queryParams
      * @return string

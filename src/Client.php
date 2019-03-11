@@ -47,6 +47,15 @@ class Client
         $this->queryBuilder = new UrlBuilder($this->config);
     }
 
+    /**
+     * @param array<mixed> $parameters
+     * @return string
+     */
+    public function getLoginFormUrl(array $parameters): string
+    {
+        return $this->queryBuilder->createLoginFormUrl($parameters);
+    }
+
     public function getAuthAndRefreshToken(): Response
     {
         return $this->makeRequest(

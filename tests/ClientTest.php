@@ -32,6 +32,14 @@ class ClientTest extends TestCase
         $this->client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, Config::EVIDENCE, false, null);
     }
 
+    public function testGetLoginFormUrl(): void
+    {
+        Assert::assertNotEmpty($this->client->getLoginFormUrl([]));
+        $queryWithParameters = $this->client->getLoginFormUrl(['otp' => 'test', 'returnUrl' => $this->faker->url]);
+        Assert::assertStringContainsString('otp', $queryWithParameters);
+        Assert::assertStringContainsString('returnUrl', $queryWithParameters);
+    }
+
     public function testInvalidAuthorization(): void
     {
         $client = new Client(Config::HOST, Config::COMPANY, 'xxx', 'xxx', Config::EVIDENCE, false, null);
@@ -47,6 +55,17 @@ class ClientTest extends TestCase
         Assert::assertArrayHasKey('csrfToken', $authToken);
         $client = new Client(Config::HOST, Config::COMPANY, 'xxx', 'xxx', Config::EVIDENCE, false, $authToken['authSessionId']);
         Assert::assertNotEmpty($client->allInEvidence());
+        Assert::assertNotEmpty($client->allInEvidence());
+    }
+
+    public function testInvalidGetAuthToken(): void
+    {
+        $client = new Client(Config::HOST, Config::COMPANY, 'xxx', 'xxx', Config::EVIDENCE, false, null);
+        $flexibeeResponse = $client->getAuthAndRefreshToken();
+        Assert::assertFalse($flexibeeResponse->isSuccess());
+        $data = $flexibeeResponse->getData();
+        Assert::assertArrayHasKey('errors', $data);
+        Assert::assertArrayHasKey('reason', $data['errors']);
     }
 
     public function testCRUDForCustomIds(): void
