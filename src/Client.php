@@ -395,7 +395,7 @@ class Client extends ObjectPrototype
             throw new EcomailFlexibeeConnectionError(sprintf('cURL error (%s): %s', curl_errno($ch), curl_error($ch)));
         }
 
-        if (mb_strpos($url, '.pdf') !== false && is_string($output)) {
+        if (mb_strpos($url, '.pdf') !== false) {
             return new FlexibeePdfResponse($output);
         }
 
