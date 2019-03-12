@@ -33,7 +33,7 @@ $tokens = $client->getAuthAndRefreshToken();
 $client = new Client('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', 'adresar', false, null);
 $evidenceData['kod'] = 'prvnizaznam'
 $evidenceData['nazev'] = 'První kontaktní adresa'
-$evidenceItemId = $client->save($evidenceData, null);
+$evidenceItemId = $client->save($evidenceData, null, $dryRun);
 ```
 Pokud vše proběhne v pořádku, vratí se třída `\EcomailFlexibee\Http\Response\Response:class` s daty ze systému Flexibee. Nastane-li chyba, vyhodí se výjimka
 `EcomailFlexibeeRequestError::class`. Pro editaci záznamu stačí vyplnit druhý parametr `$id`.

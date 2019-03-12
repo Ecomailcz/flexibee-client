@@ -139,7 +139,12 @@ class UrlBuilder extends Url
      */
     public function createUri($filterQueryOrId, array $uriParams): string
     {
-        $this->setPath($this->buildPathWithIdOrFilter($filterQueryOrId));
+        if ($filterQueryOrId === null) {
+            $this->setPath($this->buildPathForOnlyEvidence());
+        } else {
+            $this->setPath($this->buildPathWithIdOrFilter($filterQueryOrId));
+        }
+
         $this->createQueryParams($uriParams);
 
         return $this->getUrl();

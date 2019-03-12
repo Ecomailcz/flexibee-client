@@ -176,6 +176,15 @@ class ClientTest extends TestCase
         Assert::assertTrue(count($result) > 0);
     }
 
+    public function testDryRunRequest(): void
+    {
+        $response = $this->client->save(['kod' => uniqid(), 'nazev' => 'SDSDXXXXX'], null, true);
+        $firstItem = $response->getData()[0];
+        Assert::assertArrayHasKey('content', $firstItem);
+        Assert::assertArrayHasKey(Config::EVIDENCE, $firstItem['content']);
+        Assert::assertTrue((int) $firstItem['content'][Config::EVIDENCE]['id'] < 0);
+    }
+
     public function testMakeCustomRequest(): void
     {
         $results = $this->client->callRequest(
