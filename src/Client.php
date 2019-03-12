@@ -116,8 +116,8 @@ class Client
     {
         $data = $response->getData();
 
-        if ($response->getStatusCode() === 404 || count($data) === 0) {
-            return [];
+        if (!isset($data[$this->config->getEvidence()])) {
+            return count($data) !== 0  ? [new EvidenceResult($data)] : [];
         }
 
         if (!isset($data[$this->config->getEvidence()])) {
@@ -133,12 +133,12 @@ class Client
     {
         $data = $response->getData();
 
-        if ($response->getStatusCode() === 404 || count($data) === 0) {
+        if ($response->getStatusCode() === 404 || !isset($data[$this->config->getEvidence()])) {
             if ($throwException) {
                 throw new EcomailFlexibeeNoEvidenceResult();
             }
 
-            return new EvidenceResult([]);
+            return count($data) !== 0  ? new EvidenceResult($data) : new EvidenceResult([]);
         }
 
         return new EvidenceResult($data[$this->config->getEvidence()]);
@@ -291,6 +291,19 @@ class Client
         return $this->convertResponseToEvidenceResults($response);
     }
 
+    public function sumInEvidence(): EvidenceResult
+    {
+        $response = $this->makeRequest(
+            Method::get(Method::GET),
+            $this->queryBuilder->createSumQuery(),
+            [],
+            [],
+            []
+        );
+
+        return $this->convertResponseToEvidenceResult($response, false);
+    }
+
     /**
      * @param string $query
      * @param array<string> $queryParameters
@@ -303,7 +316,7 @@ class Client
     {
         $response = $this->makeRequest(
             Method::get(Method::GET),
-            $this->queryBuilder->createUriByEvidenceForSearchQuery($query, $queryParameters),
+            $this->queryBuilder->createFilterQuery($query, $queryParameters),
             [],
             [],
             []
@@ -364,6 +377,7 @@ class Client
     public function makeRequest(Method $httpMethod, string $url, array $postFields = [], array $headers = [], array $queryParameters = [])
     {
         $url = urldecode($url);
+
         /** @var resource $ch */
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);

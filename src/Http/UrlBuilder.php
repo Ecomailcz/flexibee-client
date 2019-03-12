@@ -121,19 +121,30 @@ class UrlBuilder extends Url
      * @param array<mixed> $queryParameters
      * @return string
      */
-    public function createUriByEvidenceForSearchQuery(string $query, array $queryParameters): string
+    public function createFilterQuery(string $query, array $queryParameters): string
     {
         $this->setPath(
             new Path(
                 sprintf('c/%s/%s/(%s).json',
-                $this->company,
-                $this->evidence,
-                SearchQueryOperator::convertOperatorsInQuery($query)
+                    $this->company,
+                    $this->evidence,
+                    SearchQueryOperator::convertOperatorsInQuery($query)
                 )
             )
         );
 
         $this->createQueryParams($queryParameters);
+
+        return $this->getUrl();
+    }
+
+    public function createSumQuery(): string
+    {
+        $baseUrl = sprintf('c/%s/%s/$sum.json',
+            $this->company,
+            $this->evidence
+        );
+        $this->setPath(new Path($baseUrl));
 
         return $this->getUrl();
     }

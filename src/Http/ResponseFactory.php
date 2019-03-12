@@ -18,8 +18,9 @@ final class ResponseFactory
 
         /** @var array<mixed>|null $data */
         $data = json_decode($response, true);
-        $data = $data === null || $statusCode === 404 ? [] : $data;
+        $data = $data ?? [];
         $data = $data['winstrom'] ?? $data;
+        $results = $data['results'] ?? $data;
 
         /** @var float|null $message */
         $version = null;
@@ -47,8 +48,6 @@ final class ResponseFactory
             $success = (isset($data['success']) && ($data['success'] === 'true' || $data['success'] === true));
             unset($data['success']);
         }
-
-        $results = $data['results'] ?? $data;
 
         if ($statusCode === 401) {
             throw new EcomailFlexibeeInvalidAuthorization();

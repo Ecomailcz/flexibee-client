@@ -38,7 +38,7 @@ $evidenceItemId = $client->save($evidenceData, null);
 Pokud vše proběhne v pořádku, vratí se třída `\EcomailFlexibee\Http\Response\Response:class` s daty ze systému Flexibee. Nastane-li chyba, vyhodí se výjimka
 `EcomailFlexibeeRequestError::class`. Pro editaci záznamu stačí vyplnit druhý parametr `$id`.
 
-## Vrácení záznamu dle parmetrů
+## Vrácení záznamu dle parametrů
 Nalezení záznamu dle id s vyhozením výjimky, pokud záznam neexistuje  
 ```
 $evidenceItem = $client->getById($evidenceItemId, $queryParams);
@@ -49,6 +49,11 @@ Vrácení prázného záznamu, pokud neexistuje ve Flexibee (bez vyhození výji
 ```
 $evidenceItem = $client->findById($evidenceItemId, $queryParams);
 $evidenceItem = $client->findByCode($evidenceItemCode, $queryParams);
+```
+
+## Sumace
+```
+$client->sumInEvidence();
 ```
 
 ## Smazání záznamu

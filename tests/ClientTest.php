@@ -47,6 +47,13 @@ class ClientTest extends TestCase
         $client->findById($this->faker->numberBetween());
     }
 
+    public function testSumInEvidence(): void
+    {
+        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'banka', false, null);
+        $data = $client->sumInEvidence();
+        Assert::assertArrayHasKey('sum', $data->getData());
+    }
+
     public function testGetAuthTokenAndMakeSuccessCallWithSessionAuthId(): void
     {
         $authToken = $this->client->getAuthAndRefreshToken()->getData();

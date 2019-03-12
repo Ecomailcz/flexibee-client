@@ -64,8 +64,8 @@ class QueryBuilderTest extends TestCase
 
     public function testCreateUriByEvidenceForSearchQuery(): void
     {
-        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/(test).json?limit=10000', $this->urlBuilder->createUriByEvidenceForSearchQuery('test', ['limit' => 10000]));
-        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/(test).json?limit=10000&start=0', $this->urlBuilder->createUriByEvidenceForSearchQuery('test', ['limit' => 10000, 'start' => 0]));
+        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/(test).json?limit=10000', $this->urlBuilder->createFilterQuery('test', ['limit' => 10000]));
+        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/(test).json?limit=10000&start=0', $this->urlBuilder->createFilterQuery('test', ['limit' => 10000, 'start' => 0]));
     }
 
 }
