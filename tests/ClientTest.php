@@ -47,13 +47,6 @@ class ClientTest extends TestCase
         $client->findById($this->faker->numberBetween());
     }
 
-    public function testSumInEvidence(): void
-    {
-        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'banka', false, null);
-        $data = $client->sumInEvidence();
-        Assert::assertArrayHasKey('sum', $data->getData());
-    }
-
     public function testGetAuthTokenAndMakeSuccessCallWithSessionAuthId(): void
     {
         $authToken = $this->client->getAuthAndRefreshToken()->getData();
@@ -62,7 +55,11 @@ class ClientTest extends TestCase
         Assert::assertArrayHasKey('csrfToken', $authToken);
         $client = new Client(Config::HOST, Config::COMPANY, 'xxx', 'xxx', Config::EVIDENCE, false, $authToken['authSessionId']);
         Assert::assertNotEmpty($client->allInEvidence());
-        Assert::assertNotEmpty($client->allInEvidence());
+    }
+
+    public function testCount(): void
+    {
+        Assert::assertTrue($this->client->countInEvidence() > 0);
     }
 
     public function testInvalidGetAuthToken(): void
@@ -179,22 +176,20 @@ class ClientTest extends TestCase
         Assert::assertTrue(count($result) > 0);
     }
 
-    public function testMakePreparedUrl(): void
+    public function testMakeCustomRequest(): void
     {
-        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'smlouva', false, null);
-        /** @var array<\EcomailFlexibee\Result\EvidenceResult> $result */
-        $result = $client->makePreparedRequest(Method::get(Method::POST), 'generovani-faktur.json');
-        /** @var array<mixed> $resultData */
-        $resultData = $result[0]->getData();
-        Assert::assertArrayHasKey('operation', $resultData);
-        Assert::assertArrayHasKey('messages', $resultData);
-    }
+        $results = $this->client->callRequest(
+            Method::get(Method::GET),
+            'properties',
+            [],
+            [],
+            []
+        );
 
-    public function testMakeRawRequest(): void
-    {
-        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false, null);
-        $result = $client->makeRawRequest(Method::get(Method::GET), '/c/demo/faktura-vydana/1.json');
-        Assert::assertTrue(count($result) > 0);
+        Assert::assertArrayHasKey(0, $results);
+        /** @var \EcomailFlexibee\Result\EvidenceResult $data */
+        $data = $results[0];
+        Assert::assertArrayHasKey('properties', $data->getData());
     }
 
     public function testWithExampleFlexibeeData(): void

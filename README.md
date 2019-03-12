@@ -41,14 +41,14 @@ Pokud vše proběhne v pořádku, vratí se třída `\EcomailFlexibee\Http\Respo
 ## Vrácení záznamu dle parametrů
 Nalezení záznamu dle id s vyhozením výjimky, pokud záznam neexistuje  
 ```
-$evidenceItem = $client->getById($evidenceItemId, $queryParams);
-$evidenceItem = $client->getByCode($evidenceItemCode, $queryParams);
+$evidenceItem = $client->getById($evidenceItemId, $uriParameters);
+$evidenceItem = $client->getByCode($evidenceItemCode, $uriParameters);
 ```
 
 Vrácení prázného záznamu, pokud neexistuje ve Flexibee (bez vyhození výjimky)  
 ```
-$evidenceItem = $client->findById($evidenceItemId, $queryParams);
-$evidenceItem = $client->findByCode($evidenceItemCode, $queryParams);
+$evidenceItem = $client->findById($evidenceItemId, $uriParameters);
+$evidenceItem = $client->findByCode($evidenceItemCode, $uriParameters);
 ```
 
 ## Sumace
@@ -65,20 +65,18 @@ $client->deleteByCode($code);
 ## Generování PDF
 Systém Flexibee umožňuje vrátit vygenerované faktury.
 ```
-$client->getPdfById($id, $queryParams);
+$client->getPdfById($id, $uriParameters);
 ```
 
 ## Vyhledávání v evidenci
 Systém Flexibee umožňuje vyhledávat nas evidencí. (https://www.flexibee.eu/api/dokumentace/ref/filters/)
 ```
-$client->searchInEvidence($query, $queryParams);
+$client->searchInEvidence($query, $uriParameters);
 ```
 ## Vytváření vlastních requestů
 Client nabízí možnost vytváření vlastních requestů. Stačí zavolat:  
 ```
-$responseData = $client->makeRequest(Method $httpMethod, string $uri, array $postFields);
-$responseData = $client->makeRequestPrepared(Method $httpMethod, string $uri);
-$responseData = $client->makeRawPrepared(Method $httpMethod, string $uri);
+$responseData = $client->callRequest(Method $httpMethod, string $section, array $queryParameters);
 ```
 Následně máte k dispozici data vrácená z Flexibee. Chyby jsou ošetřeny vyhozením kontrétních výjimek.
 
