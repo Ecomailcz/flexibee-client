@@ -195,7 +195,7 @@ class ClientTest extends TestCase
         $result = $client->searchInEvidence('kod<>\'JAN\'', []);
         Assert::assertTrue(count($result) > 0);
 
-        $result = $client->searchInEvidence('datSplat<\'2018-12-04\'%20and%20zuctovano=false', []);
+        $result = $client->searchInEvidence('(datSplat<\'2018-12-04\'%20and%20zuctovano=false)', []);
         Assert::assertTrue(count($result) > 0);
     }
 
