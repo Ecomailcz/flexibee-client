@@ -73,6 +73,18 @@ class ClientTest extends TestCase
         Assert::assertArrayHasKey('reason', $data['errors']);
     }
 
+    public function testGetChanges(): void
+    {
+        Assert::assertTrue($this->client->isAllowedChangesApi());
+        $response = $this->client->getAllApiChanges(null);
+        Assert::assertTrue($response->isSuccess());
+        $data = $response->getData();
+        Assert::assertArrayHasKey('changes', $data);
+        Assert::assertTrue(count($data['changes']) > 0);
+        $response = $this->client->getChangesApiForEvidence('faktura-vydana');
+        Assert::assertTrue($response->isSuccess());
+    }
+
     public function testCRUDForCustomIds(): void
     {
         $evidenceData = [
@@ -102,7 +114,9 @@ class ClientTest extends TestCase
      * @param array<mixed> $expectedDataAfterUpdate
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed
      */

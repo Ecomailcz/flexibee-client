@@ -94,6 +94,25 @@ class UrlBuilder extends Url
      * @param array<mixed> $uriParameters
      * @return string
      */
+    public function createChangesUrl(array $uriParameters = []): string
+    {
+        $this->setPath(new Path(sprintf('/c/%s/changes.json', $this->company)));
+        $this->createQueryParams($uriParameters);
+
+        return $this->getUrl();
+    }
+
+    public function createChangesStatusUrl(): string
+    {
+        $this->setPath(new Path(sprintf('/c/%s/changes/status.json', $this->company)));
+
+        return $this->getUrl();
+    }
+
+    /**
+     * @param array<mixed> $uriParameters
+     * @return string
+     */
     public function createUriByEvidenceOnly(array $uriParameters): string
     {
         $this->setPath($this->buildPathForOnlyEvidence());
