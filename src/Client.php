@@ -352,6 +352,15 @@ class Client
         return $this->responseHydrator->convertResponseToEvidenceResults($response);
     }
 
+    public function backup(): Response
+    {
+        return $this->makeRequest(
+            Method::get(Method::GET),
+            $this->queryBuilder->createBackupUrl(),
+            []
+        );
+    }
+
     /**
      * @param int $id
      * @param array<mixed> $uriParameters

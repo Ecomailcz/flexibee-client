@@ -5,6 +5,7 @@ namespace EcomailFlexibeeTest;
 use EcomailFlexibee\Client;
 use EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
+use EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestError;
 use EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed;
 use EcomailFlexibee\Http\Method;
@@ -86,6 +87,12 @@ class ClientTest extends TestCase
         Assert::assertNotEquals(count($evidenceItem->getData()[0]), count($evidenceItemFull->getData()[0]));
         $this->client->deleteByCode($code);
         Assert::assertCount(0, $this->client->findByCode($code)->getData());
+    }
+
+    public function testFailedBackup(): void
+    {
+        $this->expectException(EcomailFlexibeeNotAcceptableRequest::class);
+        $this->client->backup();
     }
 
     /**

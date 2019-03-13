@@ -3,6 +3,7 @@
 namespace EcomailFlexibee\Http;
 
 use EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization;
+use EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestError;
 use EcomailFlexibee\Http\Response\FlexibeeResponse;
 
@@ -57,6 +58,10 @@ final class ResponseFactory
 
         if ($statusCode === 401) {
             throw new EcomailFlexibeeInvalidAuthorization();
+        }
+
+        if ($statusCode === 406) {
+            throw new EcomailFlexibeeNotAcceptableRequest();
         }
 
         if (in_array($statusCode, [500, 400], true)) {
