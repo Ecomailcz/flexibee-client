@@ -9,6 +9,7 @@ use EcomailFlexibee\Http\Method;
 use EcomailFlexibee\Http\Response\FlexibeePdfResponse;
 use EcomailFlexibee\Http\Response\Response;
 use EcomailFlexibee\Http\ResponseFactory;
+use EcomailFlexibee\Http\ResponseHydrator;
 use EcomailFlexibee\Http\UrlBuilder;
 use EcomailFlexibee\Result\EvidenceResult;
 
@@ -24,6 +25,11 @@ class Client
      * @var \EcomailFlexibee\Config
      */
     private $config;
+
+    /**
+     * @var \EcomailFlexibee\Http\ResponseHydrator
+     */
+    private $responseHydrator;
 
     public function __construct(
         string $url,
@@ -45,6 +51,7 @@ class Client
             $authSessionId
         );
         $this->queryBuilder = new UrlBuilder($this->config);
+        $this->responseHydrator = new ResponseHydrator($this->config);
     }
 
     /**
@@ -72,20 +79,23 @@ class Client
         );
     }
     
-    public function deleteById(int $id): Response
+    public function deleteById(int $id, bool $dryRun = false): Response
     {
+        $uriParameters = $dryRun ? ['dry-run' => 'true'] : [];
+
         return $this->makeRequest(
             Method::get(Method::DELETE),
-            $this->queryBuilder->createUri($id, []),
+            $this->queryBuilder->createUri($id, $uriParameters),
             []
         );
     }
     
-    public function deleteByCode(string $id): void
+    public function deleteByCode(string $id, bool $dryRun = false): void
     {
+        $uriParameters = $dryRun ? ['dry-run' => 'true'] : [];
         $this->makeRequest(
             Method::get(Method::DELETE),
-            $this->queryBuilder->createUri(sprintf('code:%s', $id), []),
+            $this->queryBuilder->createUri(sprintf('code:%s', $id), $uriParameters),
             [],
             [],
             []
@@ -157,7 +167,7 @@ class Client
      */
     public function getByCode(string $code, array $uriParameters = []): EvidenceResult
     {
-        return $this->convertResponseToEvidenceResult(
+        return $this->responseHydrator->convertResponseToEvidenceResult(
             $this->makeRequest(
                 Method::get(Method::GET),
                 $this->queryBuilder->createUriByCodeOnly($code, $uriParameters),
@@ -178,7 +188,7 @@ class Client
      */
     public function getById(int $id, array $uriParameters = []): EvidenceResult
     {
-        return $this->convertResponseToEvidenceResult(
+        return $this->responseHydrator->convertResponseToEvidenceResult(
             $this->makeRequest(
                 Method::get(Method::GET),
                 $this->queryBuilder->createUri($id, $uriParameters),
@@ -210,13 +220,14 @@ class Client
      * @param array<mixed> $evidenceData
      * @param int|null $id
      * @param bool $dryRun
+     * @param array<mixed> $uriParameters
      * @return \EcomailFlexibee\Http\Response\Response
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed
      */
-    public function save(array $evidenceData, ?int $id, bool $dryRun = false): Response
+    public function save(array $evidenceData, ?int $id, bool $dryRun = false, array $uriParameters = []): Response
     {
         if ($id !== null) {
             $evidenceData['id'] = $id;
@@ -224,7 +235,7 @@ class Client
 
         $postData = [];
         $postData[$this->config->getEvidence()] = $evidenceData;
-        $uriParameters = $dryRun ? ['dry-run' => 'true'] : [];
+        $uriParameters = $dryRun ? array_merge($uriParameters, ['dry-run' => 'true']) : $uriParameters;
         $response = $this->makeRequest(Method::get(Method::PUT), $this->queryBuilder->createUriByEvidenceOnly($uriParameters), $postData);
         $statisticsData = $response->getStatistics();
 
@@ -251,7 +262,7 @@ class Client
             []
         );
 
-        return $this->convertResponseToEvidenceResults($response);
+        return $this->responseHydrator->convertResponseToEvidenceResults($response);
     }
 
     public function countInEvidence(): int
@@ -288,7 +299,7 @@ class Client
             []
         );
 
-        return $this->convertResponseToEvidenceResults($response);
+        return $this->responseHydrator->convertResponseToEvidenceResults($response);
     }
 
     /**
@@ -309,7 +320,7 @@ class Client
             []
         );
 
-        return $this->convertResponseToEvidenceResults($response);
+        return $this->responseHydrator->convertResponseToEvidenceResults($response);
     }
 
     /**
@@ -338,7 +349,7 @@ class Client
             $headers
         );
 
-        return $this->convertResponseToEvidenceResults($response);
+        return $this->responseHydrator->convertResponseToEvidenceResults($response);
     }
 
     /**

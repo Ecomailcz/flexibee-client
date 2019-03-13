@@ -33,7 +33,7 @@ $tokens = $client->getAuthAndRefreshToken();
 $client = new Client('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', 'adresar', false, null);
 $evidenceData['kod'] = 'prvnizaznam'
 $evidenceData['nazev'] = 'První kontaktní adresa'
-$evidenceItemId = $client->save($evidenceData, null, $dryRun);
+$evidenceItemId = $client->save($evidenceData, null, $dryRun, $uriParameters);
 ```
 Pokud vše proběhne v pořádku, vratí se třída `\EcomailFlexibee\Http\Response\Response:class` s daty ze systému Flexibee. Nastane-li chyba, vyhodí se výjimka
 `EcomailFlexibeeRequestError::class`. Pro editaci záznamu stačí vyplnit druhý parametr `$id`.
@@ -58,8 +58,8 @@ $client->sumInEvidence();
 
 ## Smazání záznamu
 ```
-$client->deleteById($id);
-$client->deleteByCode($code);
+$client->deleteById($id, $dryRun);
+$client->deleteByCode($code, $dryRun);
 ```
 
 ## Generování PDF

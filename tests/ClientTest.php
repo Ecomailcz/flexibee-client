@@ -82,6 +82,8 @@ class ClientTest extends TestCase
         $evidenceItem = $this->client->getByCode($code);
         Assert::assertCount(1, $evidenceItem->getData());
         Assert::assertEquals($id, (int) $evidenceItem->getData()[0]['id']);
+        $evidenceItemFull = $this->client->getByCode($code, ['detail' => 'full']);
+        Assert::assertNotEquals(count($evidenceItem->getData()[0]), count($evidenceItemFull->getData()[0]));
         $this->client->deleteByCode($code);
         Assert::assertCount(0, $this->client->findByCode($code)->getData());
     }
