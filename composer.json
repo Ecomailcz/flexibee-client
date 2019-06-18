@@ -1,6 +1,6 @@
 {
 	"name": "ecomailcz/flexibee-client",
-	"description": "Basic client for make flexibee requests",
+	"description": "Basic client for make FlexiBee requests",
 	"author": "Petr Král (petr@ecomail.cz)",
 	"license": ["MIT"],
 	"minimum-stability": "dev",
@@ -10,13 +10,13 @@
 		"ext-curl": "*",
 		"ext-json": "*",
 		"php": "^7.2",
-		"consistence/consistence": "^2.0",
-		"jwage/purl": "^0.0.10",
-		"rakit/validation": "^1.1"
+		"jwage/purl": "^1.0",
+		"rakit/validation": "^1.1",
+		"consistence/consistence": "^2.0"
 	},
 	"require-dev": {
 		"slevomat/coding-standard": "^5.0",
-		"phpstan/phpstan": "^0.11.0",
+		"phpstan/phpstan": "^0.11",
 		"phpunit/phpunit": "^8.0",
 		"phing/phing": "^2.16",
 		"fzaninotto/faker": "^1.7",
@@ -24,8 +24,8 @@
 		"sllh/composer-versions-check": "^2.0",
 		"wapmorgan/php-code-fixer": "^2.0",
 		"sebastian/phpcpd": "^4.0",
-		"phpstan/phpstan-strict-rules": "^0.11.0",
-		"phpstan/phpstan-phpunit": "^0.11.0"
+		"phpstan/phpstan-strict-rules": "^0.11",
+		"phpstan/phpstan-phpunit": "^0.11"
 	},
 	"autoload": {
 		"psr-4": {

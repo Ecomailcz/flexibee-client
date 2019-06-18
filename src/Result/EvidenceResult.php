@@ -2,9 +2,7 @@
 
 namespace EcomailFlexibee\Result;
 
-use Consistence\ObjectPrototype;
-
-final class EvidenceResult extends ObjectPrototype
+final class EvidenceResult
 {
 
     /**

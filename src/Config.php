@@ -2,9 +2,7 @@
 
 namespace EcomailFlexibee;
 
-use Consistence\ObjectPrototype;
-
-final class Config extends ObjectPrototype
+final class Config
 {
 
     /**

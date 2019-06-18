@@ -2,9 +2,9 @@
 
 namespace EcomailFlexibee\Exception;
 
-use Consistence\PhpException;
+use Exception;
 
-final class EcomailFlexibeeNoEvidenceResult extends PhpException
+final class EcomailFlexibeeNoEvidenceResult extends Exception
 {
 
 }

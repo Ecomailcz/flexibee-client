@@ -2,9 +2,7 @@
 
 namespace EcomailFlexibee\Http\Response;
 
-use Consistence\ObjectPrototype;
-
-class FlexibeeResponse extends ObjectPrototype implements Response
+class FlexibeeResponse implements Response
 {
 
     /**

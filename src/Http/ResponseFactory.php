@@ -2,12 +2,11 @@
 
 namespace EcomailFlexibee\Http;
 
-use Consistence\ObjectPrototype;
 use EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestError;
 use EcomailFlexibee\Http\Response\FlexibeeResponse;
 
-final class ResponseFactory extends ObjectPrototype
+final class ResponseFactory
 {
 
     protected function __construct()

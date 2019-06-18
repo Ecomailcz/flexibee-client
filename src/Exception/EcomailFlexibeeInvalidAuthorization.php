@@ -2,9 +2,9 @@
 
 namespace EcomailFlexibee\Exception;
 
-use Consistence\PhpException;
+use Exception;
 
-final class EcomailFlexibeeInvalidAuthorization extends PhpException
+final class EcomailFlexibeeInvalidAuthorization extends Exception
 {
 
 }

@@ -2,7 +2,6 @@
 
 namespace EcomailFlexibee;
 
-use Consistence\ObjectPrototype;
 use EcomailFlexibee\Exception\EcomailFlexibeeConnectionError;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
 use EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed;
@@ -13,7 +12,7 @@ use EcomailFlexibee\Http\ResponseFactory;
 use EcomailFlexibee\Http\UrlBuilder;
 use EcomailFlexibee\Result\EvidenceResult;
 
-class Client extends ObjectPrototype
+class Client
 {
 
     /**
@@ -110,6 +109,10 @@ class Client extends ObjectPrototype
 
         if ($response->getStatusCode() === 404 || count($data) === 0) {
             return [];
+        }
+
+        if (!isset($data[$this->config->getEvidence()])) {
+            return [new EvidenceResult($data)];
         }
 
         return array_map(static function (array $data){

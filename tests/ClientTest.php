@@ -156,9 +156,12 @@ class ClientTest extends TestCase
     public function testMakePreparedUrl(): void
     {
         $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'smlouva', false, null);
-        // There was error on flexibee demo account
-        $this->expectException(EcomailFlexibeeRequestError::class);
-        $client->makePreparedRequest(Method::get(Method::POST), 'generovani-faktur.json');
+        /** @var array<\EcomailFlexibee\Result\EvidenceResult> $result */
+        $result = $client->makePreparedRequest(Method::get(Method::POST), 'generovani-faktur.json');
+        /** @var array<mixed> $resultData */
+        $resultData = $result[0]->getData();
+        Assert::assertArrayHasKey('operation', $resultData);
+        Assert::assertArrayHasKey('messages', $resultData);
     }
 
     public function testMakeRawRequest(): void
