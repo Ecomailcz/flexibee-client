@@ -3,6 +3,8 @@
 namespace EcomailFlexibee\Http;
 
 use EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization;
+use EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed;
+use EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestError;
 use EcomailFlexibee\Http\Response\FlexibeeResponse;
 
@@ -15,11 +17,11 @@ final class ResponseFactory
 
     public static function createFromOutput(string $response, int $statusCode): FlexibeeResponse
     {
-
         /** @var array<mixed>|null $data */
         $data = json_decode($response, true);
-        $data = $data === null || $statusCode === 404 ? [] : $data;
+        $data = $data ?? [];
         $data = $data['winstrom'] ?? $data;
+        $results = $data['results'] ?? $data;
 
         /** @var float|null $message */
         $version = null;
@@ -27,10 +29,22 @@ final class ResponseFactory
         $message = null;
         $success = false;
         $statistics = [];
+        $rowCount = null;
+        $globalVersion = null;
 
         if (isset($data['@version'])) {
             $version = (float) $data['@version'];
             unset($data['@version']);
+        }
+
+        if (isset($data['@rowCount'])) {
+            $rowCount = (int) $data['@rowCount'];
+            unset($data['@rowCount']);
+        }
+
+        if (isset($data['@globalVersion'])) {
+            $globalVersion = (int) $data['@globalVersion'];
+            unset($data['@globalVersion']);
         }
 
         if (isset($data['message'])) {
@@ -46,12 +60,20 @@ final class ResponseFactory
         if (isset($data['success'])) {
             $success = (isset($data['success']) && ($data['success'] === 'true' || $data['success'] === true));
             unset($data['success']);
+        } elseif(in_array($statusCode, [200, 201], true)) {
+            $success = true;
         }
-
-        $results = $data['results'] ?? $data;
 
         if ($statusCode === 401) {
             throw new EcomailFlexibeeInvalidAuthorization();
+        }
+
+        if ($statusCode === 406) {
+            throw new EcomailFlexibeeNotAcceptableRequest();
+        }
+
+        if ($statusCode === 405) {
+            throw new EcomailFlexibeeMethodNotAllowed();
         }
 
         if (in_array($statusCode, [500, 400], true)) {
@@ -71,6 +93,8 @@ final class ResponseFactory
             $version,
             $success,
             $message,
+            $rowCount,
+            $globalVersion,
             $results,
             $statistics
         );

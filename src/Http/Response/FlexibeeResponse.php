@@ -36,12 +36,24 @@ class FlexibeeResponse implements Response
     private $statistics;
 
     /**
+     * @var int|null
+     */
+    private $rowCount;
+
+    /**
+     * @var int|null
+     */
+    private $globalVersion;
+
+    /**
      * FlexibeeResponse constructor.
      *
      * @param int $statusCode
      * @param float|null $version
      * @param bool $success
      * @param string|null $message
+     * @param int|null $rowCount
+     * @param int|null $globalVersion
      * @param array<mixed> $data
      * @param array<string> $statistics
      */
@@ -50,6 +62,8 @@ class FlexibeeResponse implements Response
         ?float $version,
         bool $success,
         ?string $message,
+        ?int $rowCount,
+        ?int $globalVersion,
         array $data = [],
         array $statistics = []
     )
@@ -60,6 +74,8 @@ class FlexibeeResponse implements Response
         $this->statusCode = $statusCode;
         $this->data = $data;
         $this->statistics = $statistics;
+        $this->rowCount = $rowCount;
+        $this->globalVersion = $globalVersion;
     }
 
     public function getVersion(): ?float
@@ -96,6 +112,16 @@ class FlexibeeResponse implements Response
     public function getStatistics(): array
     {
         return $this->statistics;
+    }
+
+    public function getRowCount(): ?int
+    {
+        return $this->rowCount;
+    }
+
+    public function getGlobalVersion(): ?int
+    {
+        return $this->globalVersion;
     }
 
 }

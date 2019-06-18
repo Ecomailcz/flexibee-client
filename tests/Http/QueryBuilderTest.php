@@ -32,11 +32,6 @@ class QueryBuilderTest extends TestCase
         );
     }
 
-    public function testCreateUriByIdOnly(): void
-    {
-        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/11.json', $this->urlBuilder->createUriByIdOnly(11));
-    }
-
     public function testCreateUriByCodeOnly(): void
     {
         Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/(kod=\'CODE:TEST\').json', $this->urlBuilder->createUriByCodeOnly('CODE:TEST', []));
@@ -50,22 +45,22 @@ class QueryBuilderTest extends TestCase
 
     public function testCreateUriByCustomId(): void
     {
-        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/code:TEST.json', $this->urlBuilder->createUriByCode('TEST', []));
+        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/code:TEST.json', $this->urlBuilder->createFilterQuery('code:TEST', []));
     }
 
     public function testCreateUriPdf(): void
     {
-        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/11.pdf', $this->urlBuilder->createUriPdf(11, []));
+        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/11.pdf', $this->urlBuilder->createPdfUrl(11, []));
         $queryParams = [];
         $queryParams['report-name'] = 'test';
         $queryParams['report-lang'] = 'en';
-        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/11.pdf?report-name=test&report-lang=en', $this->urlBuilder->createUriPdf(11, $queryParams));
+        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/11.pdf?report-name=test&report-lang=en', $this->urlBuilder->createPdfUrl(11, $queryParams));
     }
 
     public function testCreateUriByEvidenceForSearchQuery(): void
     {
-        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/(test).json?limit=10000', $this->urlBuilder->createUriByEvidenceForSearchQuery('test', ['limit' => 10000]));
-        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/(test).json?limit=10000&start=0', $this->urlBuilder->createUriByEvidenceForSearchQuery('test', ['limit' => 10000, 'start' => 0]));
+        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/1.json?limit=10000', $this->urlBuilder->createFilterQuery('1', ['limit' => 10000]));
+        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/1.json?limit=10000&start=0', $this->urlBuilder->createFilterQuery('1', ['limit' => 10000, 'start' => 0]));
     }
 
 }

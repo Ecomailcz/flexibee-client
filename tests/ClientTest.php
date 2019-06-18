@@ -5,6 +5,7 @@ namespace EcomailFlexibeeTest;
 use EcomailFlexibee\Client;
 use EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
+use EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestError;
 use EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed;
 use EcomailFlexibee\Http\Method;
@@ -32,6 +33,14 @@ class ClientTest extends TestCase
         $this->client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, Config::EVIDENCE, false, null);
     }
 
+    public function testGetLoginFormUrl(): void
+    {
+        Assert::assertNotEmpty($this->client->getLoginFormUrl([]));
+        $queryWithParameters = $this->client->getLoginFormUrl(['otp' => 'test', 'returnUrl' => $this->faker->url]);
+        Assert::assertStringContainsString('otp', $queryWithParameters);
+        Assert::assertStringContainsString('returnUrl', $queryWithParameters);
+    }
+
     public function testInvalidAuthorization(): void
     {
         $client = new Client(Config::HOST, Config::COMPANY, 'xxx', 'xxx', Config::EVIDENCE, false, null);
@@ -49,6 +58,34 @@ class ClientTest extends TestCase
         Assert::assertNotEmpty($client->allInEvidence());
     }
 
+    public function testCount(): void
+    {
+        Assert::assertTrue($this->client->countInEvidence() > 0);
+    }
+
+    public function testInvalidGetAuthToken(): void
+    {
+        $client = new Client(Config::HOST, Config::COMPANY, 'xxx', 'xxx', Config::EVIDENCE, false, null);
+        $flexibeeResponse = $client->getAuthAndRefreshToken();
+        Assert::assertFalse($flexibeeResponse->isSuccess());
+        $data = $flexibeeResponse->getData();
+        Assert::assertArrayHasKey('errors', $data);
+        Assert::assertArrayHasKey('reason', $data['errors']);
+    }
+
+    public function testGetChanges(): void
+    {
+        if ($this->client->isAllowedChangesApi()) {
+            $response = $this->client->getAllApiChanges(null);
+            Assert::assertTrue($response->isSuccess());
+            $data = $response->getData();
+            Assert::assertArrayHasKey('changes', $data);
+            Assert::assertTrue(count($data['changes']) > 0);
+            $response = $this->client->getChangesApiForEvidence('faktura-vydana');
+            Assert::assertTrue($response->isSuccess());
+        }
+    }
+
     public function testCRUDForCustomIds(): void
     {
         $evidenceData = [
@@ -59,8 +96,16 @@ class ClientTest extends TestCase
         $evidenceItem = $this->client->getByCode($code);
         Assert::assertCount(1, $evidenceItem->getData());
         Assert::assertEquals($id, (int) $evidenceItem->getData()[0]['id']);
+        $evidenceItemFull = $this->client->getByCode($code, ['detail' => 'full']);
+        Assert::assertNotEquals(count($evidenceItem->getData()[0]), count($evidenceItemFull->getData()[0]));
         $this->client->deleteByCode($code);
         Assert::assertCount(0, $this->client->findByCode($code)->getData());
+    }
+
+    public function testFailedBackup(): void
+    {
+        $this->expectException(EcomailFlexibeeNotAcceptableRequest::class);
+        $this->client->backup();
     }
 
     /**
@@ -70,7 +115,9 @@ class ClientTest extends TestCase
      * @param array<mixed> $expectedDataAfterUpdate
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed
      */
@@ -149,26 +196,33 @@ class ClientTest extends TestCase
         $result = $client->searchInEvidence('kod<>\'JAN\'', []);
         Assert::assertTrue(count($result) > 0);
 
-        $result = $client->searchInEvidence('datSplat<\'2018-12-04\'%20and%20zuctovano=false', []);
+        $result = $client->searchInEvidence('(datSplat<\'2018-12-04\'%20and%20zuctovano=false)', []);
         Assert::assertTrue(count($result) > 0);
     }
 
-    public function testMakePreparedUrl(): void
+    public function testDryRunRequest(): void
     {
-        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'smlouva', false, null);
-        /** @var array<\EcomailFlexibee\Result\EvidenceResult> $result */
-        $result = $client->makePreparedRequest(Method::get(Method::POST), 'generovani-faktur.json');
-        /** @var array<mixed> $resultData */
-        $resultData = $result[0]->getData();
-        Assert::assertArrayHasKey('operation', $resultData);
-        Assert::assertArrayHasKey('messages', $resultData);
+        $response = $this->client->save(['kod' => uniqid(), 'nazev' => 'SDSDXXXXX'], null, true);
+        $firstItem = $response->getData()[0];
+        Assert::assertArrayHasKey('content', $firstItem);
+        Assert::assertArrayHasKey(Config::EVIDENCE, $firstItem['content']);
+        Assert::assertTrue((int) $firstItem['content'][Config::EVIDENCE]['id'] < 0);
     }
 
-    public function testMakeRawRequest(): void
+    public function testMakeCustomRequest(): void
     {
-        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false, null);
-        $result = $client->makeRawRequest(Method::get(Method::GET), '/c/demo/faktura-vydana/1.json');
-        Assert::assertTrue(count($result) > 0);
+        $results = $this->client->callRequest(
+            Method::get(Method::GET),
+            'properties',
+            [],
+            [],
+            []
+        );
+
+        Assert::assertArrayHasKey(0, $results);
+        /** @var \EcomailFlexibee\Result\EvidenceResult $data */
+        $data = $results[0];
+        Assert::assertArrayHasKey('properties', $data->getData());
     }
 
     public function testWithExampleFlexibeeData(): void

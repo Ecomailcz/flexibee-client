@@ -9,6 +9,7 @@ use EcomailFlexibee\Http\Method;
 use EcomailFlexibee\Http\Response\FlexibeePdfResponse;
 use EcomailFlexibee\Http\Response\Response;
 use EcomailFlexibee\Http\ResponseFactory;
+use EcomailFlexibee\Http\ResponseHydrator;
 use EcomailFlexibee\Http\UrlBuilder;
 use EcomailFlexibee\Result\EvidenceResult;
 
@@ -24,6 +25,11 @@ class Client
      * @var \EcomailFlexibee\Config
      */
     private $config;
+
+    /**
+     * @var \EcomailFlexibee\Http\ResponseHydrator
+     */
+    private $responseHydrator;
 
     public function __construct(
         string $url,
@@ -45,6 +51,49 @@ class Client
             $authSessionId
         );
         $this->queryBuilder = new UrlBuilder($this->config);
+        $this->responseHydrator = new ResponseHydrator($this->config);
+    }
+
+    public function isAllowedChangesApi(): bool
+    {
+        return $this->makeRequest(
+            Method::get(Method::GET),
+            $this->queryBuilder->createChangesStatusUrl(),
+            [],
+            [],
+            []
+        )->isSuccess();
+    }
+
+    public function getChangesApiForEvidence(string $evidenceName): Response
+    {
+        return $this->makeRequest(
+            Method::get(Method::GET),
+            $this->queryBuilder->createChangesUrl(['evidence' => $evidenceName]),
+            [],
+            [],
+            []
+        );
+    }
+
+    public function getAllApiChanges(?string $fromVersion): Response
+    {
+        return $this->makeRequest(
+            Method::get(Method::GET),
+            $this->queryBuilder->createChangesUrl(['start' => $fromVersion]),
+            [],
+            [],
+            []
+        );
+    }
+
+    /**
+     * @param array<mixed> $parameters
+     * @return string
+     */
+    public function getLoginFormUrl(array $parameters): string
+    {
+        return $this->queryBuilder->createLoginFormUrl($parameters);
     }
 
     public function getAuthAndRefreshToken(): Response
@@ -63,39 +112,26 @@ class Client
         );
     }
     
-    public function deleteById(int $id): Response
+    public function deleteById(int $id, bool $dryRun = false): Response
     {
+        $uriParameters = $dryRun ? ['dry-run' => 'true'] : [];
+
         return $this->makeRequest(
             Method::get(Method::DELETE),
-            $this->queryBuilder->createUriByIdOnly($id),
+            $this->queryBuilder->createUri($id, $uriParameters),
             []
         );
     }
     
-    public function deleteByCode(string $id): void
+    public function deleteByCode(string $id, bool $dryRun = false): void
     {
+        $uriParameters = $dryRun ? ['dry-run' => 'true'] : [];
         $this->makeRequest(
             Method::get(Method::DELETE),
-            $this->queryBuilder->createUriByCode($id, []),
+            $this->queryBuilder->createUri(sprintf('code:%s', $id), $uriParameters),
+            [],
+            [],
             []
-        );
-    }
-
-    /**
-     * @param \EcomailFlexibee\Http\Method $method
-     * @param string $url
-     * @return array<\EcomailFlexibee\Result\EvidenceResult>
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
-     */
-    public function makePreparedRequest(Method $method, string $url): array
-    {
-        return $this->convertResponseToEvidenceResults(
-            $this->makeRequest(
-                $method,
-                $this->queryBuilder->createBaseUrl($url)
-            )
         );
     }
 
@@ -107,8 +143,8 @@ class Client
     {
         $data = $response->getData();
 
-        if ($response->getStatusCode() === 404 || count($data) === 0) {
-            return [];
+        if (!isset($data[$this->config->getEvidence()])) {
+            return count($data) !== 0  ? [new EvidenceResult($data)] : [];
         }
 
         if (!isset($data[$this->config->getEvidence()])) {
@@ -124,12 +160,12 @@ class Client
     {
         $data = $response->getData();
 
-        if ($response->getStatusCode() === 404 || count($data) === 0) {
+        if ($response->getStatusCode() === 404 || !isset($data[$this->config->getEvidence()])) {
             if ($throwException) {
                 throw new EcomailFlexibeeNoEvidenceResult();
             }
 
-            return new EvidenceResult([]);
+            return count($data) !== 0  ? new EvidenceResult($data) : new EvidenceResult([]);
         }
 
         return new EvidenceResult($data[$this->config->getEvidence()]);
@@ -137,16 +173,18 @@ class Client
 
     /**
      * @param int $id
-     * @param array<mixed> $queryParams
+     * @param array<mixed> $uriParameters
      * @return \EcomailFlexibee\Result\EvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
-    public function findById(int $id, array $queryParams = []): EvidenceResult
+    public function findById(int $id, array $uriParameters = []): EvidenceResult
     {
         try {
-            return $this->getById($id, $queryParams);
+            return $this->getById($id, $uriParameters);
         } catch (EcomailFlexibeeNoEvidenceResult $exception) {
             return new EvidenceResult([]);
         }
@@ -154,20 +192,22 @@ class Client
 
     /**
      * @param string $code
-     * @param array<mixed> $queryParams
+     * @param array<mixed> $uriParameters
      * @return \EcomailFlexibee\Result\EvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
-    public function getByCode(string $code, array $queryParams = []): EvidenceResult
+    public function getByCode(string $code, array $uriParameters = []): EvidenceResult
     {
-        return $this->convertResponseToEvidenceResult(
+        return $this->responseHydrator->convertResponseToEvidenceResult(
             $this->makeRequest(
                 Method::get(Method::GET),
-                $this->queryBuilder->createUriByCodeOnly($code, $queryParams),
+                $this->queryBuilder->createUriByCodeOnly($code, $uriParameters),
                 []
             ) ,
             true
@@ -176,19 +216,21 @@ class Client
 
     /**
      * @param int $id
-     * @param array<string> $queryParams
+     * @param array<string> $uriParameters
      * @return \EcomailFlexibee\Result\EvidenceResult
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
-    public function getById(int $id, array $queryParams = []): EvidenceResult
+    public function getById(int $id, array $uriParameters = []): EvidenceResult
     {
-        return $this->convertResponseToEvidenceResult(
+        return $this->responseHydrator->convertResponseToEvidenceResult(
             $this->makeRequest(
                 Method::get(Method::GET),
-                $this->queryBuilder->createUriByIdOnly($id, $queryParams),
+                $this->queryBuilder->createUri($id, $uriParameters),
                 []
             ),
             true
@@ -197,17 +239,18 @@ class Client
 
     /**
      * @param string $code
-     * @param array<mixed> $queryParams
+     * @param array<mixed> $uriParameters
      * @return \EcomailFlexibee\Result\EvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
-    public function findByCode(string $code, array $queryParams = []): EvidenceResult
+    public function findByCode(string $code, array $uriParameters = []): EvidenceResult
     {
         try {
-            return $this->getByCode($code, $queryParams);
+            return $this->getByCode($code, $uriParameters);
         } catch (EcomailFlexibeeNoEvidenceResult $exception) {
             return new EvidenceResult([]);
         }
@@ -216,13 +259,17 @@ class Client
     /**
      * @param array<mixed> $evidenceData
      * @param int|null $id
+     * @param bool $dryRun
+     * @param array<mixed> $uriParameters
      * @return \EcomailFlexibee\Http\Response\Response
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed
      */
-    public function save(array $evidenceData, ?int $id): Response
+    public function save(array $evidenceData, ?int $id, bool $dryRun = false, array $uriParameters = []): Response
     {
         if ($id !== null) {
             $evidenceData['id'] = $id;
@@ -230,9 +277,8 @@ class Client
 
         $postData = [];
         $postData[$this->config->getEvidence()] = $evidenceData;
-
-        $response = $this->makeRequest(Method::get(Method::PUT), $this->queryBuilder->createUriByEvidenceOnly([]), $postData);
-
+        $uriParameters = $dryRun ? array_merge($uriParameters, ['dry-run' => 'true']) : $uriParameters;
+        $response = $this->makeRequest(Method::get(Method::PUT), $this->queryBuilder->createUriByEvidenceOnly($uriParameters), $postData);
         $statisticsData = $response->getStatistics();
 
         if ((int) $statisticsData['created'] === 0 && (int) $statisticsData['updated'] === 0) {
@@ -246,19 +292,37 @@ class Client
      * @return array<mixed>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
     public function allInEvidence(): array
     {
         $response = $this->makeRequest(
             Method::get(Method::GET),
-            $this->queryBuilder->createUriByEvidenceWithQueryParameters(['limit' => 0]),
+            $this->queryBuilder->createUriByEvidenceOnly(['limit' => 0]),
             [],
             [],
             []
         );
 
-        return $this->convertResponseToEvidenceResults($response);
+        return $this->responseHydrator->convertResponseToEvidenceResults($response);
+    }
+
+    public function countInEvidence(): int
+    {
+        $response = $this->makeRequest(
+            Method::get(Method::GET),
+            $this->queryBuilder->createUriByEvidenceOnly(['add-row-count' => 'true']),
+            [],
+            [],
+            []
+        );
+
+        /** @var int $result */
+        $result = $response->getRowCount() ?? 0;
+
+        return $result;
     }
 
     /**
@@ -267,76 +331,101 @@ class Client
      * @return array<\EcomailFlexibee\Result\EvidenceResult>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
     public function chunkInEvidence(int $start, int $limit): array
     {
         $response = $this->makeRequest(
             Method::get(Method::GET),
-            $this->queryBuilder->createUriByEvidenceWithQueryParameters(['limit' => $limit, 'start' => $start]),
+            $this->queryBuilder->createUriByEvidenceOnly(['limit' => $limit, 'start' => $start]),
             [],
             [],
             []
         );
 
-        return $this->convertResponseToEvidenceResults($response);
+        return $this->responseHydrator->convertResponseToEvidenceResults($response);
     }
 
     /**
      * @param string $query
-     * @param array<string> $queryParameters
+     * @param array<string> $uriParameters
      * @return array<\EcomailFlexibee\Result\EvidenceResult>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
-    public function searchInEvidence(string $query, array $queryParameters): array
+    public function searchInEvidence(string $query, array $uriParameters): array
     {
         $response = $this->makeRequest(
             Method::get(Method::GET),
-            $this->queryBuilder->createUriByEvidenceForSearchQuery($query, $queryParameters),
+            $this->queryBuilder->createFilterQuery($query, $uriParameters),
             [],
             [],
             []
         );
 
-        return $this->convertResponseToEvidenceResults($response);
+        return $this->responseHydrator->convertResponseToEvidenceResults($response);
     }
 
     /**
-     * @param \EcomailFlexibee\Http\Method $method
-     * @param string $uri
+     * @param \EcomailFlexibee\Http\Method $httpMethod
+     * @param mixed $queryFilterOrId
+     * @param array<mixed> $uriParameters
+     * @param array<mixed> $postFields
+     * @param array<string> $headers
      * @return array<\EcomailFlexibee\Result\EvidenceResult>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      */
-    public function makeRawRequest(Method $method, string $uri): array
+    public function callRequest(
+        Method $httpMethod,
+        $queryFilterOrId,
+        array $uriParameters,
+        array $postFields,
+        array $headers
+    ): array
     {
         $response = $this->makeRequest(
-            $method,
-            $this->queryBuilder->createUriByDomainOnly($uri),
-            [],
-            [],
-            []
+            $httpMethod,
+            $this->queryBuilder->createUri($queryFilterOrId, $uriParameters),
+            $postFields,
+            $headers
         );
 
-        return $this->convertResponseToEvidenceResults($response);
+        return $this->responseHydrator->convertResponseToEvidenceResults($response);
+    }
+
+    public function backup(): Response
+    {
+        return $this->makeRequest(
+            Method::get(Method::GET),
+            $this->queryBuilder->createBackupUrl(),
+            []
+        );
     }
 
     /**
      * @param int $id
-     * @param array<mixed> $queryParams
+     * @param array<mixed> $uriParameters
      * @return \EcomailFlexibee\Http\Response\Response
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
-    public function getPdfById(int $id, array $queryParams): Response
+    public function getPdfById(int $id, array $uriParameters): Response
     {
         return $this->makeRequest(
             Method::get(Method::GET),
-            $this->queryBuilder->createUriPdf($id, $queryParams),
+            $this->queryBuilder->createPdfUrl($id, $uriParameters),
             []
         );
     }
@@ -348,13 +437,16 @@ class Client
      * @param array<string> $headers
      * @param array<mixed> $queryParameters
      * @return \EcomailFlexibee\Http\Response\Response|\EcomailFlexibee\Http\Response\FlexibeePdfResponse
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
-    public function makeRequest(Method $httpMethod, string $url, array $postFields = [], array $headers = [], array $queryParameters = [])
+    private function makeRequest(Method $httpMethod, string $url, array $postFields = [], array $headers = [], array $queryParameters = [])
     {
         $url = urldecode($url);
+
         /** @var resource $ch */
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);

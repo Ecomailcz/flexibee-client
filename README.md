@@ -33,47 +33,50 @@ $tokens = $client->getAuthAndRefreshToken();
 $client = new Client('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', 'adresar', false, null);
 $evidenceData['kod'] = 'prvnizaznam'
 $evidenceData['nazev'] = 'První kontaktní adresa'
-$evidenceItemId = $client->save($evidenceData, null);
+$evidenceItemId = $client->save($evidenceData, null, $dryRun, $uriParameters);
 ```
 Pokud vše proběhne v pořádku, vratí se třída `\EcomailFlexibee\Http\Response\Response:class` s daty ze systému Flexibee. Nastane-li chyba, vyhodí se výjimka
 `EcomailFlexibeeRequestError::class`. Pro editaci záznamu stačí vyplnit druhý parametr `$id`.
 
-## Vrácení záznamu dle parmetrů
+## Vrácení záznamu dle parametrů
 Nalezení záznamu dle id s vyhozením výjimky, pokud záznam neexistuje  
 ```
-$evidenceItem = $client->getById($evidenceItemId, $queryParams);
-$evidenceItem = $client->getByCode($evidenceItemCode, $queryParams);
+$evidenceItem = $client->getById($evidenceItemId, $uriParameters);
+$evidenceItem = $client->getByCode($evidenceItemCode, $uriParameters);
 ```
 
 Vrácení prázného záznamu, pokud neexistuje ve Flexibee (bez vyhození výjimky)  
 ```
-$evidenceItem = $client->findById($evidenceItemId, $queryParams);
-$evidenceItem = $client->findByCode($evidenceItemCode, $queryParams);
+$evidenceItem = $client->findById($evidenceItemId, $uriParameters);
+$evidenceItem = $client->findByCode($evidenceItemCode, $uriParameters);
+```
+
+## Sumace
+```
+$client->sumInEvidence();
 ```
 
 ## Smazání záznamu
 ```
-$client->deleteById($id);
-$client->deleteByCode($code);
+$client->deleteById($id, $dryRun);
+$client->deleteByCode($code, $dryRun);
 ```
 
 ## Generování PDF
 Systém Flexibee umožňuje vrátit vygenerované faktury.
 ```
-$client->getPdfById($id, $queryParams);
+$client->getPdfById($id, $uriParameters);
 ```
 
 ## Vyhledávání v evidenci
 Systém Flexibee umožňuje vyhledávat nas evidencí. (https://www.flexibee.eu/api/dokumentace/ref/filters/)
 ```
-$client->searchInEvidence($query, $queryParams);
+$client->searchInEvidence($query, $uriParameters);
 ```
 ## Vytváření vlastních requestů
 Client nabízí možnost vytváření vlastních requestů. Stačí zavolat:  
 ```
-$responseData = $client->makeRequest(Method $httpMethod, string $uri, array $postFields);
-$responseData = $client->makeRequestPrepared(Method $httpMethod, string $uri);
-$responseData = $client->makeRawPrepared(Method $httpMethod, string $uri);
+$responseData = $client->callRequest(Method $httpMethod, string $section, array $queryParameters);
 ```
 Následně máte k dispozici data vrácená z Flexibee. Chyby jsou ošetřeny vyhozením kontrétních výjimek.
 
