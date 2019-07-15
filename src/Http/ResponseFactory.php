@@ -29,7 +29,7 @@ final class ResponseFactory
         $message = null;
         $success = false;
         $statistics = [];
-        $rowCount = null;
+        $rowCount = 0;
         $globalVersion = null;
 
         if (isset($data['@version'])) {

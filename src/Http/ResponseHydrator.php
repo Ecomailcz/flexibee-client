@@ -30,7 +30,15 @@ class ResponseHydrator extends ObjectPrototype
         $data = $response->getData();
 
         if (!isset($data[$this->config->getEvidence()])) {
-            return count($data) !== 0  ? [new EvidenceResult($data)] : [];
+            if (count($data) === 0) {
+                $data = $response->getStatistics();
+                $data['status_code'] = $response->getStatusCode();
+                $data['message'] = $response->getMessage();
+                $data['version'] = $response->getVersion();
+                $data['row_count'] = $response->getRowCount();
+            }
+
+            return [new EvidenceResult($data)];
         }
 
         return array_map(static function (array $data){

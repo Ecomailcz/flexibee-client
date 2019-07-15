@@ -23,6 +23,6 @@ interface Response
      */
     public function getStatistics(): array;
 
-    public function getRowCount(): ?int;
+    public function getRowCount(): int;
 
 }
