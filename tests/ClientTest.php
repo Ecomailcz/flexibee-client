@@ -76,15 +76,17 @@ class ClientTest extends TestCase
 
     public function testGetChanges(): void
     {
-        if ($this->client->isAllowedChangesApi()) {
-            $response = $this->client->getAllApiChanges(null);
-            Assert::assertTrue($response->isSuccess());
-            $data = $response->getData();
-            Assert::assertArrayHasKey('changes', $data);
-            Assert::assertTrue(count($data['changes']) > 0);
-            $response = $this->client->getChangesApiForEvidence('faktura-vydana');
-            Assert::assertTrue($response->isSuccess());
+        if (!$this->client->isAllowedChangesApi()) {
+            return;
         }
+
+        $response = $this->client->getAllApiChanges(null);
+        Assert::assertTrue($response->isSuccess());
+        $data = $response->getData();
+        Assert::assertArrayHasKey('changes', $data);
+        Assert::assertTrue(count($data['changes']) > 0);
+        $response = $this->client->getChangesApiForEvidence('faktura-vydana');
+        Assert::assertTrue($response->isSuccess());
     }
 
     public function testCRUDForCustomIds(): void
@@ -271,8 +273,6 @@ class ClientTest extends TestCase
 
                 throw $exception;
             }
-
-
         }
     }
 
@@ -280,6 +280,7 @@ class ClientTest extends TestCase
     {
         $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'pokladni-pohyb', false);
         $results = $client->callRequest(Method::get(Method::POST), 'automaticke-parovani', [], [], []);
+
         foreach ($results as $result) {
             $this->checkResponseStructure($result);
         }
@@ -298,6 +299,7 @@ class ClientTest extends TestCase
             'version',
             'row_count',
         ];
+
         foreach ($requiredKeys as $requiredKey) {
             Assert::assertArrayHasKey($requiredKey, $result->getData());
         }

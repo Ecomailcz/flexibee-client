@@ -4,7 +4,6 @@ namespace EcomailFlexibeeTest\Validator;
 
 use EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter;
 use EcomailFlexibee\Validator\ParameterValidator;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class ParameterValidatorTest extends TestCase
@@ -21,12 +20,6 @@ final class ParameterValidatorTest extends TestCase
         $this->validator = new ParameterValidator();
     }
 
-    /**
-     * @dataProvider getDataForTestValidateFlexibeeRequestCodeParameter
-     * @param string $code
-     * @param string|null $exceptionClass
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
-     */
     public function testValidateFlexibeeRequestCodeParameter(string $code, ?string $exceptionClass): void
     {
         if ($exceptionClass !== null) {
