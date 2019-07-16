@@ -9,6 +9,7 @@ use EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestError;
 use EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed;
 use EcomailFlexibee\Http\Method;
+use EcomailFlexibee\Result\EvidenceResult;
 use Faker\Factory;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
@@ -272,6 +273,33 @@ class ClientTest extends TestCase
             }
 
 
+        }
+    }
+
+    public function testRunBackendProcesses(): void
+    {
+        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'pokladni-pohyb', false);
+        $results = $client->callRequest(Method::get(Method::POST), 'automaticke-parovani', [], [], []);
+        foreach ($results as $result) {
+            $this->checkResponseStructure($result);
+        }
+    }
+
+    private function checkResponseStructure(EvidenceResult $result): void
+    {
+        $requiredKeys = [
+            'created',
+            'updated',
+            'deleted',
+            'skipped',
+            'failed',
+            'status_code',
+            'message',
+            'version',
+            'row_count',
+        ];
+        foreach ($requiredKeys as $requiredKey) {
+            Assert::assertArrayHasKey($requiredKey, $result->getData());
         }
     }
 
