@@ -303,4 +303,29 @@ class ClientTest extends TestCase
         }
     }
 
+    public function testCreateUserRelations(): void
+    {
+        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false);
+        $evidenceData = [
+            'nazev' => $this->faker->firstName,
+            'kod' => uniqid(),
+            'typDokl' => 'code:FAKTURA',
+        ];
+        $invoiceIdA = (int) $client->save($evidenceData, null)->getData()[0]['id'];
+        Assert::assertNotEmpty($invoiceIdA);
+        $evidenceData = [
+            'nazev' => $this->faker->firstName,
+            'kod' => uniqid(),
+            'typDokl' => 'code:FAKTURA',
+        ];
+        $invoiceIdB = (int) $client->save($evidenceData, null)->getData()[0]['id'];
+        Assert::assertNotEmpty($invoiceIdB);
+
+        $client->addUserRelation($invoiceIdA, $invoiceIdB, 10.0, 1);
+        $relationsEvidenceResult = $client->getUserRelations($invoiceIdA);
+        Assert::assertNotEmpty($relationsEvidenceResult->getData());
+        $relationId = $relationsEvidenceResult->getData()[0]['id'];
+        Assert::assertNotEmpty($relationId);
+    }
+
 }

@@ -282,10 +282,53 @@ class Client
         $statisticsData = $response->getStatistics();
 
         if ((int) $statisticsData['created'] === 0 && (int) $statisticsData['updated'] === 0) {
-            throw new EcomailFlexibeeSaveFailed();
+            throw new EcomailFlexibeeSaveFailed((string) $response->getMessage());
         }
 
         return $response;
+    }
+
+    public function createDeductionFromProforma(int $proformaInvoiceId, int $issuedInvoiceId, float $price): void
+    {
+        $issuedInvoiceData = $this->getById($issuedInvoiceId)->getData()[0];
+        $relationData = [
+            'id' => $issuedInvoiceId,
+            'typDokl' => $issuedInvoiceData['typDokl'],
+            'odpocty-zaloh' => [
+                'odpocet' => [
+                    'castkaMen' => $price,
+                    'doklad' => $proformaInvoiceId,
+                ],
+            ],
+        ];
+
+        $this->save($relationData, null);
+    }
+
+    public function getUserRelations(int $objectId): EvidenceResult
+    {
+        $data = $this->getById($objectId, ['relations' => 'uzivatelske-vazby'])->getData()[0]['uzivatelske-vazby'];
+
+        return new EvidenceResult($data);
+    }
+
+    public function addUserRelation(int $objectAId, int $objectBId, float $price, int $relationTypeId, ?string $description = null): void
+    {
+        $objectBData = $this->getById($objectBId, [])->getData()[0];
+        $relationData = [
+            'id' => $objectAId,
+            'uzivatelske-vazby' => [
+                'uzivatelska-vazba' => [
+                    'vazbaTyp' => $relationTypeId,
+                    'cena' => $price,
+                    'popis' => $description,
+                    'evidenceType' => $this->config->getEvidence(),
+                    'object' => sprintf('code:%s', $objectBData['kod']),
+                ],
+            ],
+        ];
+
+        $this->save($relationData, $objectAId);
     }
 
     /**
