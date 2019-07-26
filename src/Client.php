@@ -281,6 +281,10 @@ class Client
         $response = $this->makeRequest(Method::get(Method::PUT), $this->queryBuilder->createUriByEvidenceOnly($uriParameters), $postData);
         $statisticsData = $response->getStatistics();
 
+        if (!array_key_exists('created', $statisticsData) && !array_key_exists('updated', $statisticsData)) {
+            throw new EcomailFlexibeeSaveFailed(sprintf('%s - %s', (string) $response->getMessage(), print_r($response->getData(), true)));
+        }
+
         if ((int) $statisticsData['created'] === 0 && (int) $statisticsData['updated'] === 0) {
             throw new EcomailFlexibeeSaveFailed((string) $response->getMessage());
         }
