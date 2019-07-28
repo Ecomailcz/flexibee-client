@@ -303,6 +303,14 @@ class ClientTest extends TestCase
         }
     }
 
+    public function testUnknownCompany(): void
+    {
+        $client = new Client(Config::HOST, 'xxx', Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false);
+        $this->expectException(EcomailFlexibeeSaveFailed::class);
+        $client->save([], null);
+
+    }
+
     public function testCreateUserRelations(): void
     {
         $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false);
