@@ -139,7 +139,7 @@ class ClientTest extends TestCase
         Assert::assertCount(0, $client->findById($addressBookId)->getData());
         $this->expectException(EcomailFlexibeeNoEvidenceResult::class);
         $client->getById($addressBookId);
-        $this->expectException(EcomailFlexibeeSaveFailed::class);
+        $this->expectException(EcomailFlexibeeRequestError::class);
         $evidenceData = [];
         $this->client->save($evidenceData, null);
     }

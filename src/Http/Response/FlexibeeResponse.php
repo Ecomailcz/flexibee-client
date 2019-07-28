@@ -33,7 +33,7 @@ class FlexibeeResponse implements Response
     /**
      * @var array<string>
      */
-    private $statistics;
+    private $statistics = [];
 
     /**
      * @var int

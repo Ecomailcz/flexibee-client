@@ -7,6 +7,7 @@ use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
 use EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed;
 use EcomailFlexibee\Http\Method;
 use EcomailFlexibee\Http\Response\FlexibeePdfResponse;
+use EcomailFlexibee\Http\Response\FlexibeeResponse;
 use EcomailFlexibee\Http\Response\Response;
 use EcomailFlexibee\Http\ResponseFactory;
 use EcomailFlexibee\Http\ResponseHydrator;
@@ -156,21 +157,6 @@ class Client
         }, $data[$this->config->getEvidence()]);
     }
 
-    private function convertResponseToEvidenceResult(Response $response, bool $throwException): EvidenceResult
-    {
-        $data = $response->getData();
-
-        if ($response->getStatusCode() === 404 || !isset($data[$this->config->getEvidence()])) {
-            if ($throwException) {
-                throw new EcomailFlexibeeNoEvidenceResult();
-            }
-
-            return count($data) !== 0  ? new EvidenceResult($data) : new EvidenceResult([]);
-        }
-
-        return new EvidenceResult($data[$this->config->getEvidence()]);
-    }
-
     /**
      * @param int $id
      * @param array<mixed> $uriParameters
@@ -244,6 +230,7 @@ class Client
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
@@ -261,7 +248,7 @@ class Client
      * @param int|null $id
      * @param bool $dryRun
      * @param array<mixed> $uriParameters
-     * @return \EcomailFlexibee\Http\Response\Response
+     * @return \EcomailFlexibee\Http\Response\FlexibeeResponse
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
@@ -269,7 +256,7 @@ class Client
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed
      */
-    public function save(array $evidenceData, ?int $id, bool $dryRun = false, array $uriParameters = []): Response
+    public function save(array $evidenceData, ?int $id, bool $dryRun = false, array $uriParameters = []): FlexibeeResponse
     {
         if ($id !== null) {
             $evidenceData['id'] = $id;
@@ -278,18 +265,30 @@ class Client
         $postData = [];
         $postData[$this->config->getEvidence()] = $evidenceData;
         $uriParameters = $dryRun ? array_merge($uriParameters, ['dry-run' => 'true']) : $uriParameters;
-        $response = $this->makeRequest(Method::get(Method::PUT), $this->queryBuilder->createUriByEvidenceOnly($uriParameters), $postData);
-        $statisticsData = $response->getStatistics();
+        /** @var \EcomailFlexibee\Result\EvidenceResult $response */
+        $response = $this->callRequest(Method::get(Method::PUT), null, $uriParameters, $postData, [])[0];
+        $data = $response->getData();
 
-        if (!array_key_exists('created', $statisticsData) && !array_key_exists('updated', $statisticsData)) {
-            throw new EcomailFlexibeeSaveFailed(sprintf('%s - %s', (string) $response->getMessage(), print_r($response->getData(), true)));
+        if (isset($data['created']) && (int) $data['created'] === 0 && isset($data['updated']) && (int) $data['updated'] === 0) {
+            $errorMessage = sprintf('(%d) %s', $data['status_code'], $data['message']);
+
+            throw new EcomailFlexibeeSaveFailed($errorMessage);
         }
 
-        if ((int) $statisticsData['created'] === 0 && (int) $statisticsData['updated'] === 0) {
-            throw new EcomailFlexibeeSaveFailed((string) $response->getMessage());
+        if (isset($data['success']) && $data['success'] !== 'true' && isset($data['message'])) {
+            throw new EcomailFlexibeeSaveFailed($data['message']);
         }
 
-        return $response;
+        return new FlexibeeResponse(
+            200,
+            null,
+            true,
+            null,
+            count($data),
+            null,
+            $response->getData(),
+            []
+        );
     }
 
     public function createDeductionFromProforma(int $proformaInvoiceId, int $issuedInvoiceId, float $price): void
