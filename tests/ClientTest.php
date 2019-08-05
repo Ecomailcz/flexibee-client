@@ -103,12 +103,6 @@ class ClientTest extends TestCase
         Assert::assertCount(0, $this->client->findByCode($code)->getData());
     }
 
-    public function testFailedBackup(): void
-    {
-        $this->expectException(EcomailFlexibeeNotAcceptableRequest::class);
-        $this->client->backup();
-    }
-
     /**
      * @dataProvider getEvidences
      * @param string $evidence

@@ -6,6 +6,7 @@ use EcomailFlexibee\Exception\EcomailFlexibeeConnectionError;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
 use EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed;
 use EcomailFlexibee\Http\Method;
+use EcomailFlexibee\Http\Response\FlexibeeBackupResponse;
 use EcomailFlexibee\Http\Response\FlexibeePdfResponse;
 use EcomailFlexibee\Http\Response\FlexibeeResponse;
 use EcomailFlexibee\Http\Response\Response;
@@ -484,6 +485,7 @@ class Client
      * @param array<mixed> $queryParameters
      * @return \EcomailFlexibee\Http\Response\Response|\EcomailFlexibee\Http\Response\FlexibeePdfResponse
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
@@ -536,8 +538,14 @@ class Client
             throw new EcomailFlexibeeConnectionError(sprintf('cURL error (%s): %s', curl_errno($ch), curl_error($ch)));
         }
 
+        // PDF content
         if (mb_strpos($url, '.pdf') !== false) {
             return new FlexibeePdfResponse($output);
+        }
+
+        // Backup content
+        if ($httpMethod->equalsValue(Method::GET) && mb_strpos($url, 'backup') !== false) {
+            return new FlexibeeBackupResponse($output);
         }
 
         return ResponseFactory::createFromOutput($output, curl_getinfo($ch, CURLINFO_HTTP_CODE));
