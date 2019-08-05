@@ -426,10 +426,11 @@ class Client
      * @param array<string> $headers
      * @return array<\EcomailFlexibee\Result\EvidenceResult>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      */
     public function callRequest(
         Method $httpMethod,
@@ -458,11 +459,24 @@ class Client
         );
     }
 
+    public function restore(string $companyName, string $data): Response
+    {
+        return $this->makeRequest(
+            Method::get(Method::GET),
+            $this->queryBuilder->createRestoreUrl($companyName),
+            [$data],
+            [],
+            [],
+            true
+        );
+    }
+
     /**
      * @param int $id
      * @param array<mixed> $uriParameters
      * @return \EcomailFlexibee\Http\Response\Response
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
@@ -483,6 +497,7 @@ class Client
      * @param array<mixed> $postFields
      * @param array<string> $headers
      * @param array<mixed> $queryParameters
+     * @param bool $rawPostFields
      * @return \EcomailFlexibee\Http\Response\Response|\EcomailFlexibee\Http\Response\FlexibeePdfResponse
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
@@ -491,7 +506,7 @@ class Client
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
-    private function makeRequest(Method $httpMethod, string $url, array $postFields = [], array $headers = [], array $queryParameters = [])
+    private function makeRequest(Method $httpMethod, string $url, array $postFields = [], array $headers = [], array $queryParameters = [], bool $rawPostFields = false)
     {
         $url = urldecode($url);
 
@@ -520,8 +535,12 @@ class Client
         $postData = [];
 
         if (count($postFields) !== 0) {
-            $postData['winstrom'] = $postFields;
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
+            if (!$rawPostFields) {
+                $postData['winstrom'] = $postFields;
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postData));
+            } else {
+                curl_setopt($ch, CURLOPT_POSTFIELDS, implode("\n", $postFields));
+            }
         }
 
         if (count($queryParameters) !== 0) {

@@ -74,6 +74,8 @@ class ClientTest extends TestCase
         Assert::assertArrayHasKey('reason', $data['errors']);
     }
 
+    
+
     public function testGetChanges(): void
     {
         if ($this->client->isAllowedChangesApi()) {

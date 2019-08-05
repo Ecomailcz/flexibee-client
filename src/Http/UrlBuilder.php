@@ -90,6 +90,13 @@ class UrlBuilder extends Url
         return $this->getUrl();
     }
 
+    public function createRestoreUrl(string $companyName): string
+    {
+        $this->setPath(new Path(sprintf('/c/%s/restore?name=%s', $this->company, $companyName)));
+
+        return $this->getUrl();
+    }
+
     /**
      * @param array<mixed> $uriParameters
      * @return string
