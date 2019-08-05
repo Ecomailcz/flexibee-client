@@ -85,7 +85,7 @@ class UrlBuilder extends Url
 
     public function createBackupUrl(): string
     {
-        $this->setPath(new Path(sprintf('/c/%s/backup.json', $this->company)));
+        $this->setPath(new Path(sprintf('/c/%s/backup', $this->company)));
 
         return $this->getUrl();
     }

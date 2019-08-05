@@ -2,6 +2,7 @@
 
 namespace EcomailFlexibee\Http;
 
+use EcomailFlexibee\Exception\EcomailFlexibeeForbidden;
 use EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization;
 use EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed;
 use EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest;
@@ -65,11 +66,15 @@ final class ResponseFactory
         }
 
         if ($statusCode === 401) {
-            throw new EcomailFlexibeeInvalidAuthorization();
+            throw new EcomailFlexibeeInvalidAuthorization('Uživatel se musí pro provedení dané operace přihlásit.');
+        }
+
+        if ($statusCode === 403) {
+            throw new EcomailFlexibeeForbidden('Uživatel na tuto operaci nemá oprávnění. Tato chyba se zobrazí i v případě, že danou operaci neumožňuje licence.');
         }
 
         if ($statusCode === 406) {
-            throw new EcomailFlexibeeNotAcceptableRequest();
+            throw new EcomailFlexibeeNotAcceptableRequest('Cílový formát není nad konkrétním zdrojem podporovaný (např. export adresáře jako ISDOC).');
         }
 
         if ($statusCode === 405) {
