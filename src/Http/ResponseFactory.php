@@ -82,7 +82,7 @@ final class ResponseFactory
                     continue;
                 }
 
-                self::throwErrorMessage($resultData['errors']);
+                self::throwErrorMessage($resultData['errors'], $statusCode);
             }
 
             throw new EcomailFlexibeeRequestError($message);
@@ -102,9 +102,10 @@ final class ResponseFactory
 
     /**
      * @param array<mixed> $errors
+     * @param int $statusCode
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
-    private static function throwErrorMessage(array $errors): void
+    private static function throwErrorMessage(array $errors, int $statusCode): void
     {
         foreach ($errors as $error) {
             $messageLines = [];
@@ -125,7 +126,7 @@ final class ResponseFactory
                 $messageLines[] = sprintf('message: %s', $error['message']);
             }
 
-            throw new EcomailFlexibeeRequestError(implode("\n", $messageLines));
+            throw new EcomailFlexibeeRequestError(implode("\n", $messageLines), $statusCode);
         }
     }
 

@@ -336,4 +336,17 @@ class ClientTest extends TestCase
         Assert::assertNotEmpty($relationId);
     }
 
+    public function testCreateSameEvidenceRecord(): void
+    {
+        $code = uniqid();
+        $data = [
+            'nazev' => $code,
+            'kod' => $code,
+        ];
+        $this->client->save($data, null);
+        $this->expectException(EcomailFlexibeeRequestError::class);
+        $this->expectExceptionCode(400);
+        $this->client->save($data, null);
+    }
+
 }
