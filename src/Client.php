@@ -563,7 +563,7 @@ class Client
         }
 
         // Backup content
-        if ($httpMethod->equalsValue(Method::GET) && mb_strpos($url, 'backup') !== false) {
+        if ($httpMethod->equalsValue(Method::GET) && mb_stripos($url, '/backup') !== false) {
             return new FlexibeeBackupResponse($output);
         }
 
