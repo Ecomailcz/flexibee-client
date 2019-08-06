@@ -2,9 +2,9 @@
 
 namespace EcomailFlexibee\Exception;
 
-use Consistence\PhpException;
+use Exception;
 
-final class EcomailFlexibeeMethodNotAllowed extends PhpException
+final class EcomailFlexibeeMethodNotAllowed extends Exception
 {
 
 }
