@@ -462,7 +462,7 @@ class Client
     public function restore(string $companyName, string $data): Response
     {
         return $this->makeRequest(
-            Method::get(Method::GET),
+            Method::get(Method::PUT),
             $this->queryBuilder->createRestoreUrl($companyName),
             [$data],
             [],
