@@ -34,8 +34,8 @@ class QueryBuilderTest extends TestCase
 
     public function testCreateUriByCodeOnly(): void
     {
-        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/(kod=\'CODE:TEST\').json', $this->urlBuilder->createUriByCodeOnly('CODE:TEST', []));
-        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/(kod=\'CODE:TEST\').json?test=1', $this->urlBuilder->createUriByCodeOnly('CODE:TEST', ['test' => true]));
+        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/(kod%20eq%20\'CODE:TEST\').json', $this->urlBuilder->createUriByCodeOnly('CODE:TEST', []));
+        Assert::assertEquals('https://demo.flexibee.eu/c/demo/adresar/(kod%20eq%20\'CODE:TEST\').json?test=1', $this->urlBuilder->createUriByCodeOnly('CODE:TEST', ['test' => true]));
     }
 
     public function testCreateUriByEvidenceOnly(): void
