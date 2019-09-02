@@ -150,7 +150,7 @@ class UrlBuilder extends Url
     public function createUriByCodeOnly(string $code, array $uriParameters): string
     {
         $this->validator->validateFlexibeeRequestCodeParameter($code);
-        $this->setPath($this->buildPathWithIdOrFilter(sprintf('(kod=\'%s\')', $code)));
+        $this->setPath($this->buildPathWithIdOrFilter(sprintf('(kod eq \'%s\')', $code)));
         $this->createQueryParams($uriParameters);
 
         return $this->getUrl();
