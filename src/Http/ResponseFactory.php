@@ -24,7 +24,6 @@ final class ResponseFactory
         $data = $data['winstrom'] ?? $data;
         $results = $data['results'] ?? $data;
 
-        /** @var float|null $message */
         $version = null;
         /** @var string|null $message */
         $message = null;

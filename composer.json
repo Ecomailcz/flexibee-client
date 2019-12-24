@@ -8,7 +8,7 @@
 		"ext-simplexml": "*",
 		"ext-curl": "*",
 		"ext-json": "*",
-		"php": "^7.2",
+		"php": "^7.3",
 		"jwage/purl": "^1.0",
 		"rakit/validation": "^1.1",
 		"consistence/consistence": "^2.0"
@@ -19,7 +19,8 @@
 		"phing/phing": "^2.16",
 		"fzaninotto/faker": "^1.7",
 		"wapmorgan/php-code-fixer": "^2.0",
-		"sebastian/phpcpd": "^4.0"
+		"sebastian/phpcpd": "^4.0",
+		"phpstan/phpstan": "^0.12.3"
 	},
 	"autoload": {
 		"psr-4": {
