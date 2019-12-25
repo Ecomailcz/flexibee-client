@@ -20,6 +20,12 @@ final class ParameterValidatorTest extends TestCase
         $this->validator = new ParameterValidator();
     }
 
+    /**
+     * @dataProvider getDataForTestValidateFlexibeeRequestCodeParameter
+     * @param string      $code
+     * @param string|null $exceptionClass
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
+     */
     public function testValidateFlexibeeRequestCodeParameter(string $code, ?string $exceptionClass): void
     {
         if ($exceptionClass !== null) {

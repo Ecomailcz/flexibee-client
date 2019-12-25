@@ -1,6 +1,9 @@
-[![Build Status](https://travis-ci.org/Ecomailcz/flexibee-client.svg?branch=master)](https://travis-ci.org/Ecomailcz/flexibee-client)
+# FlexiBee client
+[![Build Status](https://travis-ci.org/Ecomailcz/flexibee-client.svg?branch=master?format=flat)](https://travis-ci.org/Ecomailcz/flexibee-client)
+[![Latest Stable Version](https://poser.pugx.org/ecomailcz/flexibee-client/v/stable?format=flat)](https://packagist.org/packages/ecomailcz/flexibee-client)
+[![Total Downloads](https://poser.pugx.org/ecomailcz/flexibee-client/downloads?format=flat)](https://packagist.org/packages/ecomailcz/flexibee-client)
+[![License](https://poser.pugx.org/ecomailcz/flexibee-client/license?format=flat)](https://packagist.org/packages/ecomailcz/flexibee-client)
 
-# flexibee-client
 Jednoduchý cURL client, který se stará o správné složení requestu do systému Flexibee a následné vrácení výsledků.
 
 ## Instalace přes composer
