@@ -21,7 +21,7 @@ class Client
     /**
      * @var \EcomailFlexibee\Http\UrlBuilder
      */
-    private $queryBuilder;
+    protected $queryBuilder;
 
     /**
      * @var \EcomailFlexibee\Config
@@ -416,27 +416,6 @@ class Client
         return $this->responseHydrator->convertResponseToEvidenceResults($response);
     }
 
-    public function backup(): Response
-    {
-        return $this->makeRequest(
-            Method::get(Method::GET),
-            $this->queryBuilder->createBackupUrl(),
-            []
-        );
-    }
-
-    public function restore(string $companyName, string $data): Response
-    {
-        return $this->makeRequest(
-            Method::get(Method::PUT),
-            $this->queryBuilder->createRestoreUrl($companyName),
-            [$data],
-            [],
-            [],
-            true
-        );
-    }
-
     /**
      * @param int $id
      * @param array<mixed> $uriParameters
@@ -472,7 +451,7 @@ class Client
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
-    private function makeRequest(Method $httpMethod, string $url, array $postFields = [], array $headers = [], array $queryParameters = [], bool $rawPostFields = false)
+    protected function makeRequest(Method $httpMethod, string $url, array $postFields = [], array $headers = [], array $queryParameters = [], bool $rawPostFields = false)
     {
         $url = urldecode($url);
 

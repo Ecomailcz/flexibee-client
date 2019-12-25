@@ -29,6 +29,7 @@ $authSessionId,
 K dispozici jsou různé druhy klientů, které mají implementovány metody pro snažší práci s FlexiBee API.
 ```
 $bankClient = new BankClient($config);
+$companyClient = new CompanyClient($config);
 ```
 
 ## Vygenerování autorizačního tokenu
