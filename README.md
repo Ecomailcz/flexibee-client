@@ -30,6 +30,7 @@ K dispozici jsou různé druhy klientů, které mají implementovány metody pro
 ```
 $bankClient = new BankClient($config);
 $companyClient = new CompanyClient($config);
+$recurringContractClient = new RecurringContractClient($config);
 ```
 
 ## Vygenerování autorizačního tokenu
