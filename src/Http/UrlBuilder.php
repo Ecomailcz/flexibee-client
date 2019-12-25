@@ -142,7 +142,7 @@ class UrlBuilder extends Url
     }
 
     /**
-     * @param string $code
+     * @param string       $code
      * @param array<mixed> $uriParameters
      * @return string
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter

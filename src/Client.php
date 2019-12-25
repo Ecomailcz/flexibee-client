@@ -138,27 +138,6 @@ class Client
     }
 
     /**
-     * @param \EcomailFlexibee\Http\Response\Response $response
-     * @return array<\EcomailFlexibee\Result\EvidenceResult>
-     */
-    private function convertResponseToEvidenceResults(Response $response): array
-    {
-        $data = $response->getData();
-
-        if (!isset($data[$this->config->getEvidence()])) {
-            return count($data) !== 0  ? [new EvidenceResult($data)] : [];
-        }
-
-        if (!isset($data[$this->config->getEvidence()])) {
-            return [new EvidenceResult($data)];
-        }
-
-        return array_map(static function (array $data){
-            return new EvidenceResult($data);
-        }, $data[$this->config->getEvidence()]);
-    }
-
-    /**
      * @param int $id
      * @param array<mixed> $uriParameters
      * @return \EcomailFlexibee\Result\EvidenceResult
@@ -178,10 +157,11 @@ class Client
     }
 
     /**
-     * @param string $code
+     * @param string       $code
      * @param array<mixed> $uriParameters
      * @return \EcomailFlexibee\Result\EvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
@@ -202,10 +182,11 @@ class Client
     }
 
     /**
-     * @param int $id
+     * @param int           $id
      * @param array<string> $uriParameters
      * @return \EcomailFlexibee\Result\EvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
@@ -225,10 +206,11 @@ class Client
     }
 
     /**
-     * @param string $code
+     * @param string       $code
      * @param array<mixed> $uriParameters
      * @return \EcomailFlexibee\Result\EvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
@@ -246,11 +228,12 @@ class Client
 
     /**
      * @param array<mixed> $evidenceData
-     * @param int|null $id
-     * @param bool $dryRun
+     * @param int|null     $id
+     * @param bool         $dryRun
      * @param array<mixed> $uriParameters
      * @return \EcomailFlexibee\Http\Response\FlexibeeResponse
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
@@ -292,28 +275,11 @@ class Client
         );
     }
 
-    public function createDeductionFromProforma(int $proformaInvoiceId, int $issuedInvoiceId, float $price): void
-    {
-        $issuedInvoiceData = $this->getById($issuedInvoiceId)->getData()[0];
-        $relationData = [
-            'id' => $issuedInvoiceId,
-            'typDokl' => $issuedInvoiceData['typDokl'],
-            'odpocty-zaloh' => [
-                'odpocet' => [
-                    'castkaMen' => $price,
-                    'doklad' => $proformaInvoiceId,
-                ],
-            ],
-        ];
-
-        $this->save($relationData, null);
-    }
-
     public function getUserRelations(int $objectId): EvidenceResult
     {
-        $data = $this->getById($objectId, ['relations' => 'uzivatelske-vazby'])->getData()[0]['uzivatelske-vazby'];
-
-        return new EvidenceResult($data);
+        return new EvidenceResult(
+            $this->getById($objectId, ['relations' => 'uzivatelske-vazby'])->getData()[0]['uzivatelske-vazby']
+        );
     }
 
     public function addUserRelation(int $objectAId, int $objectBId, float $price, int $relationTypeId, ?string $description = null): void
@@ -338,6 +304,7 @@ class Client
     /**
      * @return array<mixed>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
@@ -366,10 +333,7 @@ class Client
             []
         );
 
-        /** @var int $result */
-        $result = $response->getRowCount() ?? 0;
-
-        return $result;
+       return $response->getRowCount() ?? 0;
     }
 
     /**
@@ -377,6 +341,7 @@ class Client
      * @param int $limit
      * @return array<\EcomailFlexibee\Result\EvidenceResult>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
@@ -396,10 +361,11 @@ class Client
     }
 
     /**
-     * @param string $query
+     * @param string        $query
      * @param array<string> $uriParameters
      * @return array<\EcomailFlexibee\Result\EvidenceResult>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
