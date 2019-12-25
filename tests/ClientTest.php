@@ -361,4 +361,11 @@ final class ClientTest extends TestCase
         $this->client->save($data, null);
     }
 
+    public function testGetPropertiesForEvidence(): void
+    {
+        $responseData = $this->client->getPropertiesForEvidence()->getData();
+        Assert::assertArrayHasKey('properties', $responseData);
+        Assert::assertArrayHasKey('property', $responseData['properties']);
+    }
+
 }

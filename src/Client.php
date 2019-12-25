@@ -78,6 +78,17 @@ class Client
         );
     }
 
+    public function getPropertiesForEvidence(): Response
+    {
+        return $this->makeRequest(
+            Method::get(Method::GET),
+            $this->queryBuilder->createUri('properties', []),
+            [],
+            [],
+            []
+        );
+    }
+
     public function getAllApiChanges(?string $fromVersion): Response
     {
         return $this->makeRequest(

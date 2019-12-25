@@ -80,9 +80,14 @@ $client->getPdfById($id, $uriParameters);
 ```
 
 ## Vyhledávání v evidenci
-Systém Flexibee umožňuje vyhledávat nas evidencí. (https://www.flexibee.eu/api/dokumentace/ref/filters/)
+Systém Flexibee umožňuje vyhledávat nad evidencí. (https://www.flexibee.eu/api/dokumentace/ref/filters/)
 ```
 $client->searchInEvidence($query, $uriParameters);
+```
+## Seznam položek v evidenci
+Seznam všech dostupných prvků pro konkrétní evidenci
+```
+$client->getPropertiesForEvidence();
 ```
 ## Vytváření vlastních requestů
 Client nabízí možnost vytváření vlastních requestů. Stačí zavolat:  
