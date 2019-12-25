@@ -104,12 +104,29 @@ class ClientTest extends TestCase
         Assert::assertCount(0, $this->client->findByCode($code)->getData());
     }
 
+    public function testEvidenceGetOnlyCustomFields(): void
+    {
+        $evidenceData = [
+            'nazev' => $this->faker->firstName,
+        ];
+        $id = (int) $this->client->save($evidenceData, null)->getData()[0]['id'];
+        $evidenceData = $this->client->getById($id, ['detail' => 'custom:id,email,kontakty(primarni,email)'])->getData()[0];
+        Assert::assertEquals([
+            'id' => $id,
+            'email' => '',
+            'kontakty' => [],
+        ],
+            $evidenceData
+        );
+    }
+
     /**
      * @dataProvider getEvidences
-     * @param string $evidence
+     * @param string       $evidence
      * @param array<mixed> $evidenceData
      * @param array<mixed> $expectedDataAfterUpdate
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
