@@ -25,6 +25,12 @@ $authSessionId,
 
 `$authSessionId - Hodnota authentikačního id pro Flexibee`
 
+## Typy klientů
+K dispozici jsou různé druhy klientů, které mají implementovány metody pro snažší práci s FlexiBee API.
+```
+$bankClient = new BankClient($config);
+```
+
 ## Vygenerování autorizačního tokenu
 ```
 $client = new Client('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', 'adresar', false, null);

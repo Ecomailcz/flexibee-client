@@ -13,7 +13,7 @@ use Faker\Factory;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class ClientTest extends TestCase
+final class ClientTest extends TestCase
 {
 
     /**
