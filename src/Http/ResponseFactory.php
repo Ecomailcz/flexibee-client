@@ -19,7 +19,7 @@ final class ResponseFactory
     public static function createFromOutput(string $response, int $statusCode): FlexibeeResponse
     {
         /** @var array<mixed>|null $data */
-        $data = json_decode($response, true);
+        $data = \json_decode($response, true);
         $data = $data ?? [];
         $data = $data['winstrom'] ?? $data;
         $results = $data['results'] ?? $data;
@@ -60,7 +60,7 @@ final class ResponseFactory
         if (isset($data['success'])) {
             $success = (isset($data['success']) && ($data['success'] === 'true' || $data['success'] === true));
             unset($data['success']);
-        } elseif(in_array($statusCode, [200, 201], true)) {
+        } elseif(\in_array($statusCode, [200, 201], true)) {
             $success = true;
         }
 
@@ -80,7 +80,7 @@ final class ResponseFactory
             throw new EcomailFlexibeeMethodNotAllowed();
         }
 
-        if (in_array($statusCode, [500, 400], true)) {
+        if (\in_array($statusCode, [500, 400], true)) {
             foreach ($results as $resultData) {
                 if (!isset($resultData['errors'])) {
                     continue;
@@ -100,7 +100,7 @@ final class ResponseFactory
             $rowCount,
             $globalVersion,
             $results,
-            $statistics
+            $statistics,
         );
     }
 
@@ -115,22 +115,22 @@ final class ResponseFactory
             $messageLines = [];
 
             if (isset($error['code'])) {
-                $messageLines[] = sprintf('code: %s',$error['code']);
+                $messageLines[] = \sprintf('code: %s',$error['code']);
             }
 
             if (isset($error['for'])) {
-                $messageLines[] = sprintf('for attribute: %s', $error['for']);
+                $messageLines[] = \sprintf('for attribute: %s', $error['for']);
             }
 
             if (isset($error['path'])) {
-                $messageLines[] = sprintf('path: %s',$error['path']);
+                $messageLines[] = \sprintf('path: %s',$error['path']);
             }
 
             if (isset($error['message'])) {
-                $messageLines[] = sprintf('message: %s', $error['message']);
+                $messageLines[] = \sprintf('message: %s', $error['message']);
             }
 
-            throw new EcomailFlexibeeRequestError(implode("\n", $messageLines), $statusCode);
+            throw new EcomailFlexibeeRequestError(\implode("\n", $messageLines), $statusCode);
         }
     }
 

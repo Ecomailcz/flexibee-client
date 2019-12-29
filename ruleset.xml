@@ -1,16 +1,26 @@
 <?xml version="1.0"?>
 <ruleset name="EcomailFlexibeeClient">
 	<rule ref="vendor/slevomat/coding-standard/SlevomatCodingStandard/ruleset.xml">
-		<exclude name="SlevomatCodingStandard.Namespaces.UseOnlyWhitelistedNamespaces"/>
-		<exclude name="SlevomatCodingStandard.Files.TypeNameMatchesFileName"/>
-		<exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalFunctions"/>
+		<!-- Global disallowed sniffs for all -->
+		<exclude name="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly"/>
 		<exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedExceptions"/>
-		<exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalConstants"/>
 		<exclude name="SlevomatCodingStandard.ControlStructures.RequireYodaComparison"/>
 		<exclude name="SlevomatCodingStandard.Commenting.RequireOneLinePropertyDocComment"/>
 		<exclude name="SlevomatCodingStandard.ControlStructures.NewWithoutParentheses"/>
-		<exclude name="SlevomatCodingStandard.ControlStructures.RequireMultiLineTernaryOperator"/>
-		<exclude name="SlevomatCodingStandard.Functions.TrailingCommaInCall"/> <!-- Enable for PHP 7.3 -->
+		<exclude name="SlevomatCodingStandard.Files.TypeNameMatchesFileName"/>
+		<exclude name="SlevomatCodingStandard.Namespaces.UseOnlyWhitelistedNamespaces"/>
+		<exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion"/>
+		<exclude name="SlevomatCodingStandard.PHP.DisallowReference"/>
+		<exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint"/>
+		<exclude name="SlevomatCodingStandard.TypeHints.PropertyTypeHint"/>
+		<exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint"/>
+		<exclude name="SlevomatCodingStandard.Numbers.RequireNumericLiteralSeparator"/>
+
+		<!-- Enable after refactoring -->
+		<exclude name="SlevomatCodingStandard.Functions.UnusedParameter"/>
 		<exclude name="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint"/>
+
+		<!-- Enable for PHP 7.4 -->
+		<exclude name="SlevomatCodingStandard.Functions.RequireArrowFunction"/>
 	</rule>
 </ruleset>

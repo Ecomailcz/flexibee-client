@@ -28,7 +28,7 @@ class CompanyClient extends Client
         return $this->makeRequest(
             Method::get(Method::GET),
             $this->queryBuilder->createBackupUrl(),
-            []
+            [],
         );
     }
 
@@ -40,7 +40,7 @@ class CompanyClient extends Client
             [$data],
             [],
             [],
-            true
+            true,
         );
     }
 

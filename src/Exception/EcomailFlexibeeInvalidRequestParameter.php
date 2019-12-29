@@ -11,7 +11,7 @@ final class EcomailFlexibeeInvalidRequestParameter extends Exception
 
     public function __construct(Validation $validation, ?Throwable $previous = null)
     {
-        parent::__construct(implode(PHP_EOL,$validation->errors()->all()), 0, $previous);
+        parent::__construct(\implode(\PHP_EOL,$validation->errors()->all()), 0, $previous);
     }
 
 }

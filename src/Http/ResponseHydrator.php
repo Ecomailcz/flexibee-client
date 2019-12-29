@@ -30,7 +30,7 @@ class ResponseHydrator extends ObjectPrototype
         $data = $response->getData();
 
         if (!isset($data[$this->config->getEvidence()])) {
-            if (count($data) === 0) {
+            if (\count($data) === 0) {
                 $data = $response->getStatistics();
                 $data['status_code'] = $response->getStatusCode();
                 $data['message'] = $response->getMessage();
@@ -41,7 +41,7 @@ class ResponseHydrator extends ObjectPrototype
             return [new EvidenceResult($data)];
         }
 
-        return array_map(static function (array $data){
+        return \array_map(static function (array $data){
             return new EvidenceResult($data);
         }, $data[$this->config->getEvidence()]);
     }
@@ -55,7 +55,7 @@ class ResponseHydrator extends ObjectPrototype
                 throw new EcomailFlexibeeNoEvidenceResult();
             }
 
-            return count($data) !== 0  ? new EvidenceResult($data) : new EvidenceResult([]);
+            return \count($data) !== 0  ? new EvidenceResult($data) : new EvidenceResult([]);
         }
 
         return new EvidenceResult($data[$this->config->getEvidence()]);

@@ -19,7 +19,7 @@ final class ParameterValidator extends Validator
             ],
             [
                 'code' => 'Parameter code must have a maximum of 20 characters and must be an uppercase',
-            ]
+            ],
         );
 
         $validation->validate();

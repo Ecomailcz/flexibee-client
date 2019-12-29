@@ -14,7 +14,7 @@
 		"consistence/consistence": "^2.0"
 	},
 	"require-dev": {
-		"slevomat/coding-standard": "^5.0",
+		"slevomat/coding-standard": "^6.0",
 		"phpunit/phpunit": "^8.0",
 		"phing/phing": "^2.16",
 		"fzaninotto/faker": "^1.7",
