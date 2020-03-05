@@ -5,6 +5,7 @@ namespace EcomailFlexibee\Http;
 use Consistence\ObjectPrototype;
 use EcomailFlexibee\Config;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
+use EcomailFlexibee\Exception\EcomailFlexibeeRequestError;
 use EcomailFlexibee\Http\Response\Response;
 use EcomailFlexibee\Result\EvidenceResult;
 
@@ -24,10 +25,15 @@ class ResponseHydrator extends ObjectPrototype
     /**
      * @param \EcomailFlexibee\Http\Response\Response $response
      * @return array<\EcomailFlexibee\Result\EvidenceResult>
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
     public function convertResponseToEvidenceResults(Response $response): array
     {
         $data = $response->getData();
+
+        if (isset($data['success']) && $data['success'] === 'false') {
+            throw new EcomailFlexibeeRequestError($data['message']);
+        }
 
         if (!isset($data[$this->config->getEvidence()])) {
             if (\count($data) === 0) {
@@ -41,7 +47,7 @@ class ResponseHydrator extends ObjectPrototype
             return [new EvidenceResult($data)];
         }
 
-        return \array_map(static function (array $data){
+        return \array_map(static function (array $data) {
             return new EvidenceResult($data);
         }, $data[$this->config->getEvidence()]);
     }

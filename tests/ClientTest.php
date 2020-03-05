@@ -206,11 +206,17 @@ final class ClientTest extends TestCase
     public function testSearchInEvidence(): void
     {
         $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false, null);
-        $result = $client->searchInEvidence('kod<>\'JAN\'', []);
+        $result = $client->searchInEvidence('(kod neq \'JAN\')', []);
         Assert::assertTrue(count($result) > 0);
+        $this->expectException(EcomailFlexibeeRequestError::class);
+        $client->searchInEvidence('kod neq \'JAN\'', []);
+    }
 
-        $result = $client->searchInEvidence('(datSplat<\'2018-12-04\'%20and%20zuctovano=false)', []);
-        Assert::assertTrue(count($result) > 0);
+    public function testSearchInEvidenceWithInvalidUrl(): void
+    {
+        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false, null);
+        $this->expectException(EcomailFlexibeeRequestError::class);
+        $client->searchInEvidence(' bla.json', []);
     }
 
     public function testDryRunRequest(): void
@@ -236,54 +242,6 @@ final class ClientTest extends TestCase
         /** @var \EcomailFlexibee\Result\EvidenceResult $data */
         $data = $results[0];
         Assert::assertArrayHasKey('properties', $data->getData());
-    }
-
-    public function testWithExampleFlexibeeData(): void
-    {
-        /** @var string $content */
-        $content = file_get_contents(sprintf('%s/_Resources/smlouva.xml', __DIR__));
-        /** @var \SimpleXMLElement $content */
-        $content = simplexml_load_string($content);
-        /** @var string $content */
-        $content = json_encode((array) $content);
-        $xmlData = json_decode($content, true);
-
-        foreach ($xmlData as $evidenceName => $evidenceData) {
-            if (in_array($evidenceName, ['@attributes'], true)) {
-                continue;
-            }
-
-            $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, $evidenceName, false, null);
-
-            if (array_key_exists('@attributes', $evidenceData)) {
-                unset($evidenceData['@attributes']);
-            }
-
-            if (array_key_exists('id', $evidenceData)) {
-                unset($evidenceData['id']);
-            }
-
-            try {
-                if ($evidenceName === 'smlouva' && isset($evidenceData['polozkySmlouvy'])) {
-                    unset($evidenceData['polozkySmlouvy']['@attributes']);
-                    $evidenceData['polozkySmlouvy']['kod'] = uniqid();
-
-                    foreach ($evidenceData['polozkySmlouvy']["smlouva-polozka"] as &$item) {
-                        $item['kod'] = uniqid();
-
-                    }
-                }
-
-                $idEvidence = (int) $client->save($evidenceData, null)->getData()[0]['id'];
-                $client->deleteById($idEvidence);
-            } catch (EcomailFlexibeeRequestError $exception) {
-                if (mb_stripos($exception->getMessage(), 'již používá jiný záznam') !== false) {
-                    continue;
-                }
-
-                throw $exception;
-            }
-        }
     }
 
     public function testRunBackendProcesses(): void
@@ -318,34 +276,9 @@ final class ClientTest extends TestCase
     public function testUnknownCompany(): void
     {
         $client = new Client(Config::HOST, 'xxx', Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false);
-        $this->expectException(EcomailFlexibeeSaveFailed::class);
+        $this->expectException(EcomailFlexibeeRequestError::class);
         $client->save([], null);
 
-    }
-
-    public function testCreateUserRelations(): void
-    {
-        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false);
-        $evidenceData = [
-            'nazev' => $this->faker->firstName,
-            'kod' => uniqid(),
-            'typDokl' => 'code:FAKTURA',
-        ];
-        $invoiceIdA = (int) $client->save($evidenceData, null)->getData()[0]['id'];
-        Assert::assertNotEmpty($invoiceIdA);
-        $evidenceData = [
-            'nazev' => $this->faker->firstName,
-            'kod' => uniqid(),
-            'typDokl' => 'code:FAKTURA',
-        ];
-        $invoiceIdB = (int) $client->save($evidenceData, null)->getData()[0]['id'];
-        Assert::assertNotEmpty($invoiceIdB);
-
-        $client->addUserRelation($invoiceIdA, $invoiceIdB, 10.0, 1);
-        $relationsEvidenceResult = $client->getUserRelations($invoiceIdA);
-        Assert::assertNotEmpty($relationsEvidenceResult->getData());
-        $relationId = $relationsEvidenceResult->getData()[0]['id'];
-        Assert::assertNotEmpty($relationId);
     }
 
     public function testCreateSameEvidenceRecord(): void

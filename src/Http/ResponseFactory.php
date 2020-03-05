@@ -22,7 +22,7 @@ final class ResponseFactory
 
         $version = null;
         /** @var string|null $message */
-        $message = null;
+        $message = $response;
         $success = false;
         $statistics = [];
         $rowCount = 0;
