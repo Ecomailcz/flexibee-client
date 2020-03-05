@@ -189,6 +189,7 @@ class UrlBuilder extends Url
      */
     private function createQueryParams(array $parameters): void
     {
+        $parameters = \array_merge(['limit' => '0'], $parameters);
         $this->setQuery(new Query(\http_build_query($parameters)));
     }
 
