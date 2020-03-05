@@ -12,10 +12,6 @@ use EcomailFlexibee\Http\Response\FlexibeeResponse;
 final class ResponseFactory
 {
 
-    protected function __construct()
-    {
-    }
-
     public static function createFromOutput(string $response, int $statusCode): FlexibeeResponse
     {
         /** @var array<mixed>|null $data */

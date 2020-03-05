@@ -31,6 +31,7 @@ class UrlBuilder extends Url
     public function __construct(Config $config, ?ParserInterface $parser = null)
     {
         parent::__construct($config->getUrl(), $parser);
+
         $this->company = $config->getCompany();
         $this->evidence = $config->getEvidence();
         $this->validator = new ParameterValidator();
@@ -66,21 +67,6 @@ class UrlBuilder extends Url
         $this->createQueryParams($uriParameters);
 
         return $this->getUrl();
-    }
-
-    /**
-     * @param string|int $filterQueryOrId
-     * @param string $format
-     * @return \Purl\Path
-     */
-    private function buildPathWithIdOrFilter($filterQueryOrId, string $format = 'json'): Path
-    {
-        return new Path(\sprintf('c/%s/%s/%s.%s', $this->company, $this->evidence, $filterQueryOrId, $format));
-    }
-
-    private function buildPathForOnlyEvidence(): Path
-    {
-        return new Path(\sprintf('c/%s/%s.json', $this->company, $this->evidence));
     }
 
     public function createBackupUrl(): string
@@ -181,6 +167,21 @@ class UrlBuilder extends Url
         $this->createQueryParams($uriParams);
 
         return $this->getUrl();
+    }
+
+    /**
+     * @param string|int $filterQueryOrId
+     * @param string $format
+     * @return \Purl\Path
+     */
+    private function buildPathWithIdOrFilter($filterQueryOrId, string $format = 'json'): Path
+    {
+        return new Path(\sprintf('c/%s/%s/%s.%s', $this->company, $this->evidence, $filterQueryOrId, $format));
+    }
+
+    private function buildPathForOnlyEvidence(): Path
+    {
+        return new Path(\sprintf('c/%s/%s.json', $this->company, $this->evidence));
     }
 
     /**

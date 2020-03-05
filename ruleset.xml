@@ -15,6 +15,13 @@
 		<exclude name="SlevomatCodingStandard.TypeHints.PropertyTypeHint"/>
 		<exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint"/>
 		<exclude name="SlevomatCodingStandard.Numbers.RequireNumericLiteralSeparator"/>
+		<exclude name="SlevomatCodingStandard.Files.LineLength"/>
+		<exclude name="SlevomatCodingStandard.Commenting.RequireOneLineDocComment"/>
+		<exclude name="SlevomatCodingStandard.Classes.RequireMultiLineMethodSignature"/>
+		<exclude name="SlevomatCodingStandard.Classes.RequireSingleLineMethodSignature"/>
+		<exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion"/>
+		<exclude name="SlevomatCodingStandard.ControlStructures.DisallowShortTernaryOperator"/>
+		<exclude name="SlevomatCodingStandard.ControlStructures.RequireMultiLineTernaryOperator"/>
 
 		<!-- Enable after refactoring -->
 		<exclude name="SlevomatCodingStandard.Functions.UnusedParameter"/>
@@ -22,5 +29,6 @@
 
 		<!-- Enable for PHP 7.4 -->
 		<exclude name="SlevomatCodingStandard.Functions.RequireArrowFunction"/>
+		<exclude name="SlevomatCodingStandard.ControlStructures.RequireNullCoalesceEqualOperator"/>
 	</rule>
 </ruleset>
