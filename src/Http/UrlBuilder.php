@@ -128,7 +128,7 @@ class UrlBuilder extends Url
     }
 
     /**
-     * @param string       $code
+     * @param string $code
      * @param array<mixed> $uriParameters
      * @return string
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
@@ -144,7 +144,7 @@ class UrlBuilder extends Url
 
     public function getUrl(): string
     {
-        $result =  parent::getUrl();
+        $result = parent::getUrl();
         $this->setQuery(new Query());
         $this->setPath(new Path());
 

@@ -149,7 +149,7 @@ class Client
     }
 
     /**
-     * @param int          $id
+     * @param int $id
      * @param array<mixed> $uriParameters
      * @return \EcomailFlexibee\Result\EvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
@@ -169,7 +169,7 @@ class Client
     }
 
     /**
-     * @param string       $code
+     * @param string $code
      * @param array<mixed> $uriParameters
      * @return \EcomailFlexibee\Result\EvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
@@ -194,7 +194,7 @@ class Client
     }
 
     /**
-     * @param int           $id
+     * @param int $id
      * @param array<string> $uriParameters
      * @return \EcomailFlexibee\Result\EvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
@@ -218,7 +218,7 @@ class Client
     }
 
     /**
-     * @param string       $code
+     * @param string $code
      * @param array<mixed> $uriParameters
      * @return \EcomailFlexibee\Result\EvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
@@ -240,8 +240,8 @@ class Client
 
     /**
      * @param array<mixed> $evidenceData
-     * @param int|null     $id
-     * @param bool         $dryRun
+     * @param int|null $id
+     * @param bool $dryRun
      * @param array<mixed> $uriParameters
      * @return \EcomailFlexibee\Http\Response\FlexibeeResponse
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
@@ -375,7 +375,7 @@ class Client
     }
 
     /**
-     * @param string        $query
+     * @param string $query
      * @param array<string> $uriParameters
      * @return array<\EcomailFlexibee\Result\EvidenceResult>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError

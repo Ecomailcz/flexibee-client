@@ -25,7 +25,7 @@ class SearchQueryOperator extends Enum
     {
         $query = \urldecode($query);
         /** @var array<mixed> $queryExploded */
-        $queryExploded  = \preg_split('/\s+/', $query);
+        $queryExploded = \preg_split('/\s+/', $query);
 
         foreach($queryExploded as &$part) {
             $toReplace = [];

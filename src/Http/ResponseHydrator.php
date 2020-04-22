@@ -61,7 +61,7 @@ class ResponseHydrator extends ObjectPrototype
                 throw new EcomailFlexibeeNoEvidenceResult();
             }
 
-            return \count($data) !== 0  ? new EvidenceResult($data) : new EvidenceResult([]);
+            return \count($data) !== 0 ? new EvidenceResult($data) : new EvidenceResult([]);
         }
 
         return new EvidenceResult($data[$this->config->getEvidence()]);
