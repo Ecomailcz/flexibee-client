@@ -25,25 +25,22 @@ class CompanyClient extends Client
 
     public function backup(): Response
     {
-        return $this->httpClient->request(
-            $this->queryBuilder->createBackupUrl(),
+        return $this->makeRequest(
             Method::get(Method::GET),
+            $this->queryBuilder->createBackupUrl(),
             [],
-            [],
-            [],
-            $this->config,
         );
     }
 
     public function restore(string $companyName, string $data): Response
     {
-        return $this->httpClient->request(
-            $this->queryBuilder->createRestoreUrl($companyName),
+        return $this->makeRequest(
             Method::get(Method::PUT),
+            $this->queryBuilder->createRestoreUrl($companyName),
             [$data],
             [],
             [],
-            $this->config,
+            true,
         );
     }
 

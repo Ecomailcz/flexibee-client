@@ -2,12 +2,15 @@
 
 namespace EcomailFlexibee;
 
+use EcomailFlexibee\Exception\EcomailFlexibeeConnectionError;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
 use EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed;
-use EcomailFlexibee\Http\HttpClient;
 use EcomailFlexibee\Http\Method;
+use EcomailFlexibee\Http\Response\FlexibeeBackupResponse;
+use EcomailFlexibee\Http\Response\FlexibeePdfResponse;
 use EcomailFlexibee\Http\Response\FlexibeeResponse;
 use EcomailFlexibee\Http\Response\Response;
+use EcomailFlexibee\Http\ResponseFactory;
 use EcomailFlexibee\Http\ResponseHydrator;
 use EcomailFlexibee\Http\UrlBuilder;
 use EcomailFlexibee\Result\EvidenceResult;
@@ -16,8 +19,8 @@ class Client
 {
 
     protected \EcomailFlexibee\Http\UrlBuilder $queryBuilder;
-    protected \EcomailFlexibee\Http\HttpClient $httpClient;
-    protected \EcomailFlexibee\Config $config;
+
+    private \EcomailFlexibee\Config $config;
 
     private \EcomailFlexibee\Http\ResponseHydrator $responseHydrator;
 
@@ -42,54 +45,49 @@ class Client
         );
         $this->queryBuilder = new UrlBuilder($this->config);
         $this->responseHydrator = new ResponseHydrator($this->config);
-        $this->httpClient = new HttpClient();
     }
 
     public function isAllowedChangesApi(): bool
     {
-        return $this->httpClient->request(
-            $this->queryBuilder->createChangesStatusUrl(),
+        return $this->makeRequest(
             Method::get(Method::GET),
+            $this->queryBuilder->createChangesStatusUrl(),
             [],
             [],
             [],
-            $this->config,
         )->isSuccess();
     }
 
     public function getChangesApiForEvidence(string $evidenceName): Response
     {
-        return $this->httpClient->request(
-            $this->queryBuilder->createChangesUrl(['evidence' => $evidenceName]),
+        return $this->makeRequest(
             Method::get(Method::GET),
+            $this->queryBuilder->createChangesUrl(['evidence' => $evidenceName]),
             [],
             [],
             [],
-            $this->config,
         );
     }
 
     public function getPropertiesForEvidence(): Response
     {
-        return $this->httpClient->request(
-            $this->queryBuilder->createUri('properties', []),
+        return $this->makeRequest(
             Method::get(Method::GET),
+            $this->queryBuilder->createUri('properties', []),
             [],
             [],
             [],
-            $this->config,
         );
     }
 
     public function getAllApiChanges(?string $fromVersion): Response
     {
-        return $this->httpClient->request(
-            $this->queryBuilder->createChangesUrl(['start' => $fromVersion]),
+        return $this->makeRequest(
             Method::get(Method::GET),
+            $this->queryBuilder->createChangesUrl(['start' => $fromVersion]),
             [],
             [],
             [],
-            $this->config,
         );
     }
 
@@ -103,18 +101,17 @@ class Client
 
     public function getAuthAndRefreshToken(): Response
     {
-        return $this->httpClient->request(
-            $this->queryBuilder->createAuthTokenUrl(),
+        return $this->makeRequest(
             Method::get(Method::POST),
+            $this->queryBuilder->createAuthTokenUrl(),
             [],
+            [
+                'Content-Type: application/x-www-form-urlencoded',
+            ],
             [
                 'username' => $this->config->getUser(),
                 'password' => $this->config->getPassword(),
             ],
-            [
-                'Content-Type: application/x-www-form-urlencoded',
-            ],
-            $this->config,
         );
     }
     
@@ -122,26 +119,22 @@ class Client
     {
         $uriParameters = $dryRun ? ['dry-run' => 'true'] : [];
 
-        return $this->httpClient->request(
-            $this->queryBuilder->createUri($id, $uriParameters),
+        return $this->makeRequest(
             Method::get(Method::DELETE),
+            $this->queryBuilder->createUri($id, $uriParameters),
             [],
-            [],
-            [],
-            $this->config,
         );
     }
     
     public function deleteByCode(string $id, bool $dryRun = false): void
     {
         $uriParameters = $dryRun ? ['dry-run' => 'true'] : [];
-        $this->httpClient->request(
-            $this->queryBuilder->createUri(\sprintf('code:%s', $id), $uriParameters),
+        $this->makeRequest(
             Method::get(Method::DELETE),
+            $this->queryBuilder->createUri(\sprintf('code:%s', $id), $uriParameters),
             [],
             [],
             [],
-            $this->config,
         );
     }
 
@@ -177,13 +170,10 @@ class Client
     public function getByCode(string $code, array $uriParameters = []): EvidenceResult
     {
         return $this->responseHydrator->convertResponseToEvidenceResult(
-            $this->httpClient->request(
-                $this->queryBuilder->createUriByCodeOnly($code, $uriParameters),
+            $this->makeRequest(
                 Method::get(Method::GET),
+                $this->queryBuilder->createUriByCodeOnly($code, $uriParameters),
                 [],
-                [],
-                [],
-                $this->config,
             ) ,
             true,
         );
@@ -202,13 +192,10 @@ class Client
     public function getById(int $id, array $uriParameters = []): EvidenceResult
     {
         return $this->responseHydrator->convertResponseToEvidenceResult(
-            $this->httpClient->request(
-                $this->queryBuilder->createUri($id, $uriParameters),
+            $this->makeRequest(
                 Method::get(Method::GET),
+                $this->queryBuilder->createUri($id, $uriParameters),
                 [],
-                [],
-                [],
-                $this->config,
             ),
             true,
         );
@@ -318,13 +305,12 @@ class Client
      */
     public function allInEvidence(): array
     {
-        $response = $this->httpClient->request(
-            $this->queryBuilder->createUriByEvidenceOnly(['limit' => 0]),
+        $response = $this->makeRequest(
             Method::get(Method::GET),
+            $this->queryBuilder->createUriByEvidenceOnly(['limit' => 0]),
             [],
             [],
             [],
-            $this->config,
         );
 
         return $this->responseHydrator->convertResponseToEvidenceResults($response);
@@ -332,13 +318,12 @@ class Client
 
     public function countInEvidence(): int
     {
-        $response = $this->httpClient->request(
-            $this->queryBuilder->createUriByEvidenceOnly(['add-row-count' => 'true']),
+        $response = $this->makeRequest(
             Method::get(Method::GET),
+            $this->queryBuilder->createUriByEvidenceOnly(['add-row-count' => 'true']),
             [],
             [],
             [],
-            $this->config,
         );
 
        return $response->getRowCount() ?? 0;
@@ -355,13 +340,12 @@ class Client
      */
     public function chunkInEvidence(int $start, int $limit): array
     {
-        $response = $this->httpClient->request(
-            $this->queryBuilder->createUriByEvidenceOnly(['limit' => $limit, 'start' => $start]),
+        $response = $this->makeRequest(
             Method::get(Method::GET),
+            $this->queryBuilder->createUriByEvidenceOnly(['limit' => $limit, 'start' => $start]),
             [],
             [],
             [],
-            $this->config,
         );
 
         return $this->responseHydrator->convertResponseToEvidenceResults($response);
@@ -379,13 +363,12 @@ class Client
      */
     public function searchInEvidence(string $query, array $uriParameters): array
     {
-        $response = $this->httpClient->request(
-            $this->queryBuilder->createFilterQuery($query, $uriParameters),
+        $response = $this->makeRequest(
             Method::get(Method::GET),
+            $this->queryBuilder->createFilterQuery($query, $uriParameters),
             [],
             [],
             [],
-            $this->config,
         );
 
         return $this->responseHydrator->convertResponseToEvidenceResults($response);
@@ -406,13 +389,11 @@ class Client
      */
     public function callRequest(Method $httpMethod, $queryFilterOrId, array $uriParameters, array $postFields, array $headers): array
     {
-        $response = $this->httpClient->request(
-            $this->queryBuilder->createUri($queryFilterOrId, $uriParameters),
+        $response = $this->makeRequest(
             $httpMethod,
+            $this->queryBuilder->createUri($queryFilterOrId, $uriParameters),
             $postFields,
-            [],
             $headers,
-            $this->config,
         );
 
         return $this->responseHydrator->convertResponseToEvidenceResults($response);
@@ -429,14 +410,87 @@ class Client
      */
     public function getPdfById(int $id, array $uriParameters): Response
     {
-        return $this->httpClient->request(
-            $this->queryBuilder->createPdfUrl($id, $uriParameters),
+        return $this->makeRequest(
             Method::get(Method::GET),
+            $this->queryBuilder->createPdfUrl($id, $uriParameters),
             [],
-            [],
-            [],
-            $this->config,
         );
+    }
+
+    /**
+     * @param array<mixed> $postFields
+     * @param array<string> $headers
+     * @param array<mixed> $queryParameters
+     * @return \EcomailFlexibee\Http\Response\Response|\EcomailFlexibee\Http\Response\FlexibeePdfResponse
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     */
+    protected function makeRequest(Method $httpMethod, string $url, array $postFields = [], array $headers = [], array $queryParameters = [], bool $rawPostFields = false)
+    {
+        $url = \urldecode($url);
+
+        $ch = \curl_init();
+        \assert(\is_resource($ch));
+        \curl_setopt($ch, \CURLOPT_FOLLOWLOCATION, TRUE);
+        \curl_setopt($ch, \CURLOPT_RETURNTRANSFER, TRUE);
+
+        if ($this->config->getAuthSessionId() !== null) {
+            \curl_setopt($ch, \CURLOPT_HTTPAUTH, FALSE);
+            $headers[] = \sprintf('X-authSessionId: %s', $this->config->getAuthSessionId());
+        } else {
+            \curl_setopt($ch, \CURLOPT_HTTPAUTH, TRUE);
+            \curl_setopt($ch, \CURLOPT_USERPWD, \sprintf('%s:%s', $this->config->getUser(), $this->config->getPassword()));
+        }
+
+        \curl_setopt($ch, \CURLOPT_URL, $url);
+        \curl_setopt($ch, \CURLOPT_CUSTOMREQUEST, $httpMethod->getValue());
+        \curl_setopt($ch, \CURLOPT_USERAGENT, 'Ecomail.cz Flexibee client (https://github.com/Ecomailcz/flexibee-client)');
+
+        if ($this->config->isSelfSignedCertificate() || $this->config->getAuthSessionId() !== null) {
+            \curl_setopt($ch, \CURLOPT_SSL_VERIFYPEER, FALSE);
+            \curl_setopt($ch, \CURLOPT_SSL_VERIFYHOST, FALSE);
+        }
+
+        $postData = [];
+
+        if (\count($postFields) !== 0) {
+            if (!$rawPostFields) {
+                $postData['winstrom'] = $postFields;
+                \curl_setopt($ch, \CURLOPT_POSTFIELDS, \json_encode($postData));
+            } else {
+                \curl_setopt($ch, \CURLOPT_POSTFIELDS, \implode("\n", $postFields));
+            }
+        }
+
+        if (\count($queryParameters) !== 0) {
+            \curl_setopt($ch, \CURLOPT_POSTFIELDS, \http_build_query($queryParameters));
+        }
+
+        if (\count($headers) !== 0) {
+            \curl_setopt($ch, \CURLOPT_HTTPHEADER, $headers);
+        }
+
+        $output = \curl_exec($ch);
+
+        if (\curl_errno($ch) !== \CURLE_OK || !\is_string($output)) {
+            throw new EcomailFlexibeeConnectionError(\sprintf('cURL error (%s): %s', \curl_errno($ch), \curl_error($ch)));
+        }
+
+        // PDF content
+        if (\mb_strpos($url, '.pdf') !== false) {
+            return new FlexibeePdfResponse($output);
+        }
+
+        // Backup content
+        if ($httpMethod->equalsValue(Method::GET) && \mb_stripos($url, '/backup') !== false) {
+            return new FlexibeeBackupResponse($output);
+        }
+
+        return ResponseFactory::createFromOutput($output, \curl_getinfo($ch, \CURLINFO_HTTP_CODE));
     }
 
 }

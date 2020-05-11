@@ -7,14 +7,13 @@
 	"require": {
 		"ext-simplexml": "*",
 		"ext-curl": "*",
-		"ext-mbstring": "*",
 		"ext-json": "*",
 		"ext-mbstring": "*",
 		"php": "^7.4",
 		"jwage/purl": "^1.0",
 		"rakit/validation": "^1.1",
 		"consistence/consistence": "^2.0"
-    },
+	},
 	"require-dev": {
 		"slevomat/coding-standard": "^6.0",
 		"phpunit/phpunit": "^9.0",
