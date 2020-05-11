@@ -16,7 +16,7 @@ final class ResponseFactory
     {
         /** @var array<mixed>|null $data */
         $data = \json_decode($response, true);
-        $data ??= [];
+        $data = $data ?? [];
         $data = $data['winstrom'] ?? $data;
         $results = $data['results'] ?? $data;
 
@@ -102,6 +102,7 @@ final class ResponseFactory
 
     /**
      * @param array<mixed> $errors
+     * @param int $statusCode
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
     private static function throwErrorMessage(array $errors, int $statusCode): void

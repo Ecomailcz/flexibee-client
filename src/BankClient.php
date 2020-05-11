@@ -24,8 +24,8 @@ class BankClient extends Client
 
     public function downloadOnlineListings(): bool
     {
+        /** @var \EcomailFlexibee\Result\EvidenceResult $result */
         $result = $this->callRequest(Method::get(Method::POST), 'nacteni-vypisu-online', [], [], [])[0];
-        \assert($result instanceof \EcomailFlexibee\Result\EvidenceResult);
         $statusCode = $result->getData()['status_code'];
 
         return $statusCode >= 200 && $statusCode <= 299;
@@ -33,8 +33,8 @@ class BankClient extends Client
 
     public function automaticPairing(): bool
     {
+        /** @var \EcomailFlexibee\Result\EvidenceResult $result */
         $result = $this->callRequest(Method::get(Method::POST), 'automaticke-parovani', [], [], [])[0];
-        \assert($result instanceof \EcomailFlexibee\Result\EvidenceResult);
         $statusCode = $result->getData()['status_code'];
 
         return $statusCode >= 200 && $statusCode <= 299;

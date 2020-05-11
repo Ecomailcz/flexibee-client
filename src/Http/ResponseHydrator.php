@@ -23,6 +23,7 @@ class ResponseHydrator extends ObjectPrototype
     }
 
     /**
+     * @param \EcomailFlexibee\Http\Response\Response $response
      * @return array<\EcomailFlexibee\Result\EvidenceResult>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
@@ -46,7 +47,9 @@ class ResponseHydrator extends ObjectPrototype
             return [new EvidenceResult($data)];
         }
 
-        return \array_map(static fn (array $data) => new EvidenceResult($data), $data[$this->config->getEvidence()]);
+        return \array_map(static function (array $data) {
+            return new EvidenceResult($data);
+        }, $data[$this->config->getEvidence()]);
     }
 
     public function convertResponseToEvidenceResult(Response $response, bool $throwException): EvidenceResult
