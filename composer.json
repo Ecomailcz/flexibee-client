@@ -8,7 +8,7 @@
 		"ext-simplexml": "*",
 		"ext-curl": "*",
 		"ext-json": "*",
-		"php": "^7.3",
+		"php": "^7.4",
 		"jwage/purl": "^1.0",
 		"rakit/validation": "^1.1",
 		"consistence/consistence": "^2.0"

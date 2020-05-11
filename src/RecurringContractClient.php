@@ -24,8 +24,8 @@ class RecurringContractClient extends Client
 
     public function generateInvoices(): bool
     {
-        /** @var \EcomailFlexibee\Result\EvidenceResult $result */
         $result = $this->callRequest(Method::get(Method::POST), 'generovani-faktur', [], [], [])[0];
+        \assert($result instanceof \EcomailFlexibee\Result\EvidenceResult);
         $statusCode = $result->getData()['status_code'];
 
         return $statusCode >= 200 && $statusCode <= 299;

@@ -39,8 +39,8 @@ class SearchQueryOperator extends Enum
             $part = \str_replace(\array_keys($toReplace), \array_values($toReplace), $part);
         }
 
-        /** @var string $result */
         $result = \preg_replace('/\s+/', ' ', \implode(' ',$queryExploded));
+        \assert(\is_string($result));
 
         return $result;
     }
