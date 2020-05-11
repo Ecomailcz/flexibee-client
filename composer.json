@@ -9,7 +9,7 @@
 		"ext-curl": "*",
 		"ext-json": "*",
 		"ext-mbstring": "*",
-		"php": "^7.4",
+		"php": "^7.3",
 		"jwage/purl": "^1.0",
 		"rakit/validation": "^1.1",
 		"consistence/consistence": "^2.0"
