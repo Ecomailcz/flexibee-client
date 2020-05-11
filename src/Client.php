@@ -18,11 +18,20 @@ use EcomailFlexibee\Result\EvidenceResult;
 class Client
 {
 
-    protected \EcomailFlexibee\Http\UrlBuilder $queryBuilder;
+    /**
+     * @var \EcomailFlexibee\Http\UrlBuilder
+     */
+    protected $queryBuilder;
 
-    private \EcomailFlexibee\Config $config;
+    /**
+     * @var \EcomailFlexibee\Config
+     */
+    private $config;
 
-    private \EcomailFlexibee\Http\ResponseHydrator $responseHydrator;
+    /**
+     * @var \EcomailFlexibee\Http\ResponseHydrator
+     */
+    private $responseHydrator;
 
     public function __construct(
         string $url,

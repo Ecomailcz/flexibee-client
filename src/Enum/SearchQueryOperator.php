@@ -10,7 +10,7 @@ class SearchQueryOperator extends Enum
     /**
      * @var array<mixed>
      */
-    private static array $operators = [
+    private static $operators = [
         '==' => ' eq ',
         '<=' => ' lte ',
         '<>' => ' neq ',

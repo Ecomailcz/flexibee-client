@@ -5,27 +5,45 @@ namespace EcomailFlexibee\Http\Response;
 class FlexibeeResponse implements Response
 {
 
-    private ?float $version = null;
+    /**
+     * @var float|null
+     */
+    private $version;
 
-    private bool $success;
+    /**
+     * @var bool
+     */
+    private $success;
 
-    private ?string $message = null;
+    /**
+     * @var string|null
+     */
+    private $message;
 
-    private int $statusCode;
+    /**
+     * @var int
+     */
+    private $statusCode;
 
     /**
      * @var array<mixed>
      */
-    private array $data;
+    private $data;
 
     /**
      * @var array<string>
      */
-    private array $statistics = [];
+    private $statistics = [];
 
-    private int $rowCount = 0;
+    /**
+     * @var int
+     */
+    private $rowCount = 0;
 
-    private ?int $globalVersion = null;
+    /**
+     * @var int|null
+     */
+    private $globalVersion;
 
     /**
      * FlexibeeResponse constructor.
