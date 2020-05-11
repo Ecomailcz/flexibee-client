@@ -20,11 +20,7 @@
 			<property name="spacesCountAroundEqualsSign" value="1"/>
 		</properties>
 	</rule>
-	<rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint">
-		<properties>
-			<property name="enableNativeTypeHint" value="false"/>
-		</properties>
-	</rule>
+	<rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint"/>
 	<rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint">
 		<properties>
 			<property name="enableObjectTypeHint" value="false"/>

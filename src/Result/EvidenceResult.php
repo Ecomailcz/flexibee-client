@@ -8,7 +8,7 @@ final class EvidenceResult
     /**
      * @var array<mixed>
      */
-    private $data;
+    private array $data;
 
     /**
      * @param array<mixed> $data
