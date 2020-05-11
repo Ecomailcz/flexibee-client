@@ -5,40 +5,19 @@ namespace EcomailFlexibee;
 final class Config
 {
 
-    /**
-     * @var string
-     */
-    private $url;
+    private string $url;
 
-    /**
-     * @var string
-     */
-    private $company;
+    private string $company;
 
-    /**
-     * @var string
-     */
-    private $user;
+    private string $user;
 
-    /**
-     * @var string
-     */
-    private $password;
+    private string $password;
 
-    /**
-     * @var string
-     */
-    private $evidence;
+    private string $evidence;
 
-    /**
-     * @var bool
-     */
-    private $selfSignedCertificate;
+    private bool $selfSignedCertificate;
 
-    /**
-     * @var string|null
-     */
-    private $authSessionId;
+    private ?string $authSessionId = null;
 
     public function __construct(
         string $url,

@@ -12,10 +12,7 @@ use EcomailFlexibee\Result\EvidenceResult;
 class ResponseHydrator extends ObjectPrototype
 {
 
-    /**
-     * @var \EcomailFlexibee\Config
-     */
-    private $config;
+    private \EcomailFlexibee\Config $config;
 
     public function __construct(Config $config)
     {

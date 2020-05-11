@@ -13,20 +13,11 @@ use Purl\Url;
 class UrlBuilder extends Url
 {
 
-    /**
-     * @var string
-     */
-    private $company;
+    private string $company;
 
-    /**
-     * @var string
-     */
-    private $evidence;
+    private string $evidence;
 
-    /**
-     * @var \EcomailFlexibee\Validator\ParameterValidator
-     */
-    private $validator;
+    private \EcomailFlexibee\Validator\ParameterValidator $validator;
 
     public function __construct(Config $config, ?ParserInterface $parser = null)
     {
