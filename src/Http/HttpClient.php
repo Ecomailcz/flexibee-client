@@ -48,7 +48,7 @@ final class HttpClient
 
         $output = \curl_exec($ch);
         $output = \is_string($output) ? $output : null;
-        $errorMessage = \mb_strlen(\trim(\curl_error($ch)))
+        $errorMessage = \mb_strlen(\trim(\curl_error($ch))) > 0
             ? null
             : \curl_error($ch);
 

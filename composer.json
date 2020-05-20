@@ -1,39 +1,52 @@
 {
 	"name": "ecomailcz/flexibee-client",
 	"description": "ECOMAIL.CZ - Simple client for communication with FlexiBee API",
-	"license": ["MIT"],
-	"minimum-stability": "dev",
-	"prefer-stable": true,
+	"license": [
+		"MIT"
+	],
 	"require": {
-		"ext-simplexml": "*",
+		"php": "^7.4",
 		"ext-curl": "*",
 		"ext-json": "*",
 		"ext-mbstring": "*",
-		"php": "^7.4",
+		"ext-simplexml": "*",
+		"consistence/consistence": "^2.0",
 		"jwage/purl": "^1.0",
-		"rakit/validation": "^1.1",
-		"consistence/consistence": "^2.0"
-    },
+		"rakit/validation": "^1.1"
+	},
 	"require-dev": {
-		"slevomat/coding-standard": "^6.0",
-		"phpunit/phpunit": "^9.0",
-		"phing/phing": "^2.16",
+		"ergebnis/composer-normalize": "^2.5",
 		"fzaninotto/faker": "^1.7",
-		"phpstan/phpstan": "^0.12.3",
 		"mockery/mockery": "^1.3",
+		"phing/phing": "^2.16",
+		"phpstan/extension-installer": "^1.0",
+		"phpstan/phpstan": "^0.12.3",
+		"phpstan/phpstan-deprecation-rules": "^0.12.2",
+		"phpstan/phpstan-phpunit": "^0.12.8",
+		"phpstan/phpstan-strict-rules": "^0.12.2",
+		"phpunit/phpunit": "^9.0",
+		"slevomat/coding-standard": "^6.0",
 		"sllh/composer-versions-check": "^2.0",
 		"php-parallel-lint/php-parallel-lint": "^1.2"
 	},
+	"config": {
+		"sort-packages": true
+	},
 	"autoload": {
 		"psr-4": {
-			"EcomailFlexibee\\": ["src/"],
-			"EcomailFlexibeeTest\\": ["tests/"]
+			"EcomailFlexibee\\": [
+				"src/"
+			],
+			"EcomailFlexibeeTest\\": [
+				"tests/"
+			]
 		}
 	},
 	"autoload-dev": {
-		"classmap": ["tests/"]
+		"classmap": [
+			"tests/"
+		]
 	},
-	"config": {
-		"sort-packages": true
-	}
+	"minimum-stability": "dev",
+	"prefer-stable": true
 }
