@@ -1,13 +1,12 @@
 {
 	"name": "ecomailcz/flexibee-client",
-	"description": "Basic client for make FlexiBee requests",
+	"description": "ECOMAIL.CZ - Simple client for communication with FlexiBee API",
 	"license": ["MIT"],
 	"minimum-stability": "dev",
 	"prefer-stable": true,
 	"require": {
 		"ext-simplexml": "*",
 		"ext-curl": "*",
-		"ext-mbstring": "*",
 		"ext-json": "*",
 		"ext-mbstring": "*",
 		"php": "^7.4",
@@ -33,5 +32,8 @@
 	},
 	"autoload-dev": {
 		"classmap": ["tests/"]
+	},
+	"config": {
+		"sort-packages": true
 	}
 }
