@@ -28,7 +28,8 @@ class Client
         string $password,
         string $evidence,
         bool $selfSignedCertificate,
-        ?string $authSessionId = null
+        ?string $authSessionId = null,
+        ?string $logFilePath = null
     )
     {
         $this->config = new Config(
@@ -39,6 +40,7 @@ class Client
             $evidence,
             $selfSignedCertificate,
             $authSessionId,
+            $logFilePath,
         );
         $this->queryBuilder = new UrlBuilder($this->config);
         $this->responseHydrator = new ResponseHydrator($this->config);

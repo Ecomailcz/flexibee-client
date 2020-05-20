@@ -3,6 +3,8 @@
 namespace EcomailFlexibee\Http;
 
 use EcomailFlexibee\Config;
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
 
 final class HttpClient
 {
@@ -46,17 +48,43 @@ final class HttpClient
             $config,
         );
 
+        $startTime = \microtime(true);
         $output = \curl_exec($ch);
+        $responseTime = \microtime(true) - $startTime;
         $output = \is_string($output) ? $output : null;
-        $errorMessage = \mb_strlen(\trim(\curl_error($ch))) > 0
+        $errorMessage = \mb_strlen(\trim(\curl_error($ch))) === 0
             ? null
             : \curl_error($ch);
+        $statusCode = \curl_getinfo($ch, \CURLINFO_HTTP_CODE);
+
+        if ($config->getLogFilePath() !== null) {
+            $rootDir = \dirname($config->getLogFilePath());
+            $fileSystem = new Filesystem(new Local($rootDir, \FILE_APPEND));
+            $logContent = \sprintf(
+                '%s METHOD: %s URL:%s TIME:%s STATUS:%s',
+                \date('Y-m-d H:i:s'),
+                $httpMethod->getValue(),
+                $url,
+                \number_format($responseTime, 2),
+                $statusCode,
+            );
+
+            if ($errorMessage !== null) {
+                $logContent = \sprintf('%s ERROR:%s', $logContent, $errorMessage);
+            }
+
+            $logContent .= "\n";
+            $fileSystem->put(
+                \basename($config->getLogFilePath()),
+                $logContent,
+            );
+        }
 
         return ResponseFactory::createFromOutput(
             $url,
             $httpMethod,
             $output,
-            \curl_getinfo($ch, \CURLINFO_HTTP_CODE),
+            $statusCode,
             \curl_errno($ch),
             $errorMessage,
         );

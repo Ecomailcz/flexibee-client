@@ -17,7 +17,9 @@ final class Config
 
     private bool $selfSignedCertificate;
 
-    private ?string $authSessionId = null;
+    private ?string $authSessionId;
+
+    private ?string $logFilePath;
 
     public function __construct(
         string $url,
@@ -26,7 +28,8 @@ final class Config
         string $password,
         string $evidence,
         bool $selfSignedCertificate,
-        ?string $authSessionId = null
+        ?string $authSessionId = null,
+        ?string $logFilePath = null
     )
     {
         $this->url = $url;
@@ -36,6 +39,7 @@ final class Config
         $this->evidence = $evidence;
         $this->selfSignedCertificate = $selfSignedCertificate;
         $this->authSessionId = $authSessionId;
+        $this->logFilePath = $logFilePath;
     }
 
     public function getUrl(): string
@@ -71,6 +75,11 @@ final class Config
     public function getAuthSessionId(): ?string
     {
         return $this->authSessionId;
+    }
+
+    public function getLogFilePath(): ?string
+    {
+        return $this->logFilePath;
     }
 
 }

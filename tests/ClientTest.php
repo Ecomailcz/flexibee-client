@@ -300,4 +300,24 @@ final class ClientTest extends TestCase
         Assert::assertArrayHasKey('property', $responseData['properties']);
     }
 
+    public function testLogRequest(): void
+    {
+        $logPath = 'logs/log.txt';
+        @\unlink($logPath);
+        $client = new Client(
+            Config::HOST,
+            Config::COMPANY,
+            Config::USERNAME,
+            Config::PASSWORD,
+            'faktura-vydana',
+            false,
+            null,
+            $logPath,
+        );
+        $client->allInEvidence();
+
+        Assert::assertTrue(\file_exists($logPath));
+        Assert::assertNotEmpty(\file_get_contents($logPath));
+    }
+
 }
