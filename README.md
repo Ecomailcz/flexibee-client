@@ -19,19 +19,14 @@ $restApiPassword,
 $evidenceName, 
 $enableSelfSignedCertificate,
 $authSessionId,
+$logPath,
 );
 ```
 `$enableSelfSignedCertificate - Vyžadání self signed certifikátu`
 
 `$authSessionId - Hodnota authentikačního id pro Flexibee`
 
-## Typy klientů
-K dispozici jsou různé druhy klientů, které mají implementovány metody pro snažší práci s FlexiBee API.
-```
-$bankClient = new BankClient($config);
-$companyClient = new CompanyClient($config);
-$recurringContractClient = new RecurringContractClient($config);
-```
+`$logPath - Cesta souboru pro logování requestů`
 
 ## Vygenerování autorizačního tokenu
 ```
