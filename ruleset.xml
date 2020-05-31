@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="EcomailFlexiBeePClientProject">
+<ruleset name="EcomailFlexiBeeClientProject">
 	<!-- Base PHPCS configuration -->
 	<config name="installed_paths" value="../../slevomat/coding-standard"/>
 	<arg name="extensions" value="php,inc" />
@@ -163,13 +163,4 @@
 	<rule ref="SlevomatCodingStandard.PHP.UselessParentheses.UselessParentheses"/>
 	<rule ref="SlevomatCodingStandard.Functions.RequireArrowFunction"/>
 	<rule ref="SlevomatCodingStandard.ControlStructures.RequireNullCoalesceEqualOperator"/>
-
-		<!-- Enable after refactoring -->
-		<exclude name="SlevomatCodingStandard.Functions.UnusedParameter"/>
-		<exclude name="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint"/>
-
-		<!-- Enable for PHP 7.4 -->
-		<exclude name="SlevomatCodingStandard.Functions.RequireArrowFunction"/>
-		<exclude name="SlevomatCodingStandard.ControlStructures.RequireNullCoalesceEqualOperator"/>
-	</rule>
 </ruleset>

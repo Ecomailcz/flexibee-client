@@ -30,12 +30,6 @@ class FlexibeeResponse implements Response
     /**
      * FlexibeeResponse constructor.
      *
-     * @param int $statusCode
-     * @param float|null $version
-     * @param bool $success
-     * @param string|null $message
-     * @param int $rowCount
-     * @param int|null $globalVersion
      * @param array<mixed> $data
      * @param array<string> $statistics
      */

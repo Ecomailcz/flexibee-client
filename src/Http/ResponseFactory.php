@@ -130,7 +130,6 @@ final class ResponseFactory
 
     /**
      * @param array<mixed> $errors
-     * @param int $statusCode
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
     private static function throwErrorMessage(array $errors, int $statusCode): void

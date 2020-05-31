@@ -97,7 +97,6 @@ class Client
 
     /**
      * @param array<mixed> $parameters
-     * @return string
      */
     public function getLoginFormUrl(array $parameters): string
     {
@@ -149,9 +148,7 @@ class Client
     }
 
     /**
-     * @param int $id
      * @param array<mixed> $uriParameters
-     * @return \EcomailFlexibee\Result\EvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
@@ -169,9 +166,7 @@ class Client
     }
 
     /**
-     * @param string $code
      * @param array<mixed> $uriParameters
-     * @return \EcomailFlexibee\Result\EvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
@@ -197,9 +192,7 @@ class Client
     }
 
     /**
-     * @param int $id
      * @param array<string> $uriParameters
-     * @return \EcomailFlexibee\Result\EvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
@@ -224,9 +217,7 @@ class Client
     }
 
     /**
-     * @param string $code
      * @param array<mixed> $uriParameters
-     * @return \EcomailFlexibee\Result\EvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
@@ -246,10 +237,7 @@ class Client
 
     /**
      * @param array<mixed> $evidenceData
-     * @param int|null $id
-     * @param bool $dryRun
      * @param array<mixed> $uriParameters
-     * @return \EcomailFlexibee\Http\Response\FlexibeeResponse
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
@@ -359,8 +347,6 @@ class Client
     }
 
     /**
-     * @param int $start
-     * @param int $limit
      * @return array<\EcomailFlexibee\Result\EvidenceResult>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
@@ -384,7 +370,6 @@ class Client
     }
 
     /**
-     * @param string $query
      * @param array<string> $uriParameters
      * @return array<\EcomailFlexibee\Result\EvidenceResult>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
@@ -409,7 +394,6 @@ class Client
     }
 
     /**
-     * @param \EcomailFlexibee\Http\Method $httpMethod
      * @param mixed $queryFilterOrId
      * @param array<mixed> $uriParameters
      * @param array<mixed> $postFields
@@ -422,13 +406,7 @@ class Client
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
-    public function callRequest(
-        Method $httpMethod,
-        $queryFilterOrId,
-        array $uriParameters,
-        array $postFields,
-        array $headers
-    ): array
+    public function callRequest(Method $httpMethod, $queryFilterOrId, array $uriParameters, array $postFields, array $headers): array
     {
         $response = $this->httpClient->request(
             $this->queryBuilder->createUri($queryFilterOrId, $uriParameters),
@@ -443,9 +421,7 @@ class Client
     }
 
     /**
-     * @param int $id
      * @param array<mixed> $uriParameters
-     * @return \EcomailFlexibee\Http\Response\Response
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
