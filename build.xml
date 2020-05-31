@@ -8,6 +8,13 @@
 		<exec command="vendor/bin/phpunit tests" checkreturn="true" passthru="true"/>
 	</target>
 	<!-- ============================================ -->
+	<!-- Target: fix                                -->
+	<!-- ============================================ -->
+	<target name="fix">
+		<exec command="composer normalize" passthru="true" checkreturn="true"/>
+		<phingcall target="phpcsfix"/>
+	</target>
+	<!-- ============================================ -->
 	<!-- Target: phpcsfix                             -->
 	<!-- ============================================ -->
 	<target name="phpcsfix">

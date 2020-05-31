@@ -18,29 +18,32 @@ class CompanyClient extends Client
             $config->getUser(),
             $config->getPassword(),
             self::EVIDENCE,
-            $config->isSelfSignedCertificate(),
+            $config->isDisableSelfSignedCertificate(),
             $config->getAuthSessionId(),
             );
     }
 
     public function backup(): Response
     {
-        return $this->makeRequest(
-            Method::get(Method::GET),
+        return $this->httpClient->request(
             $this->queryBuilder->createBackupUrl(),
+            Method::get(Method::GET),
             [],
+            [],
+            [],
+            $this->config,
         );
     }
 
     public function restore(string $companyName, string $data): Response
     {
-        return $this->makeRequest(
-            Method::get(Method::PUT),
+        return $this->httpClient->request(
             $this->queryBuilder->createRestoreUrl($companyName),
+            Method::get(Method::PUT),
             [$data],
             [],
             [],
-            true,
+            $this->config,
         );
     }
 

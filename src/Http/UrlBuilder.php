@@ -13,20 +13,11 @@ use Purl\Url;
 class UrlBuilder extends Url
 {
 
-    /**
-     * @var string
-     */
-    private $company;
+    private string $company;
 
-    /**
-     * @var string
-     */
-    private $evidence;
+    private string $evidence;
 
-    /**
-     * @var \EcomailFlexibee\Validator\ParameterValidator
-     */
-    private $validator;
+    private \EcomailFlexibee\Validator\ParameterValidator $validator;
 
     public function __construct(Config $config, ?ParserInterface $parser = null)
     {
@@ -46,7 +37,6 @@ class UrlBuilder extends Url
 
     /**
      * @param array<mixed> $uriParameters
-     * @return string
      */
     public function createLoginFormUrl(array $uriParameters): string
     {
@@ -57,9 +47,7 @@ class UrlBuilder extends Url
     }
 
     /**
-     * @param int $id
      * @param array<mixed> $uriParameters
-     * @return string
      */
     public function createPdfUrl(int $id, array $uriParameters): string
     {
@@ -85,7 +73,6 @@ class UrlBuilder extends Url
 
     /**
      * @param array<mixed> $uriParameters
-     * @return string
      */
     public function createChangesUrl(array $uriParameters = []): string
     {
@@ -104,7 +91,6 @@ class UrlBuilder extends Url
 
     /**
      * @param array<mixed> $uriParameters
-     * @return string
      */
     public function createUriByEvidenceOnly(array $uriParameters): string
     {
@@ -115,9 +101,7 @@ class UrlBuilder extends Url
     }
 
     /**
-     * @param string $filterQuery
      * @param array<mixed> $uriParameters
-     * @return string
      */
     public function createFilterQuery(string $filterQuery, array $uriParameters): string
     {
@@ -128,9 +112,7 @@ class UrlBuilder extends Url
     }
 
     /**
-     * @param string $code
      * @param array<mixed> $uriParameters
-     * @return string
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
      */
     public function createUriByCodeOnly(string $code, array $uriParameters): string
@@ -154,7 +136,6 @@ class UrlBuilder extends Url
     /**
      * @param mixed $filterQueryOrId
      * @param array<mixed> $uriParams
-     * @return string
      */
     public function createUri($filterQueryOrId, array $uriParams): string
     {
@@ -171,8 +152,6 @@ class UrlBuilder extends Url
 
     /**
      * @param string|int $filterQueryOrId
-     * @param string $format
-     * @return \Purl\Path
      */
     private function buildPathWithIdOrFilter($filterQueryOrId, string $format = 'json'): Path
     {

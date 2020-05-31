@@ -2,27 +2,55 @@
 
 namespace EcomailFlexibee\Http;
 
+use EcomailFlexibee\Exception\EcomailFlexibeeConnectionError;
 use EcomailFlexibee\Exception\EcomailFlexibeeForbidden;
 use EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization;
 use EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed;
 use EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestError;
+use EcomailFlexibee\Http\Response\FlexibeeBackupResponse;
+use EcomailFlexibee\Http\Response\FlexibeePdfResponse;
 use EcomailFlexibee\Http\Response\FlexibeeResponse;
 
 final class ResponseFactory
 {
 
-    public static function createFromOutput(string $response, int $statusCode): FlexibeeResponse
+    public static function createFromOutput(
+        string $url,
+        Method $httpMethod,
+        ?string $responseContent,
+        int $statusCode,
+        int $errorNumber,
+        ?string $errorMessage
+    ): FlexibeeResponse
     {
+        if ($responseContent === null) {
+            throw new EcomailFlexibeeRequestError();
+        }
+
+        if ($errorNumber !== \CURLE_OK && $errorMessage !== null) {
+            throw new EcomailFlexibeeConnectionError(\sprintf('cURL error (%s): %s', $errorNumber, $errorMessage));
+        }
+
+        // PDF content
+        if (\mb_strpos($url, '.pdf') !== false) {
+            return new FlexibeePdfResponse($responseContent);
+        }
+
+        // Backup content
+        if ($httpMethod->equalsValue(Method::GET) && \mb_stripos($url, '/backup') !== false) {
+            return new FlexibeeBackupResponse($responseContent);
+        }
+
         /** @var array<mixed>|null $data */
-        $data = \json_decode($response, true);
-        $data = $data ?? [];
+        $data = \json_decode($responseContent, true);
+        $data ??= [];
         $data = $data['winstrom'] ?? $data;
         $results = $data['results'] ?? $data;
 
         $version = null;
         /** @var string|null $message */
-        $message = $response;
+        $message = $responseContent;
         $success = false;
         $statistics = [];
         $rowCount = 0;
@@ -102,7 +130,6 @@ final class ResponseFactory
 
     /**
      * @param array<mixed> $errors
-     * @param int $statusCode
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
      */
     private static function throwErrorMessage(array $errors, int $statusCode): void

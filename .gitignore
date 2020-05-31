@@ -1,5 +1,6 @@
 /.idea
 /vendor
+/logs
 .DS_Store
 tests/.DS_Store
 .phpunit.result.cache
