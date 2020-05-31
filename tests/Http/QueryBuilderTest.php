@@ -11,10 +11,7 @@ use PHPUnit\Framework\TestCase;
 class QueryBuilderTest extends TestCase
 {
 
-    /**
-     * @var \EcomailFlexibee\Http\UrlBuilder
-     */
-    private $urlBuilder;
+    private \EcomailFlexibee\Http\UrlBuilder $urlBuilder;
 
     public function setUp(): void
     {
@@ -27,8 +24,8 @@ class QueryBuilderTest extends TestCase
                 TestConfig::USERNAME,
                 TestConfig::PASSWORD,
                 TestConfig::EVIDENCE,
-                false
-            )
+                false,
+            ),
         );
     }
 

@@ -6,7 +6,6 @@ use EcomailFlexibee\Client;
 use EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestError;
-use EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed;
 use EcomailFlexibee\Http\Method;
 use EcomailFlexibee\Result\EvidenceResult;
 use Faker\Factory;
@@ -16,19 +15,14 @@ use PHPUnit\Framework\TestCase;
 final class ClientTest extends TestCase
 {
 
-    /**
-     * @var \EcomailFlexibee\Client
-     */
-    private $client;
+    private \EcomailFlexibee\Client $client;
 
-    /**
-     * @var \Faker\Generator
-     */
-    private $faker;
+    private \Faker\Generator $faker;
 
     public function setUp(): void
     {
         parent::setUp();
+
         $this->faker = Factory::create();
         $this->client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, Config::EVIDENCE, false, null);
     }
@@ -98,7 +92,7 @@ final class ClientTest extends TestCase
         Assert::assertCount(1, $evidenceItem->getData());
         Assert::assertEquals($id, (int) $evidenceItem->getData()[0]['id']);
         $evidenceItemFull = $this->client->getByCode($code, ['detail' => 'full']);
-        Assert::assertNotEquals(count($evidenceItem->getData()[0]), count($evidenceItemFull->getData()[0]));
+        Assert::assertNotEquals(\count($evidenceItem->getData()[0]), \count($evidenceItemFull->getData()[0]));
         $this->client->deleteByCode($code);
         Assert::assertCount(0, $this->client->findByCode($code)->getData());
     }
@@ -115,13 +109,12 @@ final class ClientTest extends TestCase
             'email' => '',
             'kontakty' => [],
         ],
-            $evidenceData
+            $evidenceData,
         );
     }
 
     /**
      * @dataProvider getEvidences
-     * @param string       $evidence
      * @param array<mixed> $evidenceData
      * @param array<mixed> $expectedDataAfterUpdate
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
@@ -161,7 +154,7 @@ final class ClientTest extends TestCase
     public function getEvidences(): array
     {
         $faker = Factory::create();
-        $code = mb_substr($faker->uuid, 0, 20);
+        $code = \mb_substr($faker->uuid, 0, 20);
         $name = $faker->userName;
 
         return [
@@ -192,7 +185,7 @@ final class ClientTest extends TestCase
     public function testAllAndChunkInEvidence(): void
     {
         $result = $this->client->allInEvidence();
-        Assert::assertTrue(count($result) > 0);
+        Assert::assertTrue(\count($result) > 0);
 
         $firstResult = $this->client->chunkInEvidence(0, 1);
         Assert::assertCount(1, $firstResult);
@@ -206,7 +199,7 @@ final class ClientTest extends TestCase
     {
         $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false, null);
         $result = $client->searchInEvidence('(kod neq \'JAN\')', []);
-        Assert::assertTrue(count($result) > 0);
+        Assert::assertTrue(\count($result) > 0);
         $this->expectException(EcomailFlexibeeRequestError::class);
         $client->searchInEvidence('kod neq \'JAN\'', []);
     }
@@ -220,7 +213,7 @@ final class ClientTest extends TestCase
 
     public function testDryRunRequest(): void
     {
-        $response = $this->client->save(['kod' => uniqid(), 'nazev' => 'SDSDXXXXX'], null, true);
+        $response = $this->client->save(['kod' => \uniqid(), 'nazev' => 'SDSDXXXXX'], null, true);
         $firstItem = $response->getData()[0];
         Assert::assertArrayHasKey('content', $firstItem);
         Assert::assertArrayHasKey(Config::EVIDENCE, $firstItem['content']);
@@ -234,7 +227,7 @@ final class ClientTest extends TestCase
             'properties',
             [],
             [],
-            []
+            [],
         );
 
         Assert::assertArrayHasKey(0, $results);
@@ -253,25 +246,6 @@ final class ClientTest extends TestCase
         }
     }
 
-    private function checkResponseStructure(EvidenceResult $result): void
-    {
-        $requiredKeys = [
-            'created',
-            'updated',
-            'deleted',
-            'skipped',
-            'failed',
-            'status_code',
-            'message',
-            'version',
-            'row_count',
-        ];
-
-        foreach ($requiredKeys as $requiredKey) {
-            Assert::assertArrayHasKey($requiredKey, $result->getData());
-        }
-    }
-
     public function testUnknownCompany(): void
     {
         $client = new Client(Config::HOST, 'xxx', Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false);
@@ -282,7 +256,7 @@ final class ClientTest extends TestCase
 
     public function testCreateSameEvidenceRecord(): void
     {
-        $code = uniqid();
+        $code = \uniqid();
         $data = [
             'nazev' => $code,
             'kod' => $code,
@@ -318,6 +292,25 @@ final class ClientTest extends TestCase
 
         Assert::assertTrue(\file_exists($logPath));
         Assert::assertNotEmpty(\file_get_contents($logPath));
+    }
+
+    private function checkResponseStructure(EvidenceResult $result): void
+    {
+        $requiredKeys = [
+            'created',
+            'updated',
+            'deleted',
+            'skipped',
+            'failed',
+            'status_code',
+            'message',
+            'version',
+            'row_count',
+        ];
+
+        foreach ($requiredKeys as $requiredKey) {
+            Assert::assertArrayHasKey($requiredKey, $result->getData());
+        }
     }
 
 }

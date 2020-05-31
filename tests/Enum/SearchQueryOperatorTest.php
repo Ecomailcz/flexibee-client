@@ -11,8 +11,6 @@ final class SearchQueryOperatorTest extends TestCase
 
     /**
      * @dataProvider getQueryStrings
-     * @param string $query
-     * @param string $expectedQuery
      */
     public function testConvertOperators(string $query, string $expectedQuery): void
     {

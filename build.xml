@@ -18,7 +18,7 @@
 	<!-- Target: phpcsfix                             -->
 	<!-- ============================================ -->
 	<target name="phpcsfix">
-		<exec command="vendor/bin/phpcbf --standard=ruleset.xml --extensions=php --tab-width=4 -sp src" checkreturn="true" passthru="true"/>
+		<exec command="vendor/bin/phpcbf --standard=ruleset.xml --extensions=php --tab-width=4 -sp src tests" checkreturn="true" passthru="true"/>
 	</target>
 	<!-- ============================================ -->
 	<!-- Target: phpstan                              -->
@@ -30,13 +30,13 @@
 	<!-- Target: lint                                 -->
 	<!-- ============================================ -->
 	<target name="lint">
-		<exec command="vendor/bin/parallel-lint src  --exclude vendor" passthru="true" checkreturn="true" level="error"/>
+		<exec command="vendor/bin/parallel-lint src tests  --exclude vendor" passthru="true" checkreturn="true" level="error"/>
 	</target>
 	<!-- ============================================ -->
 	<!-- Target: phpcs                                -->
 	<!-- ============================================ -->
 	<target name="phpcs">
-		<exec command="php vendor/bin/phpcs --standard=ruleset.xml --extensions=php --encoding=utf-8 src" passthru="true" checkreturn="true"/>
+		<exec command="php vendor/bin/phpcs --standard=ruleset.xml --extensions=php --encoding=utf-8 src tests" passthru="true" checkreturn="true"/>
 	</target>
 	<!-- ============================================ -->
 	<!-- Target: tests                                -->
