@@ -306,11 +306,30 @@ final class ClientTest extends TestCase
             Config::EVIDENCE,
             true,
             null,
-            'logs/log.txt',
+            '../logs/log.txt',
         );
 
         $this->expectException(EcomailFlexibeeForbidden::class);
         Client::createCompany($this->faker->name, [], $config);
+
+    }
+
+    public function testCreateCompanyWithCredentials(): void
+    {
+        $this->markTestSkipped('Enable for live testing only!');
+        $config = new TestConfig(
+            ConfigEcomail::HOST,
+            ConfigEcomail::COMPANY,
+            ConfigEcomail::USERNAME,
+            ConfigEcomail::PASSWORD,
+            ConfigEcomail::EVIDENCE,
+            true,
+            null,
+            '../logs/log.txt',
+        );
+
+        $response = Client::createCompany($this->faker->name, [], $config);
+        Assert::assertEquals(201, $response->getStatusCode());
 
     }
 
