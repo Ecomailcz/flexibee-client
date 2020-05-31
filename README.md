@@ -1,10 +1,12 @@
-# FlexiBee client
-[![Build Status](https://travis-ci.org/Ecomailcz/flexibee-client.svg?branch=master?format=flat)](https://travis-ci.org/Ecomailcz/flexibee-client)
-[![Latest Stable Version](https://poser.pugx.org/ecomailcz/flexibee-client/v/stable?format=flat)](https://packagist.org/packages/ecomailcz/flexibee-client)
-[![Total Downloads](https://poser.pugx.org/ecomailcz/flexibee-client/downloads?format=flat)](https://packagist.org/packages/ecomailcz/flexibee-client)
-[![License](https://poser.pugx.org/ecomailcz/flexibee-client/license?format=flat)](https://packagist.org/packages/ecomailcz/flexibee-client)
-
+# FlexiBee - PHP HTTP client
 Jednoduchý cURL client, který se stará o správné složení requestu do systému Flexibee a následné vrácení výsledků.
+
+[![License](https://poser.pugx.org/ecomailcz/flexibee-client/license?format=flat)](https://packagist.org/packages/ecomailcz/flexibee-client)
+[![Latest version](https://img.shields.io/packagist/v/ecomailcz/flexibee-client.svg?colorB=007EC6)](https://packagist.org/packages/ecomailcz/flexibee-client)
+[![Downloads](https://img.shields.io/packagist/dt/ecomailcz/flexibee-client.svg?colorB=007EC6)](https://packagist.org/packages/ecomailcz/flexibee-client)
+![PHPStan](https://img.shields.io/badge/style-level%207-brightgreen.svg?&label=phpstan)
+## Sponsored by
+[![Downloads](https://ecomail.cz/images/logo@2.png)](https://ecomail.cz)
 
 ## Instalace přes composer
 ```composer require ecomailcz/flexibee-client```
