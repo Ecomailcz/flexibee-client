@@ -3,6 +3,8 @@
 namespace EcomailFlexibeeTest;
 
 use EcomailFlexibee\Client;
+use EcomailFlexibee\Config as TestConfig;
+use EcomailFlexibee\Exception\EcomailFlexibeeForbidden;
 use EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestError;
@@ -292,6 +294,24 @@ final class ClientTest extends TestCase
 
         Assert::assertTrue(\file_exists($logPath));
         Assert::assertNotEmpty(\file_get_contents($logPath));
+    }
+
+    public function testCreateCompanyWithBadCredentials(): void
+    {
+        $config = new TestConfig(
+            Config::HOST,
+            Config::COMPANY,
+            Config::USERNAME,
+            Config::PASSWORD,
+            Config::EVIDENCE,
+            true,
+            null,
+            'logs/log.txt',
+        );
+
+        $this->expectException(EcomailFlexibeeForbidden::class);
+        Client::createCompany($this->faker->name, [], $config);
+
     }
 
     private function checkResponseStructure(EvidenceResult $result): void

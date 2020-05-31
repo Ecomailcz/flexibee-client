@@ -441,4 +441,21 @@ class Client
         );
     }
 
+    /**
+     * @param array<string> $oarams
+     */
+    public static function createCompany(string $name, array $oarams, Config $config): \EcomailFlexibee\Http\Response\FlexibeeResponse
+    {
+        return (new HttpClient())->request(
+            \sprintf('%s/admin/zalozeni-firmy', $config->getUrl()),
+            Method::get(Method::PUT),
+            [],
+            \array_merge($oarams, [
+                'name' => $name,
+            ]),
+            [],
+            $config,
+        );
+    }
+
 }
