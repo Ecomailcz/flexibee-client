@@ -59,13 +59,20 @@ final class HttpClient
         if ($config->getLogFilePath() !== null) {
             $rootDir = \dirname($config->getLogFilePath());
             $fileSystem = new Filesystem(new Local($rootDir, \FILE_APPEND));
+            $headersContents = [];
+
+            foreach ($headers as $key => $value) {
+                $headersContents[] = \sprintf('%s:%s', $key, $value);
+            }
+
             $logContent = \sprintf(
-                '%s METHOD: %s URL:%s TIME:%s STATUS:%s',
+                '%s METHOD: %s URL:%s TIME:%s STATUS:%s HEADERS: %s',
                 \date('Y-m-d H:i:s'),
                 $httpMethod->getValue(),
                 $url,
                 \number_format($responseTime, 2),
                 $statusCode,
+                \implode(',', $headersContents),
             );
 
             if ($errorMessage !== null) {

@@ -317,18 +317,7 @@ final class ClientTest extends TestCase
     public function testCreateCompanyWithCredentials(): void
     {
         $this->markTestSkipped('Enable for live testing only!');
-        $config = new TestConfig(
-            ConfigEcomail::HOST,
-            ConfigEcomail::COMPANY,
-            ConfigEcomail::USERNAME,
-            ConfigEcomail::PASSWORD,
-            ConfigEcomail::EVIDENCE,
-            true,
-            null,
-            '../logs/log.txt',
-        );
-
-        $response = Client::createCompany($this->faker->name, [], $config);
+        $response = Client::createCompany($this->faker->name, [], $this->createEcomailConfig());
         Assert::assertEquals(201, $response->getStatusCode());
 
     }
@@ -350,6 +339,20 @@ final class ClientTest extends TestCase
         foreach ($requiredKeys as $requiredKey) {
             Assert::assertArrayHasKey($requiredKey, $result->getData());
         }
+    }
+
+    private function createEcomailConfig(): TestConfig
+    {
+        return new TestConfig(
+            ConfigEcomail::HOST,
+            ConfigEcomail::COMPANY,
+            ConfigEcomail::USERNAME,
+            ConfigEcomail::PASSWORD,
+            ConfigEcomail::EVIDENCE,
+            true,
+            null,
+            'logs/log.txt',
+        );
     }
 
 }

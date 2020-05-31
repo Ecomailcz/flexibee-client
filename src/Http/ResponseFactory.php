@@ -24,24 +24,23 @@ final class ResponseFactory
         ?string $errorMessage
     ): FlexibeeResponse
     {
-        if ($responseContent === null) {
-            throw new EcomailFlexibeeRequestError();
-        }
-
         if ($errorNumber !== \CURLE_OK && $errorMessage !== null) {
             throw new EcomailFlexibeeConnectionError(\sprintf('cURL error (%s): %s', $errorNumber, $errorMessage));
         }
 
         // PDF content
-        if (\mb_strpos($url, '.pdf') !== false) {
+        if (\mb_strpos($url, '.pdf') !== false && $responseContent !== null) {
             return new FlexibeePdfResponse($responseContent);
         }
 
         // Backup content
-        if ($httpMethod->equalsValue(Method::GET) && \mb_stripos($url, '/backup') !== false) {
+        if ($httpMethod->equalsValue(Method::GET) && \mb_stripos($url, '/backup') !== false && $responseContent !== null) {
             return new FlexibeeBackupResponse($responseContent);
         }
 
+        $responseContent = !\is_string($responseContent)
+            ? ''
+            : $responseContent;
         /** @var array<mixed>|null $data */
         $data = \json_decode($responseContent, true);
         $data ??= [];
@@ -104,7 +103,7 @@ final class ResponseFactory
             throw new EcomailFlexibeeMethodNotAllowed();
         }
 
-        if (\in_array($statusCode, [500, 400], true)) {
+        if (\in_array($statusCode, [400, 500], true)) {
             foreach ($results as $resultData) {
                 if (!isset($resultData['errors'])) {
                     continue;
@@ -113,7 +112,7 @@ final class ResponseFactory
                 self::throwErrorMessage($resultData['errors'], $statusCode);
             }
 
-            throw new EcomailFlexibeeRequestError($message);
+            throw new EcomailFlexibeeRequestError($message, $statusCode);
         }
 
         return new FlexibeeResponse(

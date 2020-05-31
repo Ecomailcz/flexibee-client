@@ -47,6 +47,20 @@ class Client
         $this->httpClient = new HttpClient();
     }
 
+    public static function createFromConfig(Config $config): self
+    {
+        return new self(
+            $config->getUrl(),
+            $config->getCompany(),
+            $config->getUser(),
+            $config->getPassword(),
+            $config->getEvidence(),
+            $config->isDisableSelfSignedCertificate(),
+            $config->getAuthSessionId(),
+            $config->getLogFilePath(),
+        );
+    }
+
     public function isAllowedChangesApi(): bool
     {
         return $this->httpClient->request(
@@ -437,6 +451,37 @@ class Client
             [],
             [],
             [],
+            $this->config,
+        );
+    }
+
+    public function backupCompany(): Response
+    {
+        return $this->httpClient->request(
+            $this->queryBuilder->createBackupUrl(),
+            Method::get(Method::GET),
+            [],
+            [],
+            [
+                'Accept' => 'application/x-winstrom-backup',
+            ],
+            $this->config,
+        );
+    }
+
+    public function restoreCompany(string $companyName, string $winstromBackupContent): Response
+    {
+        return $this->httpClient->request(
+            $this->queryBuilder->createRestoreUrl($companyName),
+            Method::get(Method::PUT),
+            [$winstromBackupContent],
+            [],
+            [
+                'Content-Type' => 'application/x-winstrom-backup',
+                'Accept' => 'application/json',
+                'Connection' => 'Keep-Alive',
+                'Keep-Alive' => 'timeout=3600, max=10000',
+            ],
             $this->config,
         );
     }

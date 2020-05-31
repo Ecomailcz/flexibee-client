@@ -3,6 +3,7 @@
 namespace EcomailFlexibee\Http;
 
 use EcomailFlexibee\Config;
+use Purl\Url;
 
 final class HttpCurlBuilder
 {
@@ -15,6 +16,8 @@ final class HttpCurlBuilder
      */
     public function build(string $url, Method $httpMethod, array $postFields, array $queryParameters, array $headers, Config $config)
     {
+        $url = new Url($url);
+
         /** @var resource $ch */
         $ch = \curl_init();
         \curl_setopt($ch, \CURLOPT_FOLLOWLOCATION, TRUE);
@@ -38,9 +41,12 @@ final class HttpCurlBuilder
         }
 
         if (\count($postFields) > 0) {
-            \curl_setopt($ch, \CURLOPT_POSTFIELDS, \json_encode([
-                'winstrom' => $postFields,
-            ]));
+
+            $postFieldsNormalized = \in_array('restore', $url->getPath()->getData(), true) ? $postFields[0] : \json_encode([
+                    'winstrom' => $postFields,
+                ]);
+
+            \curl_setopt($ch, \CURLOPT_POSTFIELDS, $postFieldsNormalized);
         }
 
         if (\count($queryParameters) > 0) {

@@ -1,0 +1,3 @@
+2020-05-31 17:29:23 METHOD: GET URL:https://demo.flexibee.eu/c/demo/faktura-vydana.json?limit=0 TIME:0.37 STATUS:200 HEADERS: 
+2020-05-31 17:38:12 METHOD: GET URL:https://ecomail.flexibee.eu/c/ecobackup/backup TIME:26.31 STATUS:200 HEADERS: Accept:application/x-winstrom-backup
+2020-05-31 17:43:35 METHOD: PUT URL:https://ecomail.flexibee.eu/c/ecobackup/restore?name=ecobackup TIME:323.29 STATUS:503 HEADERS: Content-Type:application/x-winstrom-backup,Accept:application/json,Connection:Keep-Alive,Keep-Alive:timeout=3600, max=10000 ERROR:transfer closed with 419 bytes remaining to read
