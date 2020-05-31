@@ -10,7 +10,6 @@ final class HttpClient
 {
 
     private \EcomailFlexibee\Http\UrlNormalizer $urlNormalizer;
-
     private \EcomailFlexibee\Http\HttpCurlBuilder $httpCurlBuilder;
 
     public function __construct() {

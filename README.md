@@ -17,12 +17,12 @@ $companyCode,
 $restApiUserName, 
 $restApiPassword, 
 $evidenceName, 
-$enableSelfSignedCertificate,
+$disableSelfSignedCertificate,
 $authSessionId,
 $logPath,
 );
 ```
-`$enableSelfSignedCertificate - Vyžadání self signed certifikátu`
+`$disableSelfSignedCertificate - Vypnutí self signed certifikátu`
 
 `$authSessionId - Hodnota authentikačního id pro Flexibee`
 

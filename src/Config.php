@@ -6,19 +6,12 @@ final class Config
 {
 
     private string $url;
-
     private string $company;
-
     private string $user;
-
     private string $password;
-
     private string $evidence;
-
-    private bool $selfSignedCertificate;
-
+    private bool $disableSelfSignedCertificate;
     private ?string $authSessionId;
-
     private ?string $logFilePath;
 
     public function __construct(
@@ -27,7 +20,7 @@ final class Config
         string $user,
         string $password,
         string $evidence,
-        bool $selfSignedCertificate,
+        bool $disableSelfSignedCertificate,
         ?string $authSessionId = null,
         ?string $logFilePath = null
     )
@@ -37,7 +30,7 @@ final class Config
         $this->user = $user;
         $this->password = $password;
         $this->evidence = $evidence;
-        $this->selfSignedCertificate = $selfSignedCertificate;
+        $this->disableSelfSignedCertificate = $disableSelfSignedCertificate;
         $this->authSessionId = $authSessionId;
         $this->logFilePath = $logFilePath;
     }
@@ -67,9 +60,9 @@ final class Config
         return $this->evidence;
     }
 
-    public function isSelfSignedCertificate(): bool
+    public function isDisableSelfSignedCertificate(): bool
     {
-        return $this->selfSignedCertificate;
+        return $this->disableSelfSignedCertificate;
     }
 
     public function getAuthSessionId(): ?string

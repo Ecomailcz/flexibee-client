@@ -27,7 +27,7 @@ class Client
         string $user,
         string $password,
         string $evidence,
-        bool $selfSignedCertificate,
+        bool $disableSelfSignedCertificate,
         ?string $authSessionId = null,
         ?string $logFilePath = null
     )
@@ -38,7 +38,7 @@ class Client
             $user,
             $password,
             $evidence,
-            $selfSignedCertificate,
+            $disableSelfSignedCertificate,
             $authSessionId,
             $logFilePath,
         );
