@@ -4,3 +4,4 @@
 .DS_Store
 tests/.DS_Store
 .phpunit.result.cache
+composer.lock
