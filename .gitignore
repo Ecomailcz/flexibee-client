@@ -3,5 +3,4 @@
 /logs
 .DS_Store
 tests/.DS_Store
-tests/ConfigEcomail.php
 .phpunit.result.cache
