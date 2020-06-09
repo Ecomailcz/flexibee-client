@@ -10,7 +10,7 @@ final class Config
     private string $user;
     private string $password;
     private string $evidence;
-    private bool $disableSelfSignedCertificate;
+    private bool $verifySSLCertificate;
     private ?string $authSessionId;
     private ?string $logFilePath;
 
@@ -20,7 +20,7 @@ final class Config
         string $user,
         string $password,
         string $evidence,
-        bool $disableSelfSignedCertificate,
+        bool $verifySSLCertificate,
         ?string $authSessionId = null,
         ?string $logFilePath = null
     )
@@ -30,7 +30,7 @@ final class Config
         $this->user = $user;
         $this->password = $password;
         $this->evidence = $evidence;
-        $this->disableSelfSignedCertificate = $disableSelfSignedCertificate;
+        $this->verifySSLCertificate = $verifySSLCertificate;
         $this->authSessionId = $authSessionId;
         $this->logFilePath = $logFilePath;
     }
@@ -60,9 +60,9 @@ final class Config
         return $this->evidence;
     }
 
-    public function isDisableSelfSignedCertificate(): bool
+    public function verifySSLCertificate(): bool
     {
-        return $this->disableSelfSignedCertificate;
+        return $this->verifySSLCertificate;
     }
 
     public function getAuthSessionId(): ?string

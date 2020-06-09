@@ -18,7 +18,7 @@ class CompanyClient extends Client
             $config->getUser(),
             $config->getPassword(),
             self::EVIDENCE,
-            $config->isDisableSelfSignedCertificate(),
+            $config->verifySSLCertificate(),
             $config->getAuthSessionId(),
             );
     }
