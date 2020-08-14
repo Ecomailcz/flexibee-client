@@ -16,7 +16,6 @@ final class ClientTest extends TestCase
 {
 
     private \EcomailFlexibee\Client $client;
-
     private \Faker\Generator $faker;
 
     public function setUp(): void
@@ -25,6 +24,19 @@ final class ClientTest extends TestCase
 
         $this->faker = Factory::create();
         $this->client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, Config::EVIDENCE, false, null);
+    }
+
+    public function testGetCompanies(): void
+    {
+        /** @var array<mixed> $companies */
+        $companies = $this->client->getCompanies()->getData();
+        Assert::assertArrayHasKey('companies', $companies);
+        Assert::assertTrue(\count($companies) > 0);
+    }
+
+    public function testGetCompany(): void
+    {
+        Assert::assertNotEmpty($this->client->getCompany());
     }
 
     public function testGetLoginFormUrl(): void
@@ -174,6 +186,7 @@ final class ClientTest extends TestCase
                     'kod' => $code,
                     'typDokl' => 'code:FAKTURA',
                     'cisDosle' => '1234',
+                    'eetTypK' => 'eetTyp.ne',
                 ],
                 [
                     'cisDosle' => '1234',

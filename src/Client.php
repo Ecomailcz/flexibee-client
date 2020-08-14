@@ -95,6 +95,32 @@ class Client
         );
     }
 
+    public function getCompanies(): Response
+    {
+        return $this->httpClient->request(
+            $this->queryBuilder->createCompanyUrl(),
+            Method::get(Method::GET),
+            [],
+            [],
+            [],
+            $this->config,
+        );
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function getCompany(): array
+    {
+        $result = \array_filter($this->getCompanies()->getData()['companies'], fn (array $data): bool => \mb_strtolower($data['dbNazev']) === \mb_strtolower($this->config->getCompany()));
+
+        if (isset($result['company'])) {
+            return $result['company'];
+        }
+
+        throw new EcomailFlexibeeNoEvidenceResult();
+    }
+
     /**
      * @param array<mixed> $parameters
      */

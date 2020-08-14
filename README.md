@@ -36,6 +36,13 @@ $client = new Client('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom',
 $tokens = $client->getAuthAndRefreshToken();
 ```
 
+## Informace o firmách či firmě
+```
+$client = new Client('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', 'adresar', false, null);
+$companies = $client->getCompanies();
+$company = $client->getCompany();
+```
+
 ## Vytvoření či editace záznamu
 ```
 $client = new Client('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', 'adresar', false, null);

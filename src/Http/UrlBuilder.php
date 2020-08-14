@@ -64,6 +64,13 @@ class UrlBuilder extends Url
         return $this->getUrl();
     }
 
+    public function createCompanyUrl(): string
+    {
+        $this->setPath(new Path(\sprintf('/c/%s.json', $this->company)));
+
+        return $this->getUrl();
+    }
+
     public function createRestoreUrl(string $companyName): string
     {
         $this->setPath(new Path(\sprintf('/c/%s/restore?name=%s', $this->company, $companyName)));
