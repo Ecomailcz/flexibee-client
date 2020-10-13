@@ -346,6 +346,7 @@ final class ClientTest extends TestCase
 
         Assert::assertTrue(file_exists($logPath));
         Assert::assertNotEmpty(file_get_contents($logPath));
+        unlink($logPath);
     }
 
     private function checkResponseStructure(EvidenceResult $result): void

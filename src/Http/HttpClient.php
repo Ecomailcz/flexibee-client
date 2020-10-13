@@ -13,6 +13,7 @@ use function curl_exec;
 use function curl_getinfo;
 use function date;
 use function dirname;
+use function implode;
 use function is_string;
 use function mb_strlen;
 use function microtime;
@@ -73,15 +74,22 @@ final class HttpClient
         $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
         if ($config->getLogFilePath() !== null) {
+            $headersContents = [];
+
+            foreach ($headers as $key => $value) {
+                $headersContents[] = sprintf('%s:%s', $key, $value);
+            }
+
             $rootDir = dirname($config->getLogFilePath());
             $fileSystem = new Filesystem(new Local($rootDir, FILE_APPEND));
             $logContent = sprintf(
-                '%s METHOD: %s URL:%s TIME:%s STATUS:%s',
+                '%s METHOD: %s URL:%s TIME:%s STATUS:%s HEADERS: %s',
                 date('Y-m-d H:i:s'),
                 $httpMethod->getValue(),
                 $url,
                 number_format($responseTime, 2),
                 $statusCode,
+                implode(',', $headersContents),
             );
 
             if ($errorMessage !== null) {
