@@ -51,7 +51,7 @@ $evidenceData['nazev'] = 'První kontaktní adresa'
 $evidenceItemId = $client->save($evidenceData, null, $dryRun, $uriParameters);
 ```
 Pokud vše proběhne v pořádku, vratí se třída `\EcomailFlexibee\Http\Response\Response:class` s daty ze systému Flexibee. Nastane-li chyba, vyhodí se výjimka
-`EcomailFlexibeeRequestError::class`. Pro editaci záznamu stačí vyplnit druhý parametr `$id`.
+`EcomailFlexibeeRequestFail::class`. Pro editaci záznamu stačí vyplnit druhý parametr `$id`.
 
 ## Vrácení záznamu dle parametrů
 Nalezení záznamu dle id s vyhozením výjimky, pokud záznam neexistuje  

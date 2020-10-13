@@ -4,7 +4,7 @@ namespace EcomailFlexibee\Exception;
 
 use Exception;
 
-final class EcomailFlexibeeConnectionError extends Exception
+final class EcomailFlexibeeRequestFail extends Exception
 {
 
 }

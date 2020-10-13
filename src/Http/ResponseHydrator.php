@@ -5,14 +5,16 @@ namespace EcomailFlexibee\Http;
 use Consistence\ObjectPrototype;
 use EcomailFlexibee\Config;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
-use EcomailFlexibee\Exception\EcomailFlexibeeRequestError;
+use EcomailFlexibee\Exception\EcomailFlexibeeRequestFail;
 use EcomailFlexibee\Http\Response\Response;
 use EcomailFlexibee\Result\EvidenceResult;
+use function array_map;
+use function count;
 
 class ResponseHydrator extends ObjectPrototype
 {
 
-    private \EcomailFlexibee\Config $config;
+    private Config $config;
 
     public function __construct(Config $config)
     {
@@ -21,18 +23,18 @@ class ResponseHydrator extends ObjectPrototype
 
     /**
      * @return array<\EcomailFlexibee\Result\EvidenceResult>
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
     public function convertResponseToEvidenceResults(Response $response): array
     {
         $data = $response->getData();
 
         if (isset($data['success']) && $data['success'] === 'false') {
-            throw new EcomailFlexibeeRequestError($data['message']);
+            throw new EcomailFlexibeeRequestFail($data['message']);
         }
 
         if (!isset($data[$this->config->getEvidence()])) {
-            if (\count($data) === 0) {
+            if (count($data) === 0) {
                 $data = $response->getStatistics();
                 $data['status_code'] = $response->getStatusCode();
                 $data['message'] = $response->getMessage();
@@ -43,7 +45,7 @@ class ResponseHydrator extends ObjectPrototype
             return [new EvidenceResult($data)];
         }
 
-        return \array_map(static fn (array $data) => new EvidenceResult($data), $data[$this->config->getEvidence()]);
+        return array_map(static fn (array $data) => new EvidenceResult($data), $data[$this->config->getEvidence()]);
     }
 
     public function convertResponseToEvidenceResult(Response $response, bool $throwException): EvidenceResult
@@ -55,7 +57,7 @@ class ResponseHydrator extends ObjectPrototype
                 throw new EcomailFlexibeeNoEvidenceResult();
             }
 
-            return \count($data) !== 0 ? new EvidenceResult($data) : new EvidenceResult([]);
+            return count($data) !== 0 ? new EvidenceResult($data) : new EvidenceResult([]);
         }
 
         return new EvidenceResult($data[$this->config->getEvidence()]);

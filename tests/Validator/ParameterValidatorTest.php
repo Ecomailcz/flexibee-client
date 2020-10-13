@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 final class ParameterValidatorTest extends TestCase
 {
 
-    private \EcomailFlexibee\Validator\ParameterValidator $validator;
+    private ParameterValidator $validator;
 
     public function setUp(): void
     {

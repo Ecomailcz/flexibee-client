@@ -9,6 +9,9 @@ use Purl\ParserInterface;
 use Purl\Path;
 use Purl\Query;
 use Purl\Url;
+use function array_merge;
+use function http_build_query;
+use function sprintf;
 
 class UrlBuilder extends Url
 {
@@ -17,7 +20,7 @@ class UrlBuilder extends Url
 
     private string $evidence;
 
-    private \EcomailFlexibee\Validator\ParameterValidator $validator;
+    private ParameterValidator $validator;
 
     public function __construct(Config $config, ?ParserInterface $parser = null)
     {
@@ -59,21 +62,21 @@ class UrlBuilder extends Url
 
     public function createBackupUrl(): string
     {
-        $this->setPath(new Path(\sprintf('/c/%s/backup', $this->company)));
+        $this->setPath(new Path(sprintf('/c/%s/backup', $this->company)));
 
         return $this->getUrl();
     }
 
     public function createCompanyUrl(): string
     {
-        $this->setPath(new Path(\sprintf('/c/%s.json', $this->company)));
+        $this->setPath(new Path(sprintf('/c/%s.json', $this->company)));
 
         return $this->getUrl();
     }
 
     public function createRestoreUrl(string $companyName): string
     {
-        $this->setPath(new Path(\sprintf('/c/%s/restore?name=%s', $this->company, $companyName)));
+        $this->setPath(new Path(sprintf('/c/%s/restore?name=%s', $this->company, $companyName)));
 
         return $this->getUrl();
     }
@@ -83,7 +86,7 @@ class UrlBuilder extends Url
      */
     public function createChangesUrl(array $uriParameters = []): string
     {
-        $this->setPath(new Path(\sprintf('/c/%s/changes.json', $this->company)));
+        $this->setPath(new Path(sprintf('/c/%s/changes.json', $this->company)));
         $this->createQueryParams($uriParameters);
 
         return $this->getUrl();
@@ -91,7 +94,7 @@ class UrlBuilder extends Url
 
     public function createChangesStatusUrl(): string
     {
-        $this->setPath(new Path(\sprintf('/c/%s/changes/status.json', $this->company)));
+        $this->setPath(new Path(sprintf('/c/%s/changes/status.json', $this->company)));
 
         return $this->getUrl();
     }
@@ -125,7 +128,7 @@ class UrlBuilder extends Url
     public function createUriByCodeOnly(string $code, array $uriParameters): string
     {
         $this->validator->validateFlexibeeRequestCodeParameter($code);
-        $this->setPath($this->buildPathWithIdOrFilter(\sprintf('(kod eq \'%s\')', $code)));
+        $this->setPath($this->buildPathWithIdOrFilter(sprintf('(kod eq \'%s\')', $code)));
         $this->createQueryParams($uriParameters);
 
         return $this->getUrl();
@@ -162,12 +165,12 @@ class UrlBuilder extends Url
      */
     private function buildPathWithIdOrFilter($filterQueryOrId, string $format = 'json'): Path
     {
-        return new Path(\sprintf('c/%s/%s/%s.%s', $this->company, $this->evidence, $filterQueryOrId, $format));
+        return new Path(sprintf('c/%s/%s/%s.%s', $this->company, $this->evidence, $filterQueryOrId, $format));
     }
 
     private function buildPathForOnlyEvidence(): Path
     {
-        return new Path(\sprintf('c/%s/%s.json', $this->company, $this->evidence));
+        return new Path(sprintf('c/%s/%s.json', $this->company, $this->evidence));
     }
 
     /**
@@ -175,8 +178,8 @@ class UrlBuilder extends Url
      */
     private function createQueryParams(array $parameters): void
     {
-        $parameters = \array_merge(['limit' => '0'], $parameters);
-        $this->setQuery(new Query(\http_build_query($parameters)));
+        $parameters = array_merge(['limit' => '0'], $parameters);
+        $this->setQuery(new Query(http_build_query($parameters)));
     }
 
 }

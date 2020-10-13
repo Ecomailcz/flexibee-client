@@ -2,15 +2,22 @@
 
 namespace EcomailFlexibee\Http;
 
-use EcomailFlexibee\Exception\EcomailFlexibeeConnectionError;
+use EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail;
 use EcomailFlexibee\Exception\EcomailFlexibeeForbidden;
 use EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization;
 use EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed;
 use EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest;
-use EcomailFlexibee\Exception\EcomailFlexibeeRequestError;
+use EcomailFlexibee\Exception\EcomailFlexibeeRequestFail;
 use EcomailFlexibee\Http\Response\FlexibeeBackupResponse;
 use EcomailFlexibee\Http\Response\FlexibeePdfResponse;
 use EcomailFlexibee\Http\Response\FlexibeeResponse;
+use function implode;
+use function in_array;
+use function json_decode;
+use function mb_stripos;
+use function mb_strpos;
+use function sprintf;
+use const CURLE_OK;
 
 final class ResponseFactory
 {
@@ -25,25 +32,25 @@ final class ResponseFactory
     ): FlexibeeResponse
     {
         if ($responseContent === null) {
-            throw new EcomailFlexibeeRequestError();
+            throw new EcomailFlexibeeRequestFail();
         }
 
-        if ($errorNumber !== \CURLE_OK && $errorMessage !== null) {
-            throw new EcomailFlexibeeConnectionError(\sprintf('cURL error (%s): %s', $errorNumber, $errorMessage));
+        if ($errorNumber !== CURLE_OK && $errorMessage !== null) {
+            throw new EcomailFlexibeeConnectionFail(sprintf('cURL error (%s): %s', $errorNumber, $errorMessage));
         }
 
         // PDF content
-        if (\mb_strpos($url, '.pdf') !== false) {
+        if (mb_strpos($url, '.pdf') !== false) {
             return new FlexibeePdfResponse($responseContent);
         }
 
         // Backup content
-        if ($httpMethod->equalsValue(Method::GET) && \mb_stripos($url, '/backup') !== false) {
+        if ($httpMethod->equalsValue(Method::GET) && mb_stripos($url, '/backup') !== false) {
             return new FlexibeeBackupResponse($responseContent);
         }
 
         /** @var array<mixed>|null $data */
-        $data = \json_decode($responseContent, true);
+        $data = json_decode($responseContent, true);
         $data ??= [];
         $data = $data['winstrom'] ?? $data;
         $results = $data['results'] ?? $data;
@@ -84,7 +91,7 @@ final class ResponseFactory
         if (isset($data['success'])) {
             $success = (isset($data['success']) && ($data['success'] === 'true' || $data['success'] === true));
             unset($data['success']);
-        } elseif(\in_array($statusCode, [200, 201], true)) {
+        } elseif(in_array($statusCode, [200, 201], true)) {
             $success = true;
         }
 
@@ -93,18 +100,22 @@ final class ResponseFactory
         }
 
         if ($statusCode === 403) {
-            throw new EcomailFlexibeeForbidden('Uživatel na tuto operaci nemá oprávnění. Tato chyba se zobrazí i v případě, že danou operaci neumožňuje licence.');
+            throw new EcomailFlexibeeForbidden(
+                'Uživatel na tuto operaci nemá oprávnění. Tato chyba se zobrazí i v případě, že danou operaci neumožňuje licence.',
+            );
         }
 
         if ($statusCode === 406) {
-            throw new EcomailFlexibeeNotAcceptableRequest('Cílový formát není nad konkrétním zdrojem podporovaný (např. export adresáře jako ISDOC).');
+            throw new EcomailFlexibeeNotAcceptableRequest(
+                'Cílový formát není nad konkrétním zdrojem podporovaný (např. export adresáře jako ISDOC).',
+            );
         }
 
         if ($statusCode === 405) {
             throw new EcomailFlexibeeMethodNotAllowed();
         }
 
-        if (\in_array($statusCode, [500, 400], true)) {
+        if (in_array($statusCode, [500, 400], true)) {
             foreach ($results as $resultData) {
                 if (!isset($resultData['errors'])) {
                     continue;
@@ -113,7 +124,7 @@ final class ResponseFactory
                 self::throwErrorMessage($resultData['errors'], $statusCode);
             }
 
-            throw new EcomailFlexibeeRequestError($message);
+            throw new EcomailFlexibeeRequestFail($message);
         }
 
         return new FlexibeeResponse(
@@ -130,7 +141,7 @@ final class ResponseFactory
 
     /**
      * @param array<mixed> $errors
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
     private static function throwErrorMessage(array $errors, int $statusCode): void
     {
@@ -138,22 +149,22 @@ final class ResponseFactory
             $messageLines = [];
 
             if (isset($error['code'])) {
-                $messageLines[] = \sprintf('code: %s',$error['code']);
+                $messageLines[] = sprintf('code: %s',$error['code']);
             }
 
             if (isset($error['for'])) {
-                $messageLines[] = \sprintf('for attribute: %s', $error['for']);
+                $messageLines[] = sprintf('for attribute: %s', $error['for']);
             }
 
             if (isset($error['path'])) {
-                $messageLines[] = \sprintf('path: %s',$error['path']);
+                $messageLines[] = sprintf('path: %s',$error['path']);
             }
 
             if (isset($error['message'])) {
-                $messageLines[] = \sprintf('message: %s', $error['message']);
+                $messageLines[] = sprintf('message: %s', $error['message']);
             }
 
-            throw new EcomailFlexibeeRequestError(\implode("\n", $messageLines), $statusCode);
+            throw new EcomailFlexibeeRequestFail(implode("\n", $messageLines), $statusCode);
         }
     }
 

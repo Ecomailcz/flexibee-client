@@ -1,11 +1,14 @@
 <?xml version="1.0"?>
-<ruleset name="EcomailFlexiBeeClientProject">
+<ruleset name="Ecomail - FlexiBee client">
 	<!-- Base PHPCS configuration -->
 	<config name="installed_paths" value="../../slevomat/coding-standard"/>
-	<arg name="extensions" value="php,inc" />
+	<ini name="memory_limit" value="8G"/>
+	<arg name="extensions" value="php" />
 	<arg name="encoding" value="utf-8" />
 	<arg name="colors"/>
 	<arg name="tab-width" value="4"/>
+
+	<exclude-pattern>/resources</exclude-pattern>
 
 	<!-- Enabled rules with configuration-->
 	<rule ref="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses">
@@ -20,7 +23,11 @@
 			<property name="spacesCountAroundEqualsSign" value="1"/>
 		</properties>
 	</rule>
-	<rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint"/>
+	<rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint">
+		<properties>
+			<property name="enableNativeTypeHint" value="false"/>
+		</properties>
+	</rule>
 	<rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint">
 		<properties>
 			<property name="enableObjectTypeHint" value="false"/>
@@ -110,6 +117,7 @@
 	<rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHintSpacing"/>
 	<rule ref="SlevomatCodingStandard.Namespaces.FullyQualifiedClassNameAfterKeyword"/>
 	<rule ref="SlevomatCodingStandard.Namespaces.MultipleUsesPerLine"/>
+	<rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly"/>
 	<rule ref="SlevomatCodingStandard.Namespaces.UseDoesNotStartWithBackslash"/>
 	<rule ref="SlevomatCodingStandard.Classes.EmptyLinesAroundClassBraces"/>
 	<rule ref="SlevomatCodingStandard.Namespaces.FullyQualifiedClassNameInAnnotation"/>
@@ -126,8 +134,6 @@
 	<rule ref="SlevomatCodingStandard.ControlStructures.UselessTernaryOperator"/>
 	<rule ref="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing.IncorrectLinesCountAfterControlStructure"/>
 	<rule ref="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing.IncorrectLinesCountBeforeControlStructure"/>
-	<rule ref="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalConstants"/>
-	<rule ref="SlevomatCodingStandard.Namespaces.FullyQualifiedGlobalFunctions"/>
 	<rule ref="SlevomatCodingStandard.ControlStructures.RequireMultiLineTernaryOperator">
 		<properties>
 			<property name="lineLengthLimit" value="75"/>
@@ -139,28 +145,35 @@
 			<property name="maxLineLength" value="150"/>
 		</properties>
 	</rule>
-	<rule ref="SlevomatCodingStandard.ControlStructures.AssignmentInCondition">
+	<rule ref="SlevomatCodingStandard.ControlStructures.AssignmentInCondition"/>
+
+	<rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
 		<properties>
-			<property name="ignoreAssignmentsInsideFunctionCalls" value="true"/>
+			<property name="rootNamespaces" type="array">
+				<element key="src" value="EcomailFlexibee"/>
+				<element key="tests" value="EcomailFlexibeeTest"/>
+			</property>
 		</properties>
 	</rule>
 
-	<!-- Disabled sniffs (try enable and do refactoring) -->
-	<exclude name="SlevomatCodingStandard.PHP.RequireExplicitAssertion"/>
-	<exclude name="SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint"/>
-	<exclude name="SlevomatCodingStandard.Namespaces.UseOnlyWhitelistedNamespaces"/>
-	<exclude name="SlevomatCodingStandard.Namespaces.FullyQualifiedExceptions"/>
-	<exclude name="SlevomatCodingStandard.Files.TypeNameMatchesFileName"/>
-	<exclude name="SlevomatCodingStandard.ControlStructures.RequireYodaComparison"/>
-	<exclude name="SlevomatCodingStandard.Commenting.RequireOneLinePropertyDocComment"/>
-	<exclude name="SlevomatCodingStandard.ControlStructures.NewWithoutParentheses"/>
-	<exclude name="SlevomatCodingStandard.Files.LineLength"/>
-	<exclude name="SlevomatCodingStandard.Commenting.RequireOneLineDocComment"/>
-	<exclude name="SlevomatCodingStandard.ControlStructures.DisallowShortTernaryOperator"/>
-	<exclude name="SlevomatCodingStandard.Classes.DisallowMultiPropertyDefinition"/>
-	<exclude name="SlevomatCodingStandard.Classes.DisallowMultiConstantDefinition"/>
 	<rule ref="SlevomatCodingStandard.Variables.DisallowSuperGlobalVariable"/>
-	<rule ref="SlevomatCodingStandard.PHP.UselessParentheses.UselessParentheses"/>
-	<rule ref="SlevomatCodingStandard.Functions.RequireArrowFunction"/>
 	<rule ref="SlevomatCodingStandard.ControlStructures.RequireNullCoalesceEqualOperator"/>
+	<rule ref="SlevomatCodingStandard.Functions.RequireMultiLineCall">
+		<properties>
+			<property name="minLineLength" value="125"/>
+		</properties>
+	</rule>
+	<rule ref="SlevomatCodingStandard.Functions.RequireSingleLineCall">
+		<properties>
+			<property name="maxLineLength" value="124"/>
+		</properties>
+	</rule>
+	<rule ref="SlevomatCodingStandard.ControlStructures.RequireMultiLineCondition">
+		<properties>
+			<property name="minLineLength" value="125"/>
+		</properties>
+	</rule>
+	<rule ref="SlevomatCodingStandard.Classes.SuperfluousErrorNaming"/>
+	<rule ref="SlevomatCodingStandard.Commenting.DeprecatedAnnotationDeclaration"/>
+
 </ruleset>

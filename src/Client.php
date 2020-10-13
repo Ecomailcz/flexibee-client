@@ -11,15 +11,20 @@ use EcomailFlexibee\Http\Response\Response;
 use EcomailFlexibee\Http\ResponseHydrator;
 use EcomailFlexibee\Http\UrlBuilder;
 use EcomailFlexibee\Result\EvidenceResult;
+use function array_filter;
+use function array_merge;
+use function count;
+use function mb_strtolower;
+use function sprintf;
 
 class Client
 {
 
-    protected \EcomailFlexibee\Http\UrlBuilder $queryBuilder;
-    protected \EcomailFlexibee\Http\HttpClient $httpClient;
-    protected \EcomailFlexibee\Config $config;
+    protected UrlBuilder $queryBuilder;
+    protected HttpClient $httpClient;
+    protected Config $config;
 
-    private \EcomailFlexibee\Http\ResponseHydrator $responseHydrator;
+    private ResponseHydrator $responseHydrator;
 
     public function __construct(
         string $url,
@@ -112,7 +117,10 @@ class Client
      */
     public function getCompany(): array
     {
-        $result = \array_filter($this->getCompanies()->getData()['companies'], fn (array $data): bool => \mb_strtolower($data['dbNazev']) === \mb_strtolower($this->config->getCompany()));
+        $result = array_filter(
+            $this->getCompanies()->getData()['companies'],
+            fn (array $data): bool => mb_strtolower($data['dbNazev']) === mb_strtolower($this->config->getCompany()),
+        );
 
         if (isset($result['company'])) {
             return $result['company'];
@@ -164,7 +172,7 @@ class Client
     {
         $uriParameters = $dryRun ? ['dry-run' => 'true'] : [];
         $this->httpClient->request(
-            $this->queryBuilder->createUri(\sprintf('code:%s', $id), $uriParameters),
+            $this->queryBuilder->createUri(sprintf('code:%s', $id), $uriParameters),
             Method::get(Method::DELETE),
             [],
             [],
@@ -175,12 +183,12 @@ class Client
 
     /**
      * @param array<mixed> $uriParameters
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
     public function findById(int $id, array $uriParameters = []): EvidenceResult
     {
@@ -193,14 +201,14 @@ class Client
 
     /**
      * @param array<mixed> $uriParameters
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
     public function getByCode(string $code, array $uriParameters = []): EvidenceResult
     {
@@ -219,13 +227,13 @@ class Client
 
     /**
      * @param array<string> $uriParameters
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
     public function getById(int $id, array $uriParameters = []): EvidenceResult
     {
@@ -244,13 +252,13 @@ class Client
 
     /**
      * @param array<mixed> $uriParameters
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
     public function findByCode(string $code, array $uriParameters = []): EvidenceResult
     {
@@ -264,12 +272,12 @@ class Client
     /**
      * @param array<mixed> $evidenceData
      * @param array<mixed> $uriParameters
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed
      */
     public function save(array $evidenceData, ?int $id, bool $dryRun = false, array $uriParameters = []): FlexibeeResponse
@@ -281,14 +289,19 @@ class Client
         $postData = [];
         $postData[$this->config->getEvidence()] = $evidenceData;
         $uriParameters = $dryRun
-            ? \array_merge($uriParameters, ['dry-run' => 'true'])
+            ? array_merge($uriParameters, ['dry-run' => 'true'])
             : $uriParameters;
         /** @var \EcomailFlexibee\Result\EvidenceResult $response */
         $response = $this->callRequest(Method::get(Method::PUT), null, $uriParameters, $postData, [])[0];
         $data = $response->getData();
 
-        if (isset($data['created']) && (int) $data['created'] === 0 && isset($data['updated']) && (int) $data['updated'] === 0) {
-            $errorMessage = \sprintf('(%d) %s', $data['status_code'], $data['message']);
+        if (
+            isset($data['created'])
+            && (int) $data['created'] === 0
+            && isset($data['updated'])
+            && (int) $data['updated'] === 0
+        ) {
+            $errorMessage = sprintf('(%d) %s', $data['status_code'], $data['message']);
 
             throw new EcomailFlexibeeSaveFailed($errorMessage);
         }
@@ -302,7 +315,7 @@ class Client
             null,
             true,
             null,
-            \count($data),
+            count($data),
             null,
             $response->getData(),
             [],
@@ -327,7 +340,7 @@ class Client
                     'cena' => $price,
                     'popis' => $description,
                     'evidenceType' => $this->config->getEvidence(),
-                    'object' => \sprintf('code:%s', $objectBData['kod']),
+                    'object' => sprintf('code:%s', $objectBData['kod']),
                 ],
             ],
         ];
@@ -337,12 +350,12 @@ class Client
 
     /**
      * @return array<mixed>
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
     public function allInEvidence(): array
     {
@@ -374,12 +387,12 @@ class Client
 
     /**
      * @return array<\EcomailFlexibee\Result\EvidenceResult>
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
     public function chunkInEvidence(int $start, int $limit): array
     {
@@ -398,12 +411,12 @@ class Client
     /**
      * @param array<string> $uriParameters
      * @return array<\EcomailFlexibee\Result\EvidenceResult>
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
     public function searchInEvidence(string $query, array $uriParameters): array
     {
@@ -425,12 +438,12 @@ class Client
      * @param array<mixed> $postFields
      * @param array<string> $headers
      * @return array<\EcomailFlexibee\Result\EvidenceResult>
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
     public function callRequest(Method $httpMethod, $queryFilterOrId, array $uriParameters, array $postFields, array $headers): array
     {
@@ -448,12 +461,12 @@ class Client
 
     /**
      * @param array<mixed> $uriParameters
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestError
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
     public function getPdfById(int $id, array $uriParameters): Response
     {

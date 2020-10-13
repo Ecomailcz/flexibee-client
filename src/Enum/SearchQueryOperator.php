@@ -3,6 +3,14 @@
 namespace EcomailFlexibee\Enum;
 
 use Consistence\Enum\Enum;
+use function array_keys;
+use function array_values;
+use function implode;
+use function preg_match_all;
+use function preg_replace;
+use function preg_split;
+use function str_replace;
+use function urldecode;
 
 class SearchQueryOperator extends Enum
 {
@@ -23,24 +31,24 @@ class SearchQueryOperator extends Enum
 
     public static function convertOperatorsInQuery(string $query): string
     {
-        $query = \urldecode($query);
+        $query = urldecode($query);
         /** @var array<mixed> $queryExploded */
-        $queryExploded = \preg_split('/\s+/', $query);
+        $queryExploded = preg_split('/\s+/', $query);
 
         foreach($queryExploded as &$part) {
             $toReplace = [];
-            \preg_match_all('/[^\'](?=(?:[^\']*\'[^"]*\'[^\']*|[^\'])*$)/', $part, $matches);
+            preg_match_all('/[^\'](?=(?:[^\']*\'[^"]*\'[^\']*|[^\'])*$)/', $part, $matches);
 
             if (isset($matches[0])) {
-                $text = \implode('', $matches[0]);
-                $toReplace[$text] = \str_replace(\array_keys(self::$operators), \array_values(self::$operators), $text);
+                $text = implode('', $matches[0]);
+                $toReplace[$text] = str_replace(array_keys(self::$operators), array_values(self::$operators), $text);
             }
 
-            $part = \str_replace(\array_keys($toReplace), \array_values($toReplace), $part);
+            $part = str_replace(array_keys($toReplace), array_values($toReplace), $part);
         }
 
         /** @var string $result */
-        $result = \preg_replace('/\s+/', ' ', \implode(' ',$queryExploded));
+        $result = preg_replace('/\s+/', ' ', implode(' ',$queryExploded));
 
         return $result;
     }
