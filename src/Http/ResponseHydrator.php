@@ -28,9 +28,19 @@ class ResponseHydrator extends ObjectPrototype
     public function convertResponseToEvidenceResults(Response $response): array
     {
         $data = $response->getData();
+        $hasErrors = isset($data[0], $data[0]['errors']);
 
-        if (isset($data['success']) && $data['success'] === 'false') {
-            throw new EcomailFlexibeeRequestFail($data['message']);
+        if ($hasErrors || (isset($data['success']) && $data['success'] === 'false')) {
+
+            if ($hasErrors && !isset($data['message'])) {
+                $data['message'] = '';
+
+                foreach ($data[0]['errors'] as $errors) {
+                    $data['message'] .= "\n" . $errors['message'];
+                }
+            }
+
+            throw new EcomailFlexibeeRequestFail($data['message'], $response->getStatusCode());
         }
 
         if (!isset($data[$this->config->getEvidence()])) {
