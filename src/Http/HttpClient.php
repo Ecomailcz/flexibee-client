@@ -74,10 +74,14 @@ final class HttpClient
         $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
         if ($config->getLogFilePath() !== null) {
-            $headersContents = [];
+            $headersContents = ['EMPTY'];
 
-            foreach ($headers as $key => $value) {
-                $headersContents[] = sprintf('%s:%s', $key, $value);
+            if (count($headers) > 0) {
+                $headersContents = [];
+
+                foreach ($headers as $key => $value) {
+                    $headersContents[] = sprintf('%s:%s', $key, $value);
+                }
             }
 
             $rootDir = dirname($config->getLogFilePath());

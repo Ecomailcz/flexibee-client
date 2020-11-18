@@ -4,11 +4,10 @@
 	<!-- ============================================ -->
 	<!-- Target: check                                -->
 	<!-- ============================================ -->
-	<target name="check" depends="lint, phpcs, phpstan, tests">
-		<exec command="vendor/bin/paratest tests" checkreturn="true" passthru="true"/>
-	</target>
+	<target name="check" depends="lint, phpcs, phpstan, tests"/>
+
 	<!-- ============================================ -->
-	<!-- Target: fix                                -->
+	<!-- Target: fix                                  -->
 	<!-- ============================================ -->
 	<target name="fix">
 		<exec command="composer normalize" passthru="true" checkreturn="true"/>
@@ -42,6 +41,6 @@
 	<!-- Target: tests                                -->
 	<!-- ============================================ -->
 	<target name="tests">
-		<exec command="vendor/bin/phpunit tests" passthru="true" checkreturn="true" level="error"/>
+		<exec command="vendor/bin/paratest tests" passthru="true" checkreturn="true" level="error"/>
 	</target>
 </project>
