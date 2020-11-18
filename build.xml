@@ -5,7 +5,7 @@
 	<!-- Target: check                                -->
 	<!-- ============================================ -->
 	<target name="check" depends="lint, phpcs, phpstan, tests">
-		<exec command="vendor/bin/phpunit tests" checkreturn="true" passthru="true"/>
+		<exec command="vendor/bin/paratest tests" checkreturn="true" passthru="true"/>
 	</target>
 	<!-- ============================================ -->
 	<!-- Target: fix                                -->
