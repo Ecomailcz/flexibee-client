@@ -110,6 +110,28 @@ class UrlBuilder extends Url
         return $this->getUrl();
     }
 
+    public function createAttachmentUriByData(int $evidenceId, string $fileName): string
+    {
+        $path = new Path(sprintf('c/%s/%s/%d/prilohy/new/%s', $this->company, $this->evidence, $evidenceId, $fileName));
+        $this->setPath($path);
+
+        return $this->getUrl();
+    }
+
+    public function createAttachmentUriByEvidence(int $evidenceId, ?int $attachmentId): string
+    {
+        $path = $attachmentId === null ? new Path(
+            sprintf('c/%s/%s/%d/prilohy.json', $this->company, $this->evidence, $evidenceId),
+        ) : new Path(
+                sprintf('c/%s/%s/%d/prilohy/%d.json', $this->company, $this->evidence, $evidenceId, $attachmentId),
+            );
+
+        $this->setPath($path);
+        $this->createQueryParams([]);
+
+        return $this->getUrl();
+    }
+
     /**
      * @param array<mixed> $uriParameters
      */
