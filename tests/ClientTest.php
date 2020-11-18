@@ -292,6 +292,7 @@ final class ClientTest extends TestCase
 
     public function testRunBackendProcesses(): void
     {
+        $this->markTestSkipped('Live tests is disabled here');
         $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'pokladni-pohyb', false);
         $results = $client->callRequest(Method::get(Method::POST), 'automaticke-parovani', [], [], []);
 
