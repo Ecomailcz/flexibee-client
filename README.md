@@ -67,6 +67,23 @@ $evidenceItem = $client->findByCode($evidenceItemCode, $uriParameters);
 $evidenceItem = $client->findLastInEvidence($evidenceItemCode, $uriParameters);
 ```
 
+## Přílohy
+Vytvoření přílohy  
+```
+$evidenceItem = $client->createAttachment($evidenceId, $fileName, $contentType, $contentTypeData);
+```
+
+Vyhledání přílohy  
+```
+$evidenceItem = $client->findAttachmentById($evidenceId, $attachmentId);
+$evidenceItem = $client->findAttachments($evidenceId);
+```
+
+Smazání přílohy  
+```
+$evidenceItem = $client->deleteAttachment($evidenceId, $attachmentId);
+```
+
 ## Sumace
 ```
 $client->sumInEvidence();

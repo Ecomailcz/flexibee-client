@@ -365,6 +365,31 @@ final class ClientTest extends TestCase
         unlink($logPath);
     }
 
+    public function testAttachments(): void
+    {
+        $logPath = 'logs/log.txt';
+        @unlink($logPath);
+        $client = new Client(
+            Config::HOST,
+            Config::COMPANY,
+            Config::USERNAME,
+            Config::PASSWORD,
+            'adresar',
+            false,
+            null,
+            $logPath,
+        );
+
+        $lastEvidenceItem = $client->findLastInEvidence(false);
+        $id = (int) $lastEvidenceItem->getData()['adresar'][0]['id'];
+        $attachmentName = sprintf('%s.jpg', uniqid());
+        $response = $client->createAttachment($id, $attachmentName, 'image/jpeg', 'x');
+        Assert::assertTrue($response->isSuccess());
+        $attachmentId = (int) $client->findAttachments($id)[0]->getData()['priloha'][0]['id'];
+        $response = $client->deleteAttachment($id, $attachmentId);
+        Assert::assertTrue($response->isSuccess());
+    }
+
     private function checkResponseStructure(EvidenceResult $result): void
     {
         $requiredKeys = [

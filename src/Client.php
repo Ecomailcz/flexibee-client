@@ -371,6 +371,76 @@ class Client
         return $this->responseHydrator->convertResponseToEvidenceResults($response);
     }
 
+    /**
+     * @return array<mixed>
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
+     */
+    public function findAttachments(int $evidenceId): array
+    {
+        $response = $this->httpClient->request(
+            $this->queryBuilder->createAttachmentUriByEvidence($evidenceId, null),
+            Method::get(Method::GET),
+            [],
+            [],
+            [],
+            $this->config,
+        );
+
+        return $this->responseHydrator->convertResponseToEvidenceResults($response);
+    }
+
+    public function createAttachment(int $evidenceId, string $fileName, string $contentType, string $contentTypeData): Response
+    {
+        return $this->httpClient->request(
+            $this->queryBuilder->createAttachmentUriByData($evidenceId, $fileName),
+            Method::get(Method::PUT),
+            ['content' => $contentTypeData],
+            [],
+            ['Content-Type' => $contentType],
+            $this->config,
+        );
+    }
+
+    public function deleteAttachment(int $evidenceId, int $attachmentId): Response
+    {
+        return $this->httpClient->request(
+            $this->queryBuilder->createAttachmentUriByEvidence($evidenceId, $attachmentId),
+            Method::get(Method::DELETE),
+            [],
+            [],
+            [],
+            $this->config,
+        );
+    }
+
+    /**
+     * @return array<mixed>
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
+     */
+    public function findAttachmentById(int $evidenceId, int $attachmentId): array
+    {
+        $response = $this->httpClient->request(
+            $this->queryBuilder->createAttachmentUriByEvidence($evidenceId, $attachmentId),
+            Method::get(Method::GET),
+            [],
+            [],
+            [],
+            $this->config,
+        );
+
+        return $this->responseHydrator->convertResponseToEvidenceResults($response);
+    }
+
     public function countInEvidence(): int
     {
         $response = $this->httpClient->request(
