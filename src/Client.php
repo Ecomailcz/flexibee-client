@@ -480,4 +480,18 @@ class Client
         );
     }
 
+    public function findLastInEvidence(bool $fullDetail): Response
+    {
+        return $this->httpClient->request(
+            $this->queryBuilder->createUriByEvidenceOnly(
+                ['order' => 'id', 'limit' => 1, 'detail' => $fullDetail ? 'full' : 'summary'],
+            ),
+            Method::get(Method::GET),
+            [],
+            [],
+            [],
+            $this->config,
+        );
+    }
+
 }

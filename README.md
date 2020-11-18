@@ -64,6 +64,7 @@ Vrácení prázného záznamu, pokud neexistuje ve Flexibee (bez vyhození výji
 ```
 $evidenceItem = $client->findById($evidenceItemId, $uriParameters);
 $evidenceItem = $client->findByCode($evidenceItemCode, $uriParameters);
+$evidenceItem = $client->findLastInEvidence($evidenceItemCode, $uriParameters);
 ```
 
 ## Sumace

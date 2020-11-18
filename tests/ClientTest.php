@@ -250,6 +250,21 @@ final class ClientTest extends TestCase
         $client->searchInEvidence('kod neq \'JAN\'', []);
     }
 
+    public function testFindLastInEvidence(): void
+    {
+        $client = new Client(
+            Config::HOST,
+            Config::COMPANY,
+            Config::USERNAME,
+            Config::PASSWORD,
+            'faktura-vydana',
+            false,
+            null,
+        );
+        $result = $client->findLastInEvidence(true);
+        Assert::assertCount(1, $result->getData()['faktura-vydana']);
+    }
+
     public function testSearchInEvidenceWithInvalidUrl(): void
     {
         $client = new Client(
