@@ -10,7 +10,7 @@
 		"ext-json": "*",
 		"ext-mbstring": "*",
 		"ext-simplexml": "*",
-		"consistence/consistence": "^2.0",
+		"consistence-community/consistence": "^2.0",
 		"jwage/purl": "^1.0",
 		"league/flysystem": "^1.0",
 		"rakit/validation": "^1.1"
