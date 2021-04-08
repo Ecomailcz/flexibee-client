@@ -4,12 +4,6 @@
 	"license": [
 		"MIT"
 	],
-	"repositories": [
-		{
-		    "type": "vcs",
-		    "url": "https://github.com/dpi/purl.git"
-		}
-	],
 	"require": {
 		"php": "^7.4|^8.0",
 		"ext-curl": "*",
@@ -17,7 +11,7 @@
 		"ext-mbstring": "*",
 		"ext-simplexml": "*",
 		"consistence-community/consistence": "^2.0",
-		"jwage/purl": "dev-php8",
+		"ecomailcz/purl": "^2.0",
 		"league/flysystem": "^1.0",
 		"rakit/validation": "^1.1"
 	},
