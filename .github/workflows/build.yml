@@ -1,38 +1,178 @@
-name: PHP Composer
+# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
+
+name: "Build - CI"
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    branches:
+      - "master"
 
 jobs:
-  build:
+  coding-standards-php-7-4:
+    name: "[BACKEND] - Coding standards (PHP-7)"
 
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        php-version:
-          - "7.4"
-          - "8.0"
+    runs-on: "ubuntu-latest"
 
     steps:
-    - name: "Checkout"
-      uses: "actions/checkout@v2"
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
 
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v2
-      with:
-        path: vendor
-        key: ${{ runner.os }}-node-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "none"
+          php-version: "7.4"
 
-    - name: Install dependencies
-      if: steps.composer-cache.outputs.cache-hit != 'true'
-      run: composer install --prefer-dist --no-progress --no-suggest
+      - name: "Cache dependencies"
+        uses: "actions/cache@v2"
+        with:
+          path: "~/.composer/cache"
+          key: "php-7.4-composer-${{ hashFiles('**/composer.json') }}"
+          restore-keys: "php-7.4-composer-"
 
-    - name: "Phing - app check"
-      run: "vendor/bin/phing"
+      - name: "Install dependencies"
+        run: "composer install --no-interaction --no-progress"
+
+      - name: "PHP - Coding Standard"
+        run: "vendor/bin/phing phpcs"
+
+  coding-standards-php-8:
+    name: "[BACKEND] - Coding standards (PHP-8)"
+
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "none"
+          php-version: "8.0"
+
+      - name: "Cache dependencies"
+        uses: "actions/cache@v2"
+        with:
+          path: "~/.composer/cache"
+          key: "php-8.0-composer-${{ hashFiles('**/composer.json') }}"
+          restore-keys: "php-8.0-composer-"
+
+      - name: "Install dependencies"
+        run: "composer install --no-interaction --no-progress"
+
+      - name: "PHP - Coding Standard"
+        run: "vendor/bin/phing phpcs"
+
+  static-analysis-php-7-4:
+    name: "[BACKEND] - Static analysis (PHP-7)"
+
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "none"
+          php-version: "7.4"
+
+      - name: "Cache dependencies"
+        uses: "actions/cache@v2"
+        with:
+          path: "~/.composer/cache"
+          key: "php-7.4-composer-${{ hashFiles('**/composer.json') }}"
+          restore-keys: "php-7.4-composer-"
+
+      - name: "Install dependencies"
+        run: "composer install --no-interaction --no-progress"
+
+      - name: "PHPStan"
+        run: "vendor/bin/phing phpstan"
+
+
+  static-analysis-php-8:
+    name: "[BACKEND] - Static analysis (PHP-8)"
+
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "none"
+          php-version: "7.4"
+
+      - name: "Cache dependencies"
+        uses: "actions/cache@v2"
+        with:
+          path: "~/.composer/cache"
+          key: "php-8.0-composer-${{ hashFiles('**/composer.json') }}"
+          restore-keys: "php-8.0-composer-"
+
+      - name: "Install dependencies"
+        run: "composer install --no-interaction --no-progress"
+
+      - name: "PHPStan"
+        run: "vendor/bin/phing phpstan"
+
+  tests-php-7-4:
+    name: "[BACKEND] - Tests (PHP-7)"
+
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "none"
+          php-version: "7.4"
+
+      - name: "Cache dependencies"
+        uses: "actions/cache@v2"
+        with:
+          path: "~/.composer/cache"
+          key: "php-7.4-composer-${{ hashFiles('**/composer.json') }}"
+          restore-keys: "php-7.4-composer-"
+
+      - name: "Install dependencies"
+        run: "composer install --no-interaction --no-progress"
+
+      - name: "PHPUnit"
+        run: "vendor/bin/paratest tests"
+
+  tests-php-8:
+    name: "[BACKEND] - Tests (PHP-8)"
+
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "none"
+          php-version: "7.4"
+
+      - name: "Cache dependencies"
+        uses: "actions/cache@v2"
+        with:
+          path: "~/.composer/cache"
+          key: "php-8.0-composer-${{ hashFiles('**/composer.json') }}"
+          restore-keys: "php-8.0-composer-"
+
+      - name: "Install dependencies"
+        run: "composer install --no-interaction --no-progress"
+
+      - name: "PHPUnit"
+        run: "vendor/bin/paratest tests"

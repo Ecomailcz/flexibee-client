@@ -11,7 +11,7 @@
 		"ext-mbstring": "*",
 		"ext-simplexml": "*",
 		"ecomailcz/purl": "^2.0",
-		"league/flysystem": "^2.0",
+		"league/flysystem": "^1.0",
 		"rakit/validation": "^1.1",
 		"slevomat/consistence": "^2.1"
 	},
@@ -28,8 +28,7 @@
 		"phpstan/phpstan-phpunit": "^0.12.8",
 		"phpstan/phpstan-strict-rules": "^0.12.2",
 		"phpunit/phpunit": "^9.0",
-		"slevomat/coding-standard": "^6.0 || ^7.0",
-		"sllh/composer-versions-check": "^2.0"
+		"slevomat/coding-standard": "^6.0 || ^7.0"
 	},
 	"config": {
 		"sort-packages": true
