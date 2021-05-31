@@ -1,4 +1,6 @@
-<?php declare(strict_types = 1);
+<?php
+
+declare(strict_types = 1);
 
 namespace EcomailFlexibee\Http;
 
@@ -67,7 +69,9 @@ class ResponseHydrator extends ObjectPrototype
                 throw new EcomailFlexibeeNoEvidenceResult();
             }
 
-            return count($data) !== 0 ? new EvidenceResult($data) : new EvidenceResult([]);
+            return count($data) !== 0
+                ? new EvidenceResult($data)
+                : new EvidenceResult([]);
         }
 
         return new EvidenceResult($data[$this->config->getEvidence()]);
