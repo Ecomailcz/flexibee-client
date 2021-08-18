@@ -6,8 +6,8 @@ namespace EcomailFlexibee\Http;
 
 use EcomailFlexibee\Config;
 use EcomailFlexibee\Http\Response\FlexibeeResponse;
+use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
-use League\Flysystem\Local\LocalFilesystemAdapter;
 use function basename;
 use function curl_errno;
 use function curl_error;
@@ -23,6 +23,7 @@ use function number_format;
 use function sprintf;
 use function trim;
 use const CURLINFO_HTTP_CODE;
+use const FILE_APPEND;
 
 final class HttpClient
 {
@@ -77,7 +78,7 @@ final class HttpClient
             }
 
             $rootDir = dirname($config->getLogFilePath());
-            $fileSystem = new Filesystem(new LocalFilesystemAdapter($rootDir));
+            $fileSystem = new Filesystem(new Local($rootDir, FILE_APPEND));
             $logContent = sprintf(
                 '%s METHOD: %s URL:%s TIME:%s STATUS:%s HEADERS: %s',
                 date('Y-m-d H:i:s'),
@@ -93,7 +94,7 @@ final class HttpClient
             }
 
             $logContent .= "\n";
-            $fileSystem->write(
+            $fileSystem->put(
                 basename($config->getLogFilePath()),
                 $logContent,
             );
