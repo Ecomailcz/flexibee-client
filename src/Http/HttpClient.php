@@ -28,11 +28,9 @@ use const FILE_APPEND;
 final class HttpClient
 {
 
-    private UrlNormalizer $urlNormalizer;
     private HttpCurlBuilder $httpCurlBuilder;
 
     public function __construct() {
-        $this->urlNormalizer = new UrlNormalizer();
         $this->httpCurlBuilder = new HttpCurlBuilder();
     }
 
@@ -57,14 +55,7 @@ final class HttpClient
     ): FlexibeeResponse
     {
 
-        $ch = $this->httpCurlBuilder->build(
-            $this->urlNormalizer->normalize($url),
-            $httpMethod,
-            $postFields,
-            $queryParameters,
-            $headers,
-            $config,
-        );
+        $ch = $this->httpCurlBuilder->build($url, $httpMethod, $postFields, $queryParameters, $headers, $config);
 
         $startTime = microtime(true);
         $output = curl_exec($ch);
