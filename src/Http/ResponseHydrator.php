@@ -60,6 +60,49 @@ class ResponseHydrator extends ObjectPrototype
         return array_map(static fn (array $data) => new EvidenceResult($data), $data[$this->config->getEvidence()]);
     }
 
+    /**
+     * @return array<mixed>
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
+     */
+    public function convertResponseToPaginatedEvidenceResults(Response $response): array
+    {
+        $data = $response->getData();
+        $hasErrors = isset($data[0], $data[0]['errors']);
+
+        if ($hasErrors || (isset($data['success']) && $data['success'] === 'false')) {
+
+            if ($hasErrors && !isset($data['message'])) {
+                $data['message'] = '';
+
+                foreach ($data[0]['errors'] as $errors) {
+                    $data['message'] .= "\n" . $errors['message'];
+                }
+            }
+
+            throw new EcomailFlexibeeRequestFail($data['message'], $response->getStatusCode());
+        }
+
+        if (!isset($data[$this->config->getEvidence()])) {
+            if (count($data) === 0) {
+                $data = $response->getStatistics();
+                $data['status_code'] = $response->getStatusCode();
+                $data['message'] = $response->getMessage();
+                $data['version'] = $response->getVersion();
+                $data['row_count'] = $response->getRowCount();
+            }
+
+            return [
+                'row_count' => $response->getRowCount(),
+                'data' => [new EvidenceResult($data)],
+            ];
+        }
+
+        return [
+            'row_count' => $response->getRowCount(),
+            'data' => array_map(static fn (array $data) => new EvidenceResult($data), $data[$this->config->getEvidence()]),
+        ];
+    }
+
     public function convertResponseToEvidenceResult(Response $response, bool $throwException): EvidenceResult
     {
         $data = $response->getData();

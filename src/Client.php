@@ -435,6 +435,31 @@ class Client
     }
 
     /**
+     * @param array<string> $uriParameters
+     * @return array<\EcomailFlexibee\Result\EvidenceResult>
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
+     */
+    public function searchInEvidencePaginated(string $query, array $uriParameters): array
+    {
+        $uriParameters = array_merge($uriParameters, ['add-row-count' => 'true']);
+        $response = $this->httpClient->request(
+            $this->queryBuilder->createFilterQuery($query, $uriParameters),
+            Method::get(Method::GET),
+            [],
+            [],
+            [],
+            $this->config,
+        );
+
+        return $this->responseHydrator->convertResponseToPaginatedEvidenceResults($response);
+    }
+
+    /**
      * @param mixed $queryFilterOrId
      * @param array<mixed> $uriParameters
      * @param array<mixed> $postFields

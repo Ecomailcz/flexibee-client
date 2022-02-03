@@ -252,6 +252,25 @@ final class ClientTest extends TestCase
         $client->searchInEvidence('kod neq \'JAN\'', []);
     }
 
+    public function testSearchInEvidencePaginated(): void
+    {
+        $client = new Client(
+            Config::HOST,
+            Config::COMPANY,
+            Config::USERNAME,
+            Config::PASSWORD,
+            'faktura-vydana',
+            false,
+            null,
+        );
+        $result = $client->searchInEvidencePaginated('(kod neq \'JAN\')', []);
+        Assert::assertIsInt($result['row_count']);
+        Assert::assertTrue($result['row_count'] > 0);
+        Assert::assertTrue(count($result['data']) > 0);
+        $this->expectException(EcomailFlexibeeRequestFail::class);
+        $client->searchInEvidencePaginated('kod neq \'JAN\'', []);
+    }
+
     public function testFindLastInEvidence(): void
     {
         $client = new Client(
