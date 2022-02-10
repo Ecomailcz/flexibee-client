@@ -436,7 +436,7 @@ class Client
 
     /**
      * @param array<string> $uriParameters
-     * @return array<\EcomailFlexibee\Result\EvidenceResult>
+     * @return array<mixed>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
