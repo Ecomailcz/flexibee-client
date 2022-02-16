@@ -89,6 +89,14 @@ Systém Flexibee umožňuje vyhledávat nad evidencí. (https://www.flexibee.eu/
 ```
 $client->searchInEvidence($query, $uriParameters);
 ```
+
+## Vyhledávání v evidenci se stránkováním
+Systém Flexibee umožňuje vyhledávat nad evidencí. (https://www.flexibee.eu/api/dokumentace/ref/filters/)
+K uri parametrům je automaticky přiřazený parameter ```'add-row-count' => 'true'```.
+Vrací array s daty a celkovým počtem záznámů.
+```
+$client->searchInEvidencePaginated($query, $uriParameters);
+```
 ## Seznam položek v evidenci
 Seznam všech dostupných prvků pro konkrétní evidenci
 ```
