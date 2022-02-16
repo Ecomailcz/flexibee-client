@@ -460,7 +460,6 @@ class Client
     }
 
     /**
-     * @param mixed $queryFilterOrId
      * @param array<mixed> $uriParameters
      * @param array<mixed> $postFields
      * @param array<string> $headers
@@ -472,7 +471,7 @@ class Client
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
-    public function callRequest(Method $httpMethod, $queryFilterOrId, array $uriParameters, array $postFields, array $headers): array
+    public function callRequest(Method $httpMethod, mixed $queryFilterOrId, array $uriParameters, array $postFields, array $headers): array
     {
         $response = $this->httpClient->request(
             $this->queryBuilder->createUri($queryFilterOrId, $uriParameters),

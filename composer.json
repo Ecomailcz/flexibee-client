@@ -5,7 +5,7 @@
 		"MIT"
 	],
 	"require": {
-		"php": "^7.4 || ^8.0",
+		"php": "^8.0",
 		"ext-curl": "*",
 		"ext-json": "*",
 		"ext-mbstring": "*",
@@ -30,9 +30,8 @@
 		"phpunit/phpunit": "^9.0",
 		"slevomat/coding-standard": "^6.0 || ^7.0"
 	},
-	"config": {
-		"sort-packages": true
-	},
+	"minimum-stability": "dev",
+	"prefer-stable": true,
 	"autoload": {
 		"psr-4": {
 			"EcomailFlexibee\\": [
@@ -48,6 +47,12 @@
 			"tests/"
 		]
 	},
-	"minimum-stability": "dev",
-	"prefer-stable": true
+	"config": {
+		"allow-plugins": {
+			"ergebnis/composer-normalize": true,
+			"phpstan/extension-installer": true,
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		},
+		"sort-packages": true
+	}
 }

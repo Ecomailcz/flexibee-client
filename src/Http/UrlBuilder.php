@@ -146,10 +146,9 @@ class UrlBuilder extends Url
     }
 
     /**
-     * @param mixed $filterQueryOrId
      * @param array<mixed> $uriParams
      */
-    public function createUri($filterQueryOrId, array $uriParams): string
+    public function createUri(mixed $filterQueryOrId, array $uriParams): string
     {
         if ($filterQueryOrId === null) {
             $this->setPath($this->buildPathForOnlyEvidence());
@@ -162,10 +161,7 @@ class UrlBuilder extends Url
         return $this->getUrl();
     }
 
-    /**
-     * @param string|int $filterQueryOrId
-     */
-    private function buildPathWithIdOrFilter($filterQueryOrId, string $format = 'json'): Path
+    private function buildPathWithIdOrFilter(string|int $filterQueryOrId, string $format = 'json'): Path
     {
         return new Path(sprintf('c/%s/%s/%s.%s', $this->company, $this->evidence, $filterQueryOrId, $format));
     }

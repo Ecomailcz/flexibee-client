@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace EcomailFlexibee\Http;
 
+use CurlHandle;
 use EcomailFlexibee\Config;
 use function count;
 use function curl_init;
@@ -30,11 +31,9 @@ final class HttpCurlBuilder
      * @param array<string> $postFields
      * @param array<string> $queryParameters
      * @param array<string> $headers
-     * @return resource
      */
-    public function build(string $url, Method $httpMethod, array $postFields, array $queryParameters, array $headers, Config $config)
+    public function build(string $url, Method $httpMethod, array $postFields, array $queryParameters, array $headers, Config $config): CurlHandle
     {
-        /** @var resource $ch */
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
