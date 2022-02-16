@@ -36,19 +36,10 @@ class Client
         string $evidence,
         bool $verifySSLCertificate,
         ?string $authSessionId = null,
-        ?string $logFilePath = null
+        ?string $logFilePath = null,
     )
     {
-        $this->config = new Config(
-            $url,
-            $company,
-            $user,
-            $password,
-            $evidence,
-            $verifySSLCertificate,
-            $authSessionId,
-            $logFilePath,
-        );
+        $this->config = new Config($url, $company, $user, $password, $evidence, $verifySSLCertificate, $authSessionId, $logFilePath);
         $this->queryBuilder = new UrlBuilder($this->config);
         $this->responseHydrator = new ResponseHydrator($this->config);
         $this->httpClient = new HttpClient();
@@ -155,7 +146,7 @@ class Client
             $this->config,
         );
     }
-    
+
     public function deleteById(int $id, bool $dryRun = false): Response
     {
         $uriParameters = $dryRun ? ['dry-run' => 'true'] : [];
@@ -169,7 +160,7 @@ class Client
             $this->config,
         );
     }
-    
+
     public function deleteByCode(string $id, bool $dryRun = false): void
     {
         $uriParameters = $dryRun ? ['dry-run' => 'true'] : [];
@@ -184,7 +175,7 @@ class Client
     }
 
     /**
-     * @param array<mixed> $uriParameters
+     * @param array $uriParameters
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
@@ -384,7 +375,7 @@ class Client
             $this->config,
         );
 
-       return $response->getRowCount() ?? 0;
+       return $response->getRowCount();
     }
 
     /**
@@ -471,7 +462,7 @@ class Client
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
-    public function callRequest(Method $httpMethod, mixed $queryFilterOrId, array $uriParameters, array $postFields, array $headers): array
+    public function callRequest(Method $httpMethod, int|string|null $queryFilterOrId, array $uriParameters, array $postFields, array $headers): array
     {
         $response = $this->httpClient->request(
             $this->queryBuilder->createUri($queryFilterOrId, $uriParameters),

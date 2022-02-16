@@ -32,15 +32,7 @@ final class ClientTest extends TestCase
         parent::setUp();
 
         $this->faker = Factory::create();
-        $this->client = new Client(
-            Config::HOST,
-            Config::COMPANY,
-            Config::USERNAME,
-            Config::PASSWORD,
-            Config::EVIDENCE,
-            false,
-            null,
-        );
+        $this->client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, Config::EVIDENCE, false, null);
     }
 
     public function testGetCompanies(): void
@@ -77,15 +69,7 @@ final class ClientTest extends TestCase
         Assert::assertArrayHasKey('refreshToken', $authToken);
         Assert::assertArrayHasKey('authSessionId', $authToken);
         Assert::assertArrayHasKey('csrfToken', $authToken);
-        $client = new Client(
-            Config::HOST,
-            Config::COMPANY,
-            'xxx',
-            'xxx',
-            Config::EVIDENCE,
-            false,
-            $authToken['authSessionId'],
-        );
+        $client = new Client(Config::HOST, Config::COMPANY, 'xxx', 'xxx', Config::EVIDENCE, false, $authToken['authSessionId']);
         Assert::assertNotEmpty($client->allInEvidence());
     }
 
@@ -237,15 +221,7 @@ final class ClientTest extends TestCase
 
     public function testSearchInEvidence(): void
     {
-        $client = new Client(
-            Config::HOST,
-            Config::COMPANY,
-            Config::USERNAME,
-            Config::PASSWORD,
-            'faktura-vydana',
-            false,
-            null,
-        );
+        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false, null);
         $result = $client->searchInEvidence('(kod neq \'JAN\')', []);
         Assert::assertTrue(count($result) > 0);
         $this->expectException(EcomailFlexibeeRequestFail::class);
@@ -254,15 +230,7 @@ final class ClientTest extends TestCase
 
     public function testSearchInEvidencePaginated(): void
     {
-        $client = new Client(
-            Config::HOST,
-            Config::COMPANY,
-            Config::USERNAME,
-            Config::PASSWORD,
-            'faktura-vydana',
-            false,
-            null,
-        );
+        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false, null);
         $result = $client->searchInEvidencePaginated('(kod neq \'JAN\')', []);
         Assert::assertIsInt($result['row_count']);
         Assert::assertTrue($result['row_count'] > 0);
@@ -273,30 +241,14 @@ final class ClientTest extends TestCase
 
     public function testFindLastInEvidence(): void
     {
-        $client = new Client(
-            Config::HOST,
-            Config::COMPANY,
-            Config::USERNAME,
-            Config::PASSWORD,
-            'faktura-vydana',
-            false,
-            null,
-        );
+        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false, null);
         $result = $client->findLastInEvidence(true);
         Assert::assertCount(1, $result->getData()['faktura-vydana']);
     }
 
     public function testSearchInEvidenceWithInvalidUrl(): void
     {
-        $client = new Client(
-            Config::HOST,
-            Config::COMPANY,
-            Config::USERNAME,
-            Config::PASSWORD,
-            'faktura-vydana',
-            false,
-            null,
-        );
+        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false, null);
         $this->expectException(EcomailFlexibeeRequestFail::class);
         $client->searchInEvidence(' bla.json', []);
     }
@@ -369,16 +321,7 @@ final class ClientTest extends TestCase
     {
         $logPath = 'logs/log.txt';
         @unlink($logPath);
-        $client = new Client(
-            Config::HOST,
-            Config::COMPANY,
-            Config::USERNAME,
-            Config::PASSWORD,
-            'faktura-vydana',
-            false,
-            null,
-            $logPath,
-        );
+        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false, null, $logPath);
         $client->allInEvidence();
 
         Assert::assertTrue(file_exists($logPath));

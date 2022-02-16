@@ -34,7 +34,7 @@ class SearchQueryOperator extends Enum
     public static function convertOperatorsInQuery(string $query): string
     {
         $query = urldecode($query);
-        /** @var array<mixed> $queryExploded */
+        /** @var array<string> $queryExploded */
         $queryExploded = preg_split('/\s+/', $query);
 
         foreach($queryExploded as &$part) {

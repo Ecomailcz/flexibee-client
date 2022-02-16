@@ -16,7 +16,7 @@ interface Response
     public function getStatusCode(): int;
 
     /**
-     * @return array<mixed>
+     * @return array
      */
     public function getData(): array;
 

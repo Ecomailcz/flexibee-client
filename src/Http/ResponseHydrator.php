@@ -16,11 +16,8 @@ use function count;
 class ResponseHydrator extends ObjectPrototype
 {
 
-    private Config $config;
-
-    public function __construct(Config $config)
+    public function __construct(private Config $config)
     {
-        $this->config = $config;
     }
 
     /**

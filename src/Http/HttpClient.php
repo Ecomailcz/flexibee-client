@@ -33,25 +33,19 @@ final class HttpClient
         $this->httpCurlBuilder = new HttpCurlBuilder();
     }
 
-    /**
-     * @param array<mixed> $postFields
-     * @param array<string> $queryParameters
-     * @param array<string> $headers
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
-     */
-    public function request(
-        string $url,
-        Method $httpMethod,
-        array $postFields,
-        array $queryParameters,
-        array $headers,
-        Config $config
-    ): FlexibeeResponse
+	/**
+	 * @param array $postFields
+	 * @param array $queryParameters
+	 * @param array $headers
+	 * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
+	 * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
+	 * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+	 * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+	 * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
+	 * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
+	 * @throws \League\Flysystem\FilesystemException
+	 */
+    public function request(string $url, Method $httpMethod, array $postFields, array $queryParameters, array $headers, Config $config): FlexibeeResponse
     {
 
         $ch = $this->httpCurlBuilder->build($url, $httpMethod, $postFields, $queryParameters, $headers, $config);
@@ -63,6 +57,7 @@ final class HttpClient
         $errorMessage = mb_strlen(trim(curl_error($ch))) === 0
             ? null
             : curl_error($ch);
+        /** @var int $statusCode */
         $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
         if ($config->getLogFilePath() !== null) {
@@ -81,7 +76,7 @@ final class HttpClient
             $logContent = sprintf(
                 '%s METHOD: %s URL:%s TIME:%s STATUS:%s HEADERS: %s',
                 date('Y-m-d H:i:s'),
-                $httpMethod->getValue(),
+                $httpMethod,
                 $url,
                 number_format($responseTime, 2),
                 $statusCode,

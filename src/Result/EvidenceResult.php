@@ -8,20 +8,14 @@ final class EvidenceResult
 {
 
     /**
-     * @var array<mixed>
+     * @param array $data
      */
-    private array $data;
-
-    /**
-     * @param array<mixed> $data
-     */
-    public function __construct(array $data)
+    public function __construct(private array $data)
     {
-        $this->data = $data;
     }
 
     /**
-     * @return array<mixed>
+     * @return array
      */
     public function getData(): array
     {

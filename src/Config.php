@@ -7,34 +7,17 @@ namespace EcomailFlexibee;
 final class Config
 {
 
-    private string $url;
-    private string $company;
-    private string $user;
-    private string $password;
-    private string $evidence;
-    private bool $verifySSLCertificate;
-    private ?string $authSessionId;
-    private ?string $logFilePath;
-
     public function __construct(
-        string $url,
-        string $company,
-        string $user,
-        string $password,
-        string $evidence,
-        bool $verifySSLCertificate,
-        ?string $authSessionId = null,
-        ?string $logFilePath = null
+        private string $url,
+        private string $company,
+        private string $user,
+        private string $password,
+        private string $evidence,
+        private bool $verifySSLCertificate,
+        private ?string $authSessionId = null,
+        private ?string $logFilePath = null,
     )
     {
-        $this->url = $url;
-        $this->company = $company;
-        $this->user = $user;
-        $this->password = $password;
-        $this->evidence = $evidence;
-        $this->verifySSLCertificate = $verifySSLCertificate;
-        $this->authSessionId = $authSessionId;
-        $this->logFilePath = $logFilePath;
     }
 
     public function getUrl(): string

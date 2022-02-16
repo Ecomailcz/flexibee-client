@@ -14,4 +14,10 @@ final class Method extends Enum
     public const DELETE = 'DELETE';
     public const PUT = 'PUT';
 
+    public function __toString(): string
+    {
+    	/** @phpstan-ignore-next-line */
+    	return $this->getValue();
+    }
+
 }

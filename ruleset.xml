@@ -27,14 +27,20 @@
 		<properties>
 			<property name="enableNativeTypeHint" value="false"/>
 		</properties>
+		<exclude name="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification"/>
 	</rule>
 	<rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint">
 		<properties>
 			<property name="enableObjectTypeHint" value="false"/>
 		</properties>
+		<exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification"/>
+		<exclude name="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint"/>
 	</rule>
 
-	<rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint"/>
+	<rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint">
+		<exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification"/>
+		<exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint"/>
+	</rule>
 	<rule ref="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint"/>
 	<rule ref="SlevomatCodingStandard.Exceptions.ReferenceThrowableOnly"/>
 	<rule ref="SlevomatCodingStandard.Arrays.DisallowImplicitArrayCreation"/>
@@ -94,6 +100,7 @@
 	<rule ref="SlevomatCodingStandard.ControlStructures.DisallowYodaComparison"/>
 	<rule ref="SlevomatCodingStandard.Functions.DisallowEmptyFunction"/>
 	<rule ref="SlevomatCodingStandard.Functions.ArrowFunctionDeclaration"/>
+	<rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInCall"/>
 	<rule ref="SlevomatCodingStandard.Namespaces.RequireOneNamespaceInFile"/>
 	<rule ref="SlevomatCodingStandard.Namespaces.NamespaceDeclaration"/>
 	<rule ref="SlevomatCodingStandard.Namespaces.NamespaceSpacing"/>
@@ -133,13 +140,13 @@
 	<rule ref="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing.IncorrectLinesCountBeforeControlStructure"/>
 	<rule ref="SlevomatCodingStandard.ControlStructures.RequireMultiLineTernaryOperator">
 		<properties>
-			<property name="lineLengthLimit" value="75"/>
+			<property name="lineLengthLimit" value="120"/>
 		</properties>
 	</rule>
 	<rule ref="SlevomatCodingStandard.ControlStructures.BlockControlStructureSpacing"/>
 	<rule ref="SlevomatCodingStandard.Classes.RequireSingleLineMethodSignature">
 		<properties>
-			<property name="maxLineLength" value="150"/>
+			<property name="maxLineLength" value="189"/>
 		</properties>
 	</rule>
 	<rule ref="SlevomatCodingStandard.ControlStructures.AssignmentInCondition"/>
@@ -157,20 +164,34 @@
 	<rule ref="SlevomatCodingStandard.ControlStructures.RequireNullCoalesceEqualOperator"/>
 	<rule ref="SlevomatCodingStandard.Functions.RequireMultiLineCall">
 		<properties>
-			<property name="minLineLength" value="125"/>
+			<property name="minLineLength" value="190"/>
 		</properties>
 	</rule>
 	<rule ref="SlevomatCodingStandard.Functions.RequireSingleLineCall">
 		<properties>
-			<property name="maxLineLength" value="124"/>
+			<property name="maxLineLength" value="189"/>
 		</properties>
 	</rule>
 	<rule ref="SlevomatCodingStandard.ControlStructures.RequireMultiLineCondition">
 		<properties>
-			<property name="minLineLength" value="125"/>
+			<property name="minLineLength" value="170"/>
 		</properties>
 	</rule>
 	<rule ref="SlevomatCodingStandard.Classes.SuperfluousErrorNaming"/>
-	<rule ref="SlevomatCodingStandard.Commenting.DeprecatedAnnotationDeclaration"/>
+	<rule ref="SlevomatCodingStandard.Classes.ForbiddenPublicProperty"/>
+
+	<!-- PHP 8 -->
+	<rule ref="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint"/>
+	<rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInDeclaration"/>
+	<rule ref="SlevomatCodingStandard.Classes.RequireConstructorPropertyPromotion"/>
+	<rule ref="SlevomatCodingStandard.TypeHints.UnionTypeHintFormat"/>
+	<rule ref="SlevomatCodingStandard.Functions.FunctionLength">
+		<properties>
+			<property name="maxLinesLength" value="7120"/>
+		</properties>
+	</rule>
+
+	<!-- Enable after refactoring -->
+	<exclude name="SlevomatCodingStandard.Commenting.DeprecatedAnnotationDeclaration"/>
 
 </ruleset>

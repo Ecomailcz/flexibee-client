@@ -148,7 +148,7 @@ class UrlBuilder extends Url
     /**
      * @param array<mixed> $uriParams
      */
-    public function createUri(mixed $filterQueryOrId, array $uriParams): string
+    public function createUri(int|string|null $filterQueryOrId, array $uriParams): string
     {
         if ($filterQueryOrId === null) {
             $this->setPath($this->buildPathForOnlyEvidence());

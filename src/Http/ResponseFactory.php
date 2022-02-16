@@ -24,14 +24,7 @@ use const CURLE_OK;
 final class ResponseFactory
 {
 
-    public static function createFromOutput(
-        string $url,
-        Method $httpMethod,
-        ?string $responseContent,
-        int $statusCode,
-        int $errorNumber,
-        ?string $errorMessage
-    ): FlexibeeResponse
+    public static function createFromOutput(string $url, Method $httpMethod, ?string $responseContent, int $statusCode, int $errorNumber, ?string $errorMessage): FlexibeeResponse
     {
         if ($responseContent === null) {
             throw new EcomailFlexibeeRequestFail();
@@ -51,7 +44,7 @@ final class ResponseFactory
             return new FlexibeeBackupResponse($responseContent);
         }
 
-        /** @var array<mixed>|null $data */
+        /** @var array|null $data */
         $data = json_decode($responseContent, true);
         $data ??= [];
         $data = $data['winstrom'] ?? $data;
@@ -102,15 +95,11 @@ final class ResponseFactory
         }
 
         if ($statusCode === 403) {
-            throw new EcomailFlexibeeForbidden(
-                'Uživatel na tuto operaci nemá oprávnění. Tato chyba se zobrazí i v případě, že danou operaci neumožňuje licence.',
-            );
+            throw new EcomailFlexibeeForbidden('Uživatel na tuto operaci nemá oprávnění. Tato chyba se zobrazí i v případě, že danou operaci neumožňuje licence.');
         }
 
         if ($statusCode === 406) {
-            throw new EcomailFlexibeeNotAcceptableRequest(
-                'Cílový formát není nad konkrétním zdrojem podporovaný (např. export adresáře jako ISDOC).',
-            );
+            throw new EcomailFlexibeeNotAcceptableRequest('Cílový formát není nad konkrétním zdrojem podporovaný (např. export adresáře jako ISDOC).');
         }
 
         if ($statusCode === 405) {
@@ -129,20 +118,11 @@ final class ResponseFactory
             throw new EcomailFlexibeeRequestFail($message);
         }
 
-        return new FlexibeeResponse(
-            $statusCode,
-            $version,
-            $success,
-            $message,
-            $rowCount,
-            $globalVersion,
-            $results,
-            $statistics,
-        );
+        return new FlexibeeResponse($statusCode, $version, $success, $message, $rowCount, $globalVersion, $results, $statistics);
     }
 
     /**
-     * @param array<mixed> $errors
+     * @param array $errors
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
     private static function throwErrorMessage(array $errors, int $statusCode): void
