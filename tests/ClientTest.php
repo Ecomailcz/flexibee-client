@@ -15,11 +15,8 @@ use Faker\Generator;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use function count;
-use function file_exists;
-use function file_get_contents;
 use function mb_substr;
 use function uniqid;
-use function unlink;
 
 final class ClientTest extends TestCase
 {
@@ -315,18 +312,6 @@ final class ClientTest extends TestCase
         $responseData = $this->client->getPropertiesForEvidence()->getData();
         Assert::assertArrayHasKey('properties', $responseData);
         Assert::assertArrayHasKey('property', $responseData['properties']);
-    }
-
-    public function testLogRequest(): void
-    {
-        $logPath = 'logs/log.txt';
-        @unlink($logPath);
-        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false, null, $logPath);
-        $client->allInEvidence();
-
-        Assert::assertTrue(file_exists($logPath));
-        Assert::assertNotEmpty(file_get_contents($logPath));
-        unlink($logPath);
     }
 
     private function checkResponseStructure(EvidenceResult $result): void

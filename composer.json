@@ -11,7 +11,6 @@
 		"ext-mbstring": "*",
 		"ext-simplexml": "*",
 		"ecomailcz/purl": "^2.0",
-		"league/flysystem": "^3.0",
 		"rakit/validation": "^1.1",
 		"slevomat/consistence": "^2.1"
 	},

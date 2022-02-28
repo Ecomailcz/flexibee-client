@@ -15,7 +15,6 @@ final class Config
         private string $evidence,
         private bool $verifySSLCertificate,
         private ?string $authSessionId = null,
-        private ?string $logFilePath = null,
     )
     {
     }
@@ -53,11 +52,6 @@ final class Config
     public function getAuthSessionId(): ?string
     {
         return $this->authSessionId;
-    }
-
-    public function getLogFilePath(): ?string
-    {
-        return $this->logFilePath;
     }
 
 }

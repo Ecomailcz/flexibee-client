@@ -21,14 +21,11 @@ $restApiPassword,
 $evidenceName, 
 $disableSelfSignedCertificate,
 $authSessionId,
-$logPath,
 );
 ```
 `$disableSelfSignedCertificate - Vypnutí self signed certifikátu`
 
 `$authSessionId - Hodnota authentikačního id pro Flexibee`
-
-`$logPath - Cesta souboru pro logování requestů`
 
 ## Vygenerování autorizačního tokenu
 ```
