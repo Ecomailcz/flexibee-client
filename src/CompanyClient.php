@@ -4,10 +4,13 @@ declare(strict_types = 1);
 
 namespace EcomailFlexibee;
 
+use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
 use EcomailFlexibee\Http\Method;
 use EcomailFlexibee\Http\Response\Response;
 
-class CompanyClient extends Client
+use function array_filter;
+
+final class CompanyClient extends Client
 {
 
     private const EVIDENCE = 'c';
@@ -47,6 +50,43 @@ class CompanyClient extends Client
             [],
             $this->config,
         );
+    }
+
+    /**
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
+     */
+    public function getCompanies(): Response
+    {
+        return $this->httpClient->request(
+            $this->queryBuilder->createCompanyUrl(),
+            Method::get(Method::GET),
+            [],
+            [],
+            [],
+            $this->config,
+        );
+    }
+
+    /**
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
+     */
+    public function getCompany(): array
+    {
+        $result = array_filter(
+            $this->getCompanies()->getData()['companies'],
+            fn (array $data): bool => mb_strtolower($data['dbNazev']) === mb_strtolower($this->config->getCompany()),
+        );
+
+        if (isset($result['company'])) {
+            return $result['company'];
+        }
+
+        throw new EcomailFlexibeeNoEvidenceResult();
     }
 
 }

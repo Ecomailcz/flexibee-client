@@ -35,7 +35,7 @@ final class ParameterValidatorTest extends TestCase
     }
 
     /**
-     * @return array<array<mixed>>
+     * @return array<array>
      */
     public function getDataForTestValidateFlexibeeRequestCodeParameter(): array
     {

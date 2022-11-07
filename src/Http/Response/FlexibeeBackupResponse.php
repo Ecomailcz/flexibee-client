@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace EcomailFlexibee\Http\Response;
 
-class FlexibeeBackupResponse extends FlexibeeResponse
+final class FlexibeeBackupResponse extends GenericResponse
 {
 
     public function __construct(string $backupContent)

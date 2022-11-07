@@ -6,7 +6,7 @@ namespace EcomailFlexibee\Exception;
 
 use Exception;
 
-class EcomailFlexibeeForbidden extends Exception
+final class EcomailFlexibeeForbidden extends Exception
 {
 
 }

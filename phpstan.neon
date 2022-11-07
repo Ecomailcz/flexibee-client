@@ -1,3 +1,5 @@
+includes:
+    - %rootDir%/../../../vendor/pekral/rulezilla/src/Rules/Php/Phpstan/phpstan.neon
 parameters:
     level: max
     checkMissingIterableValueType: false

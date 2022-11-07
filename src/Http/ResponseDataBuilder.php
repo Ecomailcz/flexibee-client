@@ -9,14 +9,16 @@ use EcomailFlexibee\Config;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestFail;
 use EcomailFlexibee\Http\Response\Response;
+use EcomailFlexibee\Http\Response\ResponseStatusCode;
 use EcomailFlexibee\Result\EvidenceResult;
+
 use function array_map;
 use function count;
 
-class ResponseHydrator extends ObjectPrototype
+final class ResponseDataBuilder extends ObjectPrototype
 {
 
-    public function __construct(private Config $config)
+    public function __construct(private readonly Config $config)
     {
     }
 
@@ -26,21 +28,7 @@ class ResponseHydrator extends ObjectPrototype
      */
     public function convertResponseToEvidenceResults(Response $response): array
     {
-        $data = $response->getData();
-        $hasErrors = isset($data[0], $data[0]['errors']);
-
-        if ($hasErrors || (isset($data['success']) && $data['success'] === 'false')) {
-
-            if ($hasErrors && !isset($data['message'])) {
-                $data['message'] = '';
-
-                foreach ($data[0]['errors'] as $errors) {
-                    $data['message'] .= "\n" . $errors['message'];
-                }
-            }
-
-            throw new EcomailFlexibeeRequestFail($data['message'], $response->getStatusCode());
-        }
+        $data = $this->transformResponse($response);
 
         if (!isset($data[$this->config->getEvidence()])) {
             if (count($data) === 0) {
@@ -58,26 +46,12 @@ class ResponseHydrator extends ObjectPrototype
     }
 
     /**
-     * @return array<mixed>
+     * @return array
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
     public function convertResponseToPaginatedEvidenceResults(Response $response): array
     {
-        $data = $response->getData();
-        $hasErrors = isset($data[0], $data[0]['errors']);
-
-        if ($hasErrors || (isset($data['success']) && $data['success'] === 'false')) {
-
-            if ($hasErrors && !isset($data['message'])) {
-                $data['message'] = '';
-
-                foreach ($data[0]['errors'] as $errors) {
-                    $data['message'] .= "\n" . $errors['message'];
-                }
-            }
-
-            throw new EcomailFlexibeeRequestFail($data['message'], $response->getStatusCode());
-        }
+        $data = $this->transformResponse($response);
 
         if (!isset($data[$this->config->getEvidence()])) {
             if (count($data) === 0) {
@@ -104,7 +78,7 @@ class ResponseHydrator extends ObjectPrototype
     {
         $data = $response->getData();
 
-        if ($response->getStatusCode() === 404 || !isset($data[$this->config->getEvidence()])) {
+        if ($response->getStatusCode() === ResponseStatusCode::NOT_FOUND || !isset($data[$this->config->getEvidence()])) {
             if ($throwException) {
                 throw new EcomailFlexibeeNoEvidenceResult();
             }
@@ -115,6 +89,30 @@ class ResponseHydrator extends ObjectPrototype
         }
 
         return new EvidenceResult($data[$this->config->getEvidence()]);
+    }
+
+    /**
+     * @return array
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
+     */
+    private function transformResponse(Response $response): array
+    {
+        $data = $response->getData();
+        $hasErrors = isset($data[0], $data[0]['errors']);
+
+        if ($hasErrors || (isset($data['success']) && $data['success'] === 'false')) {
+            if ($hasErrors && !isset($data['message'])) {
+                $data['message'] = '';
+
+                foreach ($data[0]['errors'] as $errors) {
+                    $data['message'] .= "\n".$errors['message'];
+                }
+            }
+
+            throw new EcomailFlexibeeRequestFail($data['message'], $response->getStatusCode());
+        }
+
+        return $data;
     }
 
 }

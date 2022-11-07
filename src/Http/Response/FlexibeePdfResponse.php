@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace EcomailFlexibee\Http\Response;
 
-class FlexibeePdfResponse extends FlexibeeResponse
+final class FlexibeePdfResponse extends GenericResponse
 {
 
     public function __construct(string $pdfContent)

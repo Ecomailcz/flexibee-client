@@ -1,0 +1,22 @@
+stopOnFailure: true
+commands:
+  phpstan:
+    directories: ['src']
+    config: phpstan.neon
+  phpcs:
+    directories: ['src', 'tests']
+    ruleset: ruleset.xml
+  rector:
+    directories: ['src', 'tests']
+    ruleset: rector.php
+  phpmnd:
+    directories: ['src',]
+  phpcpd:
+    directories: ['src']
+  phpunit:
+    directories: ['tests']
+    config: phpunit.xml
+    coverage: true
+    #coverage_folder: 'xxx'
+  lint:
+    directories: ['src', 'tests']

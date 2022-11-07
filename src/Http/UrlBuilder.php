@@ -7,15 +7,12 @@ namespace EcomailFlexibee\Http;
 use EcomailFlexibee\Config;
 use EcomailFlexibee\Enum\SearchQueryOperator;
 use EcomailFlexibee\Validator\ParameterValidator;
-use Purl\ParserInterface;
-use Purl\Path;
-use Purl\Query;
-use Purl\Url;
+use Nette\Http\Url;
+
 use function array_merge;
-use function http_build_query;
 use function sprintf;
 
-class UrlBuilder extends Url
+final class UrlBuilder
 {
 
     private string $company;
@@ -23,11 +20,11 @@ class UrlBuilder extends Url
     private string $evidence;
 
     private ParameterValidator $validator;
+    private Url $url;
 
-    public function __construct(Config $config, ?ParserInterface $parser = null)
+    public function __construct(Config $config)
     {
-        parent::__construct($config->getUrl(), $parser);
-
+        $this->url = new Url($config->getUrl());
         $this->company = $config->getCompany();
         $this->evidence = $config->getEvidence();
         $this->validator = new ParameterValidator();
@@ -35,149 +32,126 @@ class UrlBuilder extends Url
 
     public function createAuthTokenUrl(): string
     {
-        $this->setPath(new Path('/login-logout/login.json'));
+        $url = $this->url;
 
-        return $this->getUrl();
+        return (string) $url->setPath('/login-logout/login.json');
     }
 
     /**
-     * @param array<mixed> $uriParameters
+     * @param array $uriParameters
      */
     public function createLoginFormUrl(array $uriParameters): string
     {
-        $this->setPath(new Path('/login-logout/login.html'));
-        $this->createQueryParams($uriParameters);
+        $url = $this->url;
 
-        return $this->getUrl();
+        return (string) $this->createQueryParams($uriParameters, $url->setPath('/login-logout/login.html'));
     }
 
     /**
-     * @param array<mixed> $uriParameters
+     * @param array $uriParameters
      */
     public function createPdfUrl(int $id, array $uriParameters): string
     {
-        $this->setPath($this->buildPathWithIdOrFilter($id, 'pdf'));
-        $this->createQueryParams($uriParameters);
-
-        return $this->getUrl();
+        return (string) $this->createQueryParams($uriParameters, $this->buildPathWithIdOrFilter($id, 'pdf'));
     }
 
     public function createBackupUrl(): string
     {
-        $this->setPath(new Path(sprintf('/c/%s/backup', $this->company)));
+        $url = $this->url;
 
-        return $this->getUrl();
+        return (string) $url->setPath(sprintf('/c/%s/backup', $this->company));
     }
 
     public function createCompanyUrl(): string
     {
-        $this->setPath(new Path(sprintf('/c/%s.json', $this->company)));
+        $url = $this->url;
 
-        return $this->getUrl();
+        return (string) $url->setPath(sprintf('/c/%s.json', $this->company));
     }
 
     public function createRestoreUrl(string $companyName): string
     {
-        $this->setPath(new Path(sprintf('/c/%s/restore?name=%s', $this->company, $companyName)));
+        $url = $this->url;
 
-        return $this->getUrl();
+        return (string) $url->setPath(sprintf('/c/%s/restore?name=%s', $this->company, $companyName));
     }
 
     /**
-     * @param array<mixed> $uriParameters
+     * @param array $uriParameters
      */
     public function createChangesUrl(array $uriParameters = []): string
     {
-        $this->setPath(new Path(sprintf('/c/%s/changes.json', $this->company)));
-        $this->createQueryParams($uriParameters);
+        $url = $this->url;
 
-        return $this->getUrl();
+        return (string) $this->createQueryParams($uriParameters, $url->setPath(sprintf('/c/%s/changes.json', $this->company)));
     }
 
     public function createChangesStatusUrl(): string
     {
-        $this->setPath(new Path(sprintf('/c/%s/changes/status.json', $this->company)));
+        $url = $this->url;
 
-        return $this->getUrl();
+        return (string) $url->setPath(sprintf('/c/%s/changes/status.json', $this->company));
     }
 
     /**
-     * @param array<mixed> $uriParameters
+     * @param array $uriParameters
      */
     public function createUriByEvidenceOnly(array $uriParameters): string
     {
-        $this->setPath($this->buildPathForOnlyEvidence());
-        $this->createQueryParams($uriParameters);
-
-        return $this->getUrl();
+        return (string) $this->createQueryParams($uriParameters, $this->buildPathForOnlyEvidence());
     }
 
     /**
-     * @param array<mixed> $uriParameters
+     * @param array $uriParameters
      */
     public function createFilterQuery(string $filterQuery, array $uriParameters): string
     {
-        $this->setPath($this->buildPathWithIdOrFilter(SearchQueryOperator::convertOperatorsInQuery($filterQuery)));
-        $this->createQueryParams($uriParameters);
-
-        return $this->getUrl();
+        return (string) $this->createQueryParams($uriParameters, $this->buildPathWithIdOrFilter(SearchQueryOperator::convertOperatorsInQuery($filterQuery)));
     }
 
     /**
-     * @param array<mixed> $uriParameters
+     * @param array $uriParameters
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
      */
     public function createUriByCodeOnly(string $code, array $uriParameters): string
     {
         $this->validator->validateFlexibeeRequestCodeParameter($code);
-        $this->setPath($this->buildPathWithIdOrFilter(sprintf('(kod eq \'%s\')', $code)));
-        $this->createQueryParams($uriParameters);
 
-        return $this->getUrl();
-    }
-
-    public function getUrl(): string
-    {
-        $result = parent::getUrl();
-        $this->setQuery(new Query());
-        $this->setPath(new Path());
-
-        return $result;
+        return (string) $this->createQueryParams($uriParameters, $this->buildPathWithIdOrFilter(sprintf('(kod eq \'%s\')', $code)));
     }
 
     /**
-     * @param array<mixed> $uriParams
+     * @param array $uriParams
      */
     public function createUri(int|string|null $filterQueryOrId, array $uriParams): string
     {
-        if ($filterQueryOrId === null) {
-            $this->setPath($this->buildPathForOnlyEvidence());
-        } else {
-            $this->setPath($this->buildPathWithIdOrFilter($filterQueryOrId));
-        }
+        $url = $filterQueryOrId === null
+            ? $this->buildPathForOnlyEvidence()
+            : $this->buildPathWithIdOrFilter($filterQueryOrId);
 
-        $this->createQueryParams($uriParams);
-
-        return $this->getUrl();
+        return (string) $this->createQueryParams($uriParams, $url);
     }
 
-    private function buildPathWithIdOrFilter(string|int $filterQueryOrId, string $format = 'json'): Path
+    private function buildPathWithIdOrFilter(string|int $filterQueryOrId, string $format = 'json'): Url
     {
-        return new Path(sprintf('c/%s/%s/%s.%s', $this->company, $this->evidence, $filterQueryOrId, $format));
+        $url = $this->url;
+
+        return $url->setPath(sprintf('c/%s/%s/%s.%s', $this->company, $this->evidence, $filterQueryOrId, $format));
     }
 
-    private function buildPathForOnlyEvidence(): Path
+    private function buildPathForOnlyEvidence(): Url
     {
-        return new Path(sprintf('c/%s/%s.json', $this->company, $this->evidence));
+        $url = $this->url;
+
+        return $url->setPath(sprintf('c/%s/%s.json', $this->company, $this->evidence));
     }
 
     /**
-     * @param array<mixed> $parameters
+     * @param array $parameters
      */
-    private function createQueryParams(array $parameters): void
+    private function createQueryParams(array $parameters, Url $url): Url
     {
-        $parameters = array_merge(['limit' => '0'], $parameters);
-        $this->setQuery(new Query(http_build_query($parameters)));
+        return $url->setQuery(array_merge(['limit' => '0'], $parameters));
     }
 
 }

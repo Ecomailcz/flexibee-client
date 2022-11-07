@@ -20,7 +20,7 @@ final class SearchQueryOperatorTest extends TestCase
     }
 
     /**
-     * @return array<mixed>
+     * @return array
      */
     public function getQueryStrings(): array
     {
