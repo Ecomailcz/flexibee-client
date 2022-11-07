@@ -1,13 +1,13 @@
-name: "Build - CI"
+# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
+
+name: "Pull request - CI"
 
 on:
-  push:
-    branches:
-      - "master"
+  pull_request:
 
 jobs:
-  coding-standards-php-8:
-    name: "[BACKEND] - Coding standards (PHP-8)"
+  phpcpd:
+    name: "[PHP] - Copy paste detector"
 
     runs-on: "ubuntu-latest"
 
@@ -19,7 +19,7 @@ jobs:
         uses: "shivammathur/setup-php@v2"
         with:
           coverage: "none"
-          php-version: "8.0"
+          php-version: "8.1"
 
       - name: "Cache dependencies"
         uses: "actions/cache@v2"
@@ -31,11 +31,11 @@ jobs:
       - name: "Install dependencies"
         run: "composer install --no-interaction --no-progress"
 
-      - name: "PHP - Coding Standard"
-        run: "vendor/bin/phing phpcs"
+      - name: "PHP - Phpcpd"
+        run: "php vendor/bin/rulezilla phpcpd:run"
 
-  static-analysis-php-8:
-    name: "[BACKEND] - Static analysis (PHP-8)"
+  phpmnd:
+    name: "[PHP] - Magic number detector"
 
     runs-on: "ubuntu-latest"
 
@@ -47,7 +47,7 @@ jobs:
         uses: "shivammathur/setup-php@v2"
         with:
           coverage: "none"
-          php-version: "8.0"
+          php-version: "8.1"
 
       - name: "Cache dependencies"
         uses: "actions/cache@v2"
@@ -59,11 +59,11 @@ jobs:
       - name: "Install dependencies"
         run: "composer install --no-interaction --no-progress"
 
-      - name: "PHPStan"
-        run: "vendor/bin/phing phpstan"
+      - name: "PHP - Phpmnd"
+        run: "php vendor/bin/rulezilla phpmnd:run"
 
-  tests-php-8:
-    name: "[BACKEND] - Tests (PHP-8)"
+  phpstan:
+    name: "[PHP] - Static analysis"
 
     runs-on: "ubuntu-latest"
 
@@ -75,7 +75,7 @@ jobs:
         uses: "shivammathur/setup-php@v2"
         with:
           coverage: "none"
-          php-version: "8.0"
+          php-version: "8.1"
 
       - name: "Cache dependencies"
         uses: "actions/cache@v2"
@@ -87,5 +87,117 @@ jobs:
       - name: "Install dependencies"
         run: "composer install --no-interaction --no-progress"
 
-      - name: "PHPUnit"
-        run: "vendor/bin/paratest tests"
+      - name: "PHP - Phpstan"
+        run: "php vendor/bin/rulezilla phpstan:run"
+
+  rector:
+    name: "[PHP] - Legacy code checker"
+
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "none"
+          php-version: "8.1"
+
+      - name: "Cache dependencies"
+        uses: "actions/cache@v2"
+        with:
+          path: "~/.composer/cache"
+          key: "php-8.0-composer-${{ hashFiles('**/composer.json') }}"
+          restore-keys: "php-8.0-composer-"
+
+      - name: "Install dependencies"
+        run: "composer install --no-interaction --no-progress"
+
+      - name: "PHP - Rector"
+        run: "php vendor/bin/rulezilla rector:run"
+
+  phpcs:
+    name: "[PHP] - Coding standards"
+
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "none"
+          php-version: "8.1"
+
+      - name: "Cache dependencies"
+        uses: "actions/cache@v2"
+        with:
+          path: "~/.composer/cache"
+          key: "php-8.0-composer-${{ hashFiles('**/composer.json') }}"
+          restore-keys: "php-8.0-composer-"
+
+      - name: "Install dependencies"
+        run: "composer install --no-interaction --no-progress"
+
+      - name: "PHP - Phpcs"
+        run: "php vendor/bin/rulezilla phpcs:run"
+
+  phpunit:
+    name: "[PHP] - Tests"
+
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "none"
+          php-version: "8.1"
+
+      - name: "Cache dependencies"
+        uses: "actions/cache@v2"
+        with:
+          path: "~/.composer/cache"
+          key: "php-8.0-composer-${{ hashFiles('**/composer.json') }}"
+          restore-keys: "php-8.0-composer-"
+
+      - name: "Install dependencies"
+        run: "composer install --no-interaction --no-progress"
+
+      - name: "PHP - Phpunit"
+        run: "php vendor/bin/rulezilla phpunit:run"
+
+  lint:
+    name: "[PHP] - Lint"
+
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
+
+      - name: "Install PHP"
+        uses: "shivammathur/setup-php@v2"
+        with:
+          coverage: "none"
+          php-version: "8.1"
+
+      - name: "Cache dependencies"
+        uses: "actions/cache@v2"
+        with:
+          path: "~/.composer/cache"
+          key: "php-8.0-composer-${{ hashFiles('**/composer.json') }}"
+          restore-keys: "php-8.0-composer-"
+
+      - name: "Install dependencies"
+        run: "composer install --no-interaction --no-progress"
+
+      - name: "PHP - Lint"
+        run: "php vendor/bin/rulezilla lint:run"
