@@ -13,12 +13,14 @@ use EcomailFlexibee\Exception\EcomailFlexibeeRequestFail;
 use EcomailFlexibee\Http\Response\FlexibeeBackupResponse;
 use EcomailFlexibee\Http\Response\FlexibeePdfResponse;
 use EcomailFlexibee\Http\Response\FlexibeeResponse;
+
 use function implode;
 use function in_array;
 use function json_decode;
 use function mb_stripos;
 use function mb_strpos;
 use function sprintf;
+
 use const CURLE_OK;
 
 final class ResponseFactory

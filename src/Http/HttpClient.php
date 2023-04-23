@@ -6,6 +6,7 @@ namespace EcomailFlexibee\Http;
 
 use EcomailFlexibee\Config;
 use EcomailFlexibee\Http\Response\FlexibeeResponse;
+
 use function curl_errno;
 use function curl_error;
 use function curl_exec;
@@ -13,6 +14,7 @@ use function curl_getinfo;
 use function is_string;
 use function mb_strlen;
 use function trim;
+
 use const CURLINFO_HTTP_CODE;
 
 final class HttpClient

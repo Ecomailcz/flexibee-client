@@ -10,6 +10,7 @@ use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestFail;
 use EcomailFlexibee\Http\Response\Response;
 use EcomailFlexibee\Result\EvidenceResult;
+
 use function array_map;
 use function count;
 

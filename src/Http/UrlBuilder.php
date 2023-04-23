@@ -11,6 +11,7 @@ use Purl\ParserInterface;
 use Purl\Path;
 use Purl\Query;
 use Purl\Url;
+
 use function array_merge;
 use function http_build_query;
 use function sprintf;

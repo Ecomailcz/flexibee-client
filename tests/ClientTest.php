@@ -14,6 +14,7 @@ use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
+
 use function count;
 use function mb_substr;
 use function uniqid;

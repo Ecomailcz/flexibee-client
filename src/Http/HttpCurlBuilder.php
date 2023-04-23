@@ -6,12 +6,14 @@ namespace EcomailFlexibee\Http;
 
 use CurlHandle;
 use EcomailFlexibee\Config;
+
 use function count;
 use function curl_init;
 use function curl_setopt;
 use function http_build_query;
 use function json_encode;
 use function sprintf;
+
 use const CURLOPT_CUSTOMREQUEST;
 use const CURLOPT_FOLLOWLOCATION;
 use const CURLOPT_HTTPAUTH;

@@ -7,7 +7,9 @@ namespace EcomailFlexibee\Exception;
 use Exception;
 use Rakit\Validation\Validation;
 use Throwable;
+
 use function implode;
+
 use const PHP_EOL;
 
 final class EcomailFlexibeeInvalidRequestParameter extends Exception

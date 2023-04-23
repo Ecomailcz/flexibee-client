@@ -13,6 +13,7 @@ use EcomailFlexibee\Http\Response\Response;
 use EcomailFlexibee\Http\ResponseHydrator;
 use EcomailFlexibee\Http\UrlBuilder;
 use EcomailFlexibee\Result\EvidenceResult;
+
 use function array_filter;
 use function array_merge;
 use function count;

@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace EcomailFlexibee\Enum;
 
 use Consistence\Enum\Enum;
+
 use function array_keys;
 use function array_values;
 use function implode;
