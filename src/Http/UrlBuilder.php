@@ -18,11 +18,11 @@ use function sprintf;
 class UrlBuilder extends Url
 {
 
-    private string $company;
+    private readonly string $company;
 
-    private string $evidence;
+    private readonly string $evidence;
 
-    private ParameterValidator $validator;
+    private readonly ParameterValidator $validator;
 
     public function __construct(Config $config, ?ParserInterface $parser = null)
     {
@@ -124,7 +124,7 @@ class UrlBuilder extends Url
     }
 
     /**
-     * @param array<mixed> $uriParameters
+     * @param  array<mixed> $uriParameters
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
      */
     public function createUriByCodeOnly(string $code, array $uriParameters): string

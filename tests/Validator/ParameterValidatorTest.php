@@ -22,7 +22,7 @@ final class ParameterValidatorTest extends TestCase
 
     /**
      * @dataProvider getDataForTestValidateFlexibeeRequestCodeParameter
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
+     * @throws       \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
      */
     public function testValidateFlexibeeRequestCodeParameter(string $code, ?string $exceptionClass): void
     {

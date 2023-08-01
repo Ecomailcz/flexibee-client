@@ -16,8 +16,10 @@ final class Method extends Enum
 
     public function __toString(): string
     {
-    	/** @phpstan-ignore-next-line */
-    	return $this->getValue();
+        /**
+ * @phpstan-ignore-next-line 
+*/
+        return $this->getValue();
     }
 
 }

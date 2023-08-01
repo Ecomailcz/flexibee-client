@@ -44,14 +44,18 @@ final class ResponseFactory
             return new FlexibeeBackupResponse($responseContent);
         }
 
-        /** @var array|null $data */
+        /**
+ * @var array|null $data 
+*/
         $data = json_decode($responseContent, true);
         $data ??= [];
         $data = $data['winstrom'] ?? $data;
         $results = $data['results'] ?? $data;
 
         $version = null;
-        /** @var string|null $message */
+        /**
+ * @var string|null $message 
+*/
         $message = $responseContent;
         $success = false;
         $statistics = [];
@@ -122,7 +126,7 @@ final class ResponseFactory
     }
 
     /**
-     * @param array $errors
+     * @param  array $errors
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
     private static function throwErrorMessage(array $errors, int $statusCode): void
@@ -131,7 +135,7 @@ final class ResponseFactory
             $messageLines = [];
 
             if (isset($error['code'])) {
-                $messageLines[] = sprintf('code: %s',$error['code']);
+                $messageLines[] = sprintf('code: %s', $error['code']);
             }
 
             if (isset($error['for'])) {
@@ -139,7 +143,7 @@ final class ResponseFactory
             }
 
             if (isset($error['path'])) {
-                $messageLines[] = sprintf('path: %s',$error['path']);
+                $messageLines[] = sprintf('path: %s', $error['path']);
             }
 
             if (isset($error['message'])) {

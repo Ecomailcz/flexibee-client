@@ -22,7 +22,7 @@ class CompanyClient extends Client
             self::EVIDENCE,
             $config->verifySSLCertificate(),
             $config->getAuthSessionId(),
-            );
+        );
     }
 
     public function backup(): Response

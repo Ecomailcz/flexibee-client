@@ -8,15 +8,14 @@ final class Config
 {
 
     public function __construct(
-        private string $url,
-        private string $company,
-        private string $user,
-        private string $password,
-        private string $evidence,
-        private bool $verifySSLCertificate,
-        private ?string $authSessionId = null,
-    )
-    {
+        private readonly string $url,
+        private readonly string $company,
+        private readonly string $user,
+        private readonly string $password,
+        private readonly string $evidence,
+        private readonly bool $verifySSLCertificate,
+        private readonly ?string $authSessionId = null,
+    ) {
     }
 
     public function getUrl(): string

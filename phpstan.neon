@@ -1,4 +1,2 @@
-parameters:
-    level: max
-    checkMissingIterableValueType: false
-    treatPhpDocTypesAsCertain: false
+includes:
+     - %rootDir%/../../../vendor/pekral/phpstan-rules/phpstan.neon

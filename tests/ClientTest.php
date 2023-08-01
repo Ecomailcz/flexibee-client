@@ -34,7 +34,9 @@ final class ClientTest extends TestCase
 
     public function testGetCompanies(): void
     {
-        /** @var array<mixed> $companies */
+        /**
+ * @var array<mixed> $companies 
+*/
         $companies = $this->client->getCompanies()->getData();
         Assert::assertArrayHasKey('companies', $companies);
         Assert::assertTrue(count($companies) > 0);
@@ -122,27 +124,28 @@ final class ClientTest extends TestCase
         ];
         $id = (int) $this->client->save($evidenceData, null)->getData()[0]['id'];
         $evidenceData = $this->client->getById($id, ['detail' => 'custom:id,email,kontakty(primarni,email)'])->getData()[0];
-        Assert::assertEquals([
+        Assert::assertEquals(
+            [
             'id' => $id,
             'email' => '',
             'kontakty' => [],
-        ],
+            ],
             $evidenceData,
         );
     }
 
     /**
      * @dataProvider getEvidences
-     * @param array<mixed> $evidenceData
-     * @param array<mixed> $expectedDataAfterUpdate
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
-     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed
+     * @param        array<mixed> $evidenceData
+     * @param        array<mixed> $expectedDataAfterUpdate
+     * @throws       \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
+     * @throws       \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
+     * @throws       \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws       \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws       \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
+     * @throws       \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
+     * @throws       \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
+     * @throws       \EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed
      */
     public function testCRUDOperations(string $evidence, array $evidenceData, array $expectedDataAfterUpdate): void
     {
@@ -270,7 +273,9 @@ final class ClientTest extends TestCase
         );
 
         Assert::assertArrayHasKey(0, $results);
-        /** @var \EcomailFlexibee\Result\EvidenceResult $data */
+        /**
+ * @var \EcomailFlexibee\Result\EvidenceResult $data 
+*/
         $data = $results[0];
         Assert::assertArrayHasKey('properties', $data->getData());
     }

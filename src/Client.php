@@ -26,7 +26,7 @@ class Client
     protected HttpClient $httpClient;
     protected Config $config;
 
-    private ResponseHydrator $responseHydrator;
+    private readonly ResponseHydrator $responseHydrator;
 
     public function __construct(string $url, string $company, string $user, string $password, string $evidence, bool $verifySSLCertificate, ?string $authSessionId = null,)
     {
@@ -166,7 +166,7 @@ class Client
     }
 
     /**
-     * @param array $uriParameters
+     * @param  array $uriParameters
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
@@ -184,7 +184,7 @@ class Client
     }
 
     /**
-     * @param array<mixed> $uriParameters
+     * @param  array<mixed> $uriParameters
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
@@ -204,13 +204,13 @@ class Client
                 [],
                 [],
                 $this->config,
-            ) ,
+            ),
             true,
         );
     }
 
     /**
-     * @param array<string> $uriParameters
+     * @param  array<string> $uriParameters
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
@@ -235,7 +235,7 @@ class Client
     }
 
     /**
-     * @param array<mixed> $uriParameters
+     * @param  array<mixed> $uriParameters
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
@@ -254,8 +254,8 @@ class Client
     }
 
     /**
-     * @param array<mixed> $evidenceData
-     * @param array<mixed> $uriParameters
+     * @param  array<mixed> $evidenceData
+     * @param  array<mixed> $uriParameters
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
@@ -275,12 +275,13 @@ class Client
         $uriParameters = $dryRun
             ? array_merge($uriParameters, ['dry-run' => 'true'])
             : $uriParameters;
-        /** @var \EcomailFlexibee\Result\EvidenceResult $response */
+        /**
+ * @var \EcomailFlexibee\Result\EvidenceResult $response 
+*/
         $response = $this->callRequest(Method::get(Method::PUT), null, $uriParameters, $postData, [])[0];
         $data = $response->getData();
 
-        if (
-            isset($data['created'])
+        if (isset($data['created'])
             && (int) $data['created'] === 0
             && isset($data['updated'])
             && (int) $data['updated'] === 0
@@ -366,7 +367,7 @@ class Client
             $this->config,
         );
 
-       return $response->getRowCount();
+        return $response->getRowCount();
     }
 
     /**
@@ -393,7 +394,7 @@ class Client
     }
 
     /**
-     * @param array<string> $uriParameters
+     * @param  array<string> $uriParameters
      * @return array<\EcomailFlexibee\Result\EvidenceResult>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
@@ -417,7 +418,7 @@ class Client
     }
 
     /**
-     * @param array<string> $uriParameters
+     * @param  array<string> $uriParameters
      * @return array<mixed>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
@@ -442,9 +443,9 @@ class Client
     }
 
     /**
-     * @param array<mixed> $uriParameters
-     * @param array<mixed> $postFields
-     * @param array<string> $headers
+     * @param  array<mixed>  $uriParameters
+     * @param  array<mixed>  $postFields
+     * @param  array<string> $headers
      * @return array<\EcomailFlexibee\Result\EvidenceResult>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
@@ -468,7 +469,7 @@ class Client
     }
 
     /**
-     * @param array<mixed> $uriParameters
+     * @param  array<mixed> $uriParameters
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization

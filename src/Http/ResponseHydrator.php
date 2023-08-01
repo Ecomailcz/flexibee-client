@@ -16,7 +16,7 @@ use function count;
 class ResponseHydrator extends ObjectPrototype
 {
 
-    public function __construct(private Config $config)
+    public function __construct(private readonly Config $config)
     {
     }
 
@@ -54,7 +54,7 @@ class ResponseHydrator extends ObjectPrototype
             return [new EvidenceResult($data)];
         }
 
-        return array_map(static fn (array $data) => new EvidenceResult($data), $data[$this->config->getEvidence()]);
+        return array_map(static fn (array $data): \EcomailFlexibee\Result\EvidenceResult => new EvidenceResult($data), $data[$this->config->getEvidence()]);
     }
 
     /**
@@ -96,7 +96,7 @@ class ResponseHydrator extends ObjectPrototype
 
         return [
             'row_count' => $response->getRowCount(),
-            'data' => array_map(static fn (array $data) => new EvidenceResult($data), $data[$this->config->getEvidence()]),
+            'data' => array_map(static fn (array $data): \EcomailFlexibee\Result\EvidenceResult => new EvidenceResult($data), $data[$this->config->getEvidence()]),
         ];
     }
 

@@ -10,10 +10,10 @@ class FlexibeeResponse implements Response
     /**
      * FlexibeeResponse constructor.
      *
-     * @param array<mixed> $data
+     * @param array<mixed>  $data
      * @param array<string> $statistics
      */
-    public function __construct(private int $statusCode, private ?float $version, private bool $success, private ?string $message = null, private int $rowCount = 0, private ?int $globalVersion = null, private array $data = [], private array $statistics = [])
+    public function __construct(private readonly int $statusCode, private readonly ?float $version, private readonly bool $success, private readonly ?string $message = null, private readonly int $rowCount = 0, private readonly ?int $globalVersion = null, private readonly array $data = [], private readonly array $statistics = [])
     {
     }
 

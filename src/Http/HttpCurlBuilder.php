@@ -35,14 +35,14 @@ final class HttpCurlBuilder
     public function build(string $url, Method $httpMethod, array $postFields, array $queryParameters, array $headers, Config $config): CurlHandle
     {
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
         if ($config->getAuthSessionId() !== null) {
-            curl_setopt($ch, CURLOPT_HTTPAUTH, FALSE);
+            curl_setopt($ch, CURLOPT_HTTPAUTH, false);
             $headers[] = sprintf('X-authSessionId: %s', $config->getAuthSessionId());
         } else {
-            curl_setopt($ch, CURLOPT_HTTPAUTH, TRUE);
+            curl_setopt($ch, CURLOPT_HTTPAUTH, true);
             curl_setopt($ch, CURLOPT_USERPWD, sprintf('%s:%s', $config->getUser(), $config->getPassword()));
         }
 
@@ -54,9 +54,13 @@ final class HttpCurlBuilder
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $verifySSLCertificate);
 
         if (count($postFields) > 0) {
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-                'winstrom' => $postFields,
-            ]));
+            curl_setopt(
+                $ch, CURLOPT_POSTFIELDS, json_encode(
+                    [
+                    'winstrom' => $postFields,
+                    ]
+                )
+            );
         }
 
         if (count($queryParameters) > 0) {

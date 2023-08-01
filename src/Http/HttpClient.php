@@ -18,23 +18,24 @@ use const CURLINFO_HTTP_CODE;
 final class HttpClient
 {
 
-    private HttpCurlBuilder $httpCurlBuilder;
+    private readonly HttpCurlBuilder $httpCurlBuilder;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->httpCurlBuilder = new HttpCurlBuilder();
     }
 
-	/**
-	 * @param array $postFields
-	 * @param array $queryParameters
-	 * @param array $headers
-	 * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
-	 * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
-	 * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
-	 * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
-	 * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
-	 * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
-	 */
+    /**
+     * @param  array $postFields
+     * @param  array $queryParameters
+     * @param  array $headers
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
+     */
     public function request(string $url, Method $httpMethod, array $postFields, array $queryParameters, array $headers, Config $config): FlexibeeResponse
     {
 
@@ -45,7 +46,9 @@ final class HttpClient
         $errorMessage = mb_strlen(trim(curl_error($ch))) === 0
             ? null
             : curl_error($ch);
-        /** @var int $statusCode */
+        /**
+ * @var int $statusCode 
+*/
         $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
         return ResponseFactory::createFromOutput(

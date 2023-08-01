@@ -34,7 +34,9 @@ class SearchQueryOperator extends Enum
     public static function convertOperatorsInQuery(string $query): string
     {
         $query = urldecode($query);
-        /** @var array<string> $queryExploded */
+        /**
+ * @var array<string> $queryExploded 
+*/
         $queryExploded = preg_split('/\s+/', $query);
 
         foreach($queryExploded as &$part) {
@@ -49,8 +51,10 @@ class SearchQueryOperator extends Enum
             $part = str_replace(array_keys($toReplace), array_values($toReplace), $part);
         }
 
-        /** @var string $result */
-        $result = preg_replace('/\s+/', ' ', implode(' ',$queryExploded));
+        /**
+ * @var string $result 
+*/
+        $result = preg_replace('/\s+/', ' ', implode(' ', $queryExploded));
 
         return $result;
     }

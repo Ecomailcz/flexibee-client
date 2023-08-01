@@ -10,7 +10,7 @@ final class EvidenceResult
     /**
      * @param array $data
      */
-    public function __construct(private array $data)
+    public function __construct(private readonly array $data)
     {
     }
 
