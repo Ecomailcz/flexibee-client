@@ -52,6 +52,8 @@ final class HttpCurlBuilder
         $verifySSLCertificate = $config->verifySSLCertificate() && $config->getAuthSessionId() === null;
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $verifySSLCertificate);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $verifySSLCertificate);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3); 
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 
         if (count($postFields) > 0) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
