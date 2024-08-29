@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace EcomailFlexibee\Enum;
 
-use Consistence\Enum\Enum;
 use function array_keys;
 use function array_values;
 use function implode;
@@ -14,7 +13,7 @@ use function preg_split;
 use function str_replace;
 use function urldecode;
 
-class SearchQueryOperator extends Enum
+class SearchQueryOperator
 {
 
     /**

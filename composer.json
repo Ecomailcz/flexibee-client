@@ -11,8 +11,7 @@
 		"ext-mbstring": "*",
 		"ext-simplexml": "*",
 		"ecomailcz/purl": "^2.0",
-		"rakit/validation": "^1.4",
-		"slevomat/consistence": "^2.1"
+		"rakit/validation": "^1.4"
 	},
 	"require-dev": {
 		"brianium/paratest": "^6.10.0",
