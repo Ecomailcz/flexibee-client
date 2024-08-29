@@ -12,10 +12,4 @@ enum Method: string
     case DELETE = 'DELETE';
     case PUT = 'PUT';
 
-    public function __toString(): string
-    {
-    	/** @phpstan-ignore-next-line */
-    	return $this->value;
-    }
-
 }
