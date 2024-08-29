@@ -40,7 +40,7 @@ final class ResponseFactory
         }
 
         // Backup content
-        if ($httpMethod->equalsValue(Method::GET) && mb_stripos($url, '/backup') !== false) {
+        if ($httpMethod === Method::GET && mb_stripos($url, '/backup') !== false) {
             return new FlexibeeBackupResponse($responseContent);
         }
 

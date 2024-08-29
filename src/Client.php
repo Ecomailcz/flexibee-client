@@ -40,7 +40,7 @@ class Client
     {
         return $this->httpClient->request(
             $this->queryBuilder->createChangesStatusUrl(),
-            Method::get(Method::GET),
+            Method::GET,
             [],
             [],
             [],
@@ -52,7 +52,7 @@ class Client
     {
         return $this->httpClient->request(
             $this->queryBuilder->createChangesUrl(['evidence' => $evidenceName]),
-            Method::get(Method::GET),
+            Method::GET,
             [],
             [],
             [],
@@ -64,7 +64,7 @@ class Client
     {
         return $this->httpClient->request(
             $this->queryBuilder->createUri('properties', []),
-            Method::get(Method::GET),
+            Method::GET,
             [],
             [],
             [],
@@ -76,7 +76,7 @@ class Client
     {
         return $this->httpClient->request(
             $this->queryBuilder->createChangesUrl(['start' => $fromVersion]),
-            Method::get(Method::GET),
+            Method::GET,
             [],
             [],
             [],
@@ -88,7 +88,7 @@ class Client
     {
         return $this->httpClient->request(
             $this->queryBuilder->createCompanyUrl(),
-            Method::get(Method::GET),
+            Method::GET,
             [],
             [],
             [],
@@ -125,7 +125,7 @@ class Client
     {
         return $this->httpClient->request(
             $this->queryBuilder->createAuthTokenUrl(),
-            Method::get(Method::POST),
+            Method::POST,
             [],
             [
                 'username' => $this->config->getUser(),
@@ -144,7 +144,7 @@ class Client
 
         return $this->httpClient->request(
             $this->queryBuilder->createUri($id, $uriParameters),
-            Method::get(Method::DELETE),
+            Method::DELETE,
             [],
             [],
             [],
@@ -157,7 +157,7 @@ class Client
         $uriParameters = $dryRun ? ['dry-run' => 'true'] : [];
         $this->httpClient->request(
             $this->queryBuilder->createUri(sprintf('code:%s', $id), $uriParameters),
-            Method::get(Method::DELETE),
+            Method::DELETE,
             [],
             [],
             [],
@@ -199,7 +199,7 @@ class Client
         return $this->responseHydrator->convertResponseToEvidenceResult(
             $this->httpClient->request(
                 $this->queryBuilder->createUriByCodeOnly($code, $uriParameters),
-                Method::get(Method::GET),
+                Method::GET,
                 [],
                 [],
                 [],
@@ -224,7 +224,7 @@ class Client
         return $this->responseHydrator->convertResponseToEvidenceResult(
             $this->httpClient->request(
                 $this->queryBuilder->createUri($id, $uriParameters),
-                Method::get(Method::GET),
+                Method::GET,
                 [],
                 [],
                 [],
@@ -276,7 +276,7 @@ class Client
             ? array_merge($uriParameters, ['dry-run' => 'true'])
             : $uriParameters;
         /** @var \EcomailFlexibee\Result\EvidenceResult $response */
-        $response = $this->callRequest(Method::get(Method::PUT), null, $uriParameters, $postData, [])[0];
+        $response = $this->callRequest(Method::PUT, null, $uriParameters, $postData, [])[0];
         $data = $response->getData();
 
         if (
@@ -345,7 +345,7 @@ class Client
     {
         $response = $this->httpClient->request(
             $this->queryBuilder->createUriByEvidenceOnly(['limit' => 0]),
-            Method::get(Method::GET),
+            Method::GET,
             [],
             [],
             [],
@@ -359,7 +359,7 @@ class Client
     {
         $response = $this->httpClient->request(
             $this->queryBuilder->createUriByEvidenceOnly(['add-row-count' => 'true']),
-            Method::get(Method::GET),
+            Method::GET,
             [],
             [],
             [],
@@ -382,7 +382,7 @@ class Client
     {
         $response = $this->httpClient->request(
             $this->queryBuilder->createUriByEvidenceOnly(['limit' => $limit, 'start' => $start]),
-            Method::get(Method::GET),
+            Method::GET,
             [],
             [],
             [],
@@ -406,7 +406,7 @@ class Client
     {
         $response = $this->httpClient->request(
             $this->queryBuilder->createFilterQuery($query, $uriParameters),
-            Method::get(Method::GET),
+            Method::GET,
             [],
             [],
             [],
@@ -431,7 +431,7 @@ class Client
         $uriParameters = array_merge($uriParameters, ['add-row-count' => 'true']);
         $response = $this->httpClient->request(
             $this->queryBuilder->createFilterQuery($query, $uriParameters),
-            Method::get(Method::GET),
+            Method::GET,
             [],
             [],
             [],
@@ -480,7 +480,7 @@ class Client
     {
         return $this->httpClient->request(
             $this->queryBuilder->createPdfUrl($id, $uriParameters),
-            Method::get(Method::GET),
+            Method::GET,
             [],
             [],
             [],
@@ -494,7 +494,7 @@ class Client
             $this->queryBuilder->createUriByEvidenceOnly(
                 ['order' => 'id', 'limit' => 1, 'detail' => $fullDetail ? 'full' : 'summary'],
             ),
-            Method::get(Method::GET),
+            Method::GET,
             [],
             [],
             [],

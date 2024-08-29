@@ -47,7 +47,7 @@ final class HttpCurlBuilder
         }
 
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $httpMethod->getValue());
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $httpMethod->value);
         curl_setopt($ch, CURLOPT_USERAGENT, 'Ecomail.cz Flexibee client (https://github.com/Ecomailcz/flexibee-client)');
         $verifySSLCertificate = $config->verifySSLCertificate() && $config->getAuthSessionId() === null;
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $verifySSLCertificate);
