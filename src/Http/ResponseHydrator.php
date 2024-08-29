@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace EcomailFlexibee\Http;
 
-use Consistence\ObjectPrototype;
 use EcomailFlexibee\Config;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestFail;
@@ -13,7 +12,7 @@ use EcomailFlexibee\Result\EvidenceResult;
 use function array_map;
 use function count;
 
-class ResponseHydrator extends ObjectPrototype
+class ResponseHydrator
 {
 
     public function __construct(private Config $config)

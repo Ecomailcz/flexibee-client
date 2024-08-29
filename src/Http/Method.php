@@ -4,20 +4,18 @@ declare(strict_types = 1);
 
 namespace EcomailFlexibee\Http;
 
-use Consistence\Enum\Enum;
-
-final class Method extends Enum
+enum Method: string
 {
 
-    public const GET = 'GET';
-    public const POST = 'POST';
-    public const DELETE = 'DELETE';
-    public const PUT = 'PUT';
+    case GET = 'GET';
+    case POST = 'POST';
+    case DELETE = 'DELETE';
+    case PUT = 'PUT';
 
     public function __toString(): string
     {
     	/** @phpstan-ignore-next-line */
-    	return $this->getValue();
+    	return $this->value;
     }
 
 }
