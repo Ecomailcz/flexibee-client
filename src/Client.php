@@ -28,9 +28,9 @@ class Client
 
     private ResponseHydrator $responseHydrator;
 
-    public function __construct(string $url, string $company, string $user, string $password, string $evidence, bool $verifySSLCertificate, ?string $authSessionId = null,)
+    public function __construct(string $url, string $company, string $user, string $password, string $evidence, bool $verifySSLCertificate, ?string $authSessionId = null, bool $debugMode = false)
     {
-        $this->config = new Config($url, $company, $user, $password, $evidence, $verifySSLCertificate, $authSessionId);
+        $this->config = new Config($url, $company, $user, $password, $evidence, $verifySSLCertificate, $authSessionId, $debugMode);
         $this->queryBuilder = new UrlBuilder($this->config);
         $this->responseHydrator = new ResponseHydrator($this->config);
         $this->httpClient = new HttpClient();

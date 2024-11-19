@@ -24,7 +24,7 @@ use const CURLE_OK;
 final class ResponseFactory
 {
 
-    public static function createFromOutput(string $url, Method $httpMethod, ?string $responseContent, int $statusCode, int $errorNumber, ?string $errorMessage): FlexibeeResponse
+    public static function createFromOutput(string $url, Method $httpMethod, ?string $responseContent, int $statusCode, int $errorNumber, ?string $errorMessage, ?string $curlInfoDebug): FlexibeeResponse
     {
         if ($responseContent === null) {
             throw new EcomailFlexibeeRequestFail();
@@ -95,7 +95,11 @@ final class ResponseFactory
         }
 
         if ($statusCode === 403) {
-            throw new EcomailFlexibeeForbidden('Uživatel na tuto operaci nemá oprávnění. Tato chyba se zobrazí i v případě, že danou operaci neumožňuje licence.');
+            if($curlInfoDebug !== null) {
+                throw new EcomailFlexibeeForbidden($curlInfoDebug);
+            } else {
+                throw new EcomailFlexibeeForbidden('Uživatel na tuto operaci nemá oprávnění. Tato chyba se zobrazí i v případě, že danou operaci neumožňuje licence.');
+            }
         }
 
         if ($statusCode === 406) {

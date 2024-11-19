@@ -55,6 +55,7 @@ final class HttpClient
             $statusCode,
             curl_errno($ch),
             $errorMessage,
+            $config->debugMode() ? json_encode(curl_getinfo($ch, CURLINFO_HEADER_OUT)) : null
         );
     }
 

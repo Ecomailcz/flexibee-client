@@ -55,6 +55,10 @@ final class HttpCurlBuilder
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
         curl_setopt($ch, CURLOPT_TIMEOUT, 25);
 
+        if($config->debugMode()) {
+            curl_setopt($ch, CURLINFO_HEADER_OUT, true);
+        }
+
         if (count($postFields) > 0) {
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
                 'winstrom' => $postFields,

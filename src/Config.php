@@ -15,6 +15,7 @@ final class Config
         private string $evidence,
         private bool $verifySSLCertificate,
         private ?string $authSessionId = null,
+        private bool $debugMode = false,
     )
     {
     }
@@ -52,6 +53,11 @@ final class Config
     public function getAuthSessionId(): ?string
     {
         return $this->authSessionId;
+    }
+
+    public function debugMode(): bool
+    {
+        return $this->debugMode;
     }
 
 }
