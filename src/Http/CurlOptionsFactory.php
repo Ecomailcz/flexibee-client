@@ -48,8 +48,13 @@ final class CurlOptionsFactory
      */
     public function create(string $url, Method $httpMethod, array $postFields, array $queryParameters, array $headers, Config $config): array
     {
+        if ($url === '') {
+            throw new EcomailFlexibeeRequestFail('Request URL must not be empty.');
+        }
+
         $verifySSLCertificate = $config->verifySSLCertificate();
         $options = [
+            CURLINFO_HEADER_OUT => $config->debugMode(),
             CURLOPT_CONNECTTIMEOUT => self::CONNECT_TIMEOUT_SECONDS,
             CURLOPT_CUSTOMREQUEST => $httpMethod->value,
             CURLOPT_FOLLOWLOCATION => true,
@@ -57,13 +62,9 @@ final class CurlOptionsFactory
             CURLOPT_SSL_VERIFYHOST => $verifySSLCertificate ? 2 : 0,
             CURLOPT_SSL_VERIFYPEER => $verifySSLCertificate,
             CURLOPT_TIMEOUT => self::TIMEOUT_SECONDS,
-            CURLOPT_URL => $url !== '' ? $url : throw new EcomailFlexibeeRequestFail('Request URL must not be empty.'),
+            CURLOPT_URL => $url,
             CURLOPT_USERAGENT => self::USER_AGENT,
         ] + $this->createAuthenticationOptions($config);
-
-        if ($config->debugMode()) {
-            $options[CURLINFO_HEADER_OUT] = true;
-        }
 
         if (count($postFields) > 0) {
             $options[CURLOPT_POSTFIELDS] = $this->encodePostFields($postFields);
