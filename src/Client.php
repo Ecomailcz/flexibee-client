@@ -263,6 +263,36 @@ class Client
     }
 
     /**
+     * @param list<string> $codes
+     * @param array<string> $uriParameters
+     * @return array<\EcomailFlexibee\Result\EvidenceResult>
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
+     */
+    public function findByCodes(array $codes, array $uriParameters = []): array
+    {
+        if ($codes === []) {
+            return [];
+        }
+
+        return $this->responseHydrator->convertResponseToEvidenceResults(
+            $this->httpClient->request(
+                $this->queryBuilder->createUriByCodes($codes, $uriParameters),
+                Method::GET,
+                [],
+                [],
+                [],
+                $this->config,
+            ),
+        );
+    }
+
+    /**
      * @param array<mixed> $evidenceData
      * @param array<mixed> $uriParameters
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail

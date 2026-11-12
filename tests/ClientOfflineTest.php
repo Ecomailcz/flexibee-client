@@ -11,6 +11,7 @@ use EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed;
 use EcomailFlexibee\Http\HttpClient;
 use EcomailFlexibee\Http\Method;
 use EcomailFlexibee\Http\Response\FlexibeeResponse;
+use EcomailFlexibee\Result\EvidenceResult;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
@@ -63,6 +64,27 @@ final class ClientOfflineTest extends TestCase
 
         Assert::assertSame([['id' => '1', 'kod' => 'A']], $client->getById(1)->getData());
         Assert::assertSame([['id' => '1', 'kod' => 'A']], $client->getByCode('A')->getData());
+    }
+
+    public function testFindByCodesReturnsAllFoundRecords(): void
+    {
+        $httpClient = Mockery::mock(HttpClient::class);
+        $httpClient->shouldReceive('request')
+            ->once()
+            ->with(Mockery::pattern("/\\(kod%20in%20\\('A','B'\\)\\)\\.json/"), Method::GET, [], [], [], Mockery::type(ClientConfig::class))
+            ->andReturn($this->createResponse(['adresar' => [['kod' => 'A'], ['kod' => 'B']]]));
+
+        $results = $this->createClient($httpClient)->findByCodes(['A', 'B']);
+
+        Assert::assertEquals([new EvidenceResult(['kod' => 'A']), new EvidenceResult(['kod' => 'B'])], $results);
+    }
+
+    public function testFindByCodesWithoutCodesSendsNoRequest(): void
+    {
+        $httpClient = Mockery::mock(HttpClient::class);
+        $httpClient->shouldNotReceive('request');
+
+        Assert::assertSame([], $this->createClient($httpClient)->findByCodes([]));
     }
 
     public function testFindByIdAndFindByCodeReturnEmptyResultWhenMissing(): void

@@ -76,6 +76,11 @@ $evidenceItem = $client->findByCode($evidenceItemCode, $uriParameters);
 $evidenceItem = $client->findLastInEvidence($evidenceItemCode, $uriParameters);
 ```
 
+Načtení více záznamů najednou podle seznamu kódů (jeden request s filtrem `kod in (...)`). Vrací pole `EvidenceResult` jen pro nalezené záznamy, pro prázdný seznam kódů request neposílá.
+```
+$evidenceItems = $client->findByCodes(['KOD1', 'KOD2'], $uriParameters);
+```
+
 ## Sumace
 ```
 $client->sumInEvidence();
