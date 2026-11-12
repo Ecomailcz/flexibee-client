@@ -20,6 +20,7 @@ Návod pro přechod: [UPGRADE-2.0.md](UPGRADE-2.0.md).
 - Výchozí timeouty požadavků (5 s spojení, 25 s celkem).
 
 ### Opravy
+- Odpověď se čte jako PDF jen u `GET`, jehož cesta končí na `.pdf`. Dříve stačilo, aby URL kdekoli obsahovala `.pdf`, např. nahrání přílohy `faktura.pdf` nebo filtr s `.pdf`.
 - Kód záznamu s apostrofem je odmítnut výjimkou `EcomailFlexibeeInvalidRequestParameter`. Dříve mohl změnit význam filtru `(kod eq '…')`.
 - Ověření TLS certifikátu se při přihlášení přes session nevypíná, pokud je `$verifySSLCertificate` zapnuté.
 - Název firmy v URL pro obnovu zálohy je zakódovaný (`&` nebo `#` v názvu už nerozbije URL).

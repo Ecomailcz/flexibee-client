@@ -23,12 +23,13 @@ use function is_scalar;
 use function is_string;
 use function json_decode;
 use function mb_stripos;
-use function mb_strpos;
+use function parse_url;
 use function reset;
 use function sprintf;
 use function str_ends_with;
 
 use const CURLE_OK;
+use const PHP_URL_PATH;
 
 final class ResponseFactory
 {
@@ -64,12 +65,12 @@ final class ResponseFactory
 
     private static function createBinaryResponse(string $url, Method $httpMethod, string $responseContent, int $statusCode): ?FlexibeeResponse
     {
-        if (mb_strpos($url, '.pdf') !== false) {
-            return new FlexibeePdfResponse($responseContent);
-        }
-
         if ($httpMethod !== Method::GET) {
             return null;
+        }
+
+        if (str_ends_with((string) parse_url($url, PHP_URL_PATH), '.pdf')) {
+            return new FlexibeePdfResponse($responseContent);
         }
 
         if (mb_stripos($url, '/backup') !== false) {
