@@ -32,23 +32,10 @@ class Client
 
     protected HttpClient $httpClient;
 
-    protected Config $config;
-
     private readonly ResponseHydrator $responseHydrator;
 
-    public function __construct(
-        string $url,
-        string $company,
-        string $user,
-        string $password,
-        string $evidence,
-        bool $verifySSLCertificate,
-        ?string $authSessionId = null,
-        bool $debugMode = false,
-        ?HttpClient $httpClient = null,
-    )
+    public function __construct(protected Config $config, ?HttpClient $httpClient = null)
     {
-        $this->config = new Config($url, $company, $user, $password, $evidence, $verifySSLCertificate, $authSessionId, $debugMode);
         $this->queryBuilder = new UrlBuilder($this->config);
         $this->responseHydrator = new ResponseHydrator($this->config);
         $this->httpClient = $httpClient ?? new HttpClient();

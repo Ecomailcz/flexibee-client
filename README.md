@@ -16,36 +16,51 @@ Podporované verze PHP: 8.2, 8.3, 8.4, 8.5.
 
 ## Implementace
 ```
-$client = new Client(
-$accountUrl, 
-$companyCode, 
-$restApiUserName, 
-$restApiPassword, 
-$evidenceName, 
-$disableSelfSignedCertificate,
-$authSessionId,
-);
-```
-`$disableSelfSignedCertificate - Vypnutí self signed certifikátu`
+use EcomailFlexibee\Client;
+use EcomailFlexibee\Config;
 
-`$authSessionId - Hodnota authentikačního id pro Flexibee`
+$client = new Client(new Config(
+    $accountUrl,
+    $companyCode,
+    $restApiUserName,
+    $restApiPassword,
+    $evidenceName,
+    $verifySSLCertificate,
+    $authSessionId,
+    $debugMode,
+));
+```
+`$verifySSLCertificate` - ověřování SSL certifikátu serveru (`false` vypne ověření, např. u self-signed certifikátu)
+
+`$authSessionId` - hodnota autentizačního id pro Flexibee (volitelné)
+
+`$debugMode` - při chybě 403 vrátí odeslané hlavičky požadavku (volitelné)
+
+### Přechod z verze 1.x
+Konstruktor `Client` nově přijímá `Config` (a volitelně `HttpClient`) místo jednotlivých hodnot:
+```
+// 1.x
+$client = new Client($url, $company, $user, $password, $evidence, false, null);
+// 2.0
+$client = new Client(new Config($url, $company, $user, $password, $evidence, false, null));
+```
 
 ## Vygenerování autorizačního tokenu
 ```
-$client = new Client('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', 'adresar', false, null);
+$client = new Client(new Config('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', 'adresar', false, null));
 $tokens = $client->getAuthAndRefreshToken();
 ```
 
 ## Informace o firmách či firmě
 ```
-$client = new Client('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', 'adresar', false, null);
+$client = new Client(new Config('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', 'adresar', false, null));
 $companies = $client->getCompanies();
 $company = $client->getCompany();
 ```
 
 ## Vytvoření či editace záznamu
 ```
-$client = new Client('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', 'adresar', false, null);
+$client = new Client(new Config('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', 'adresar', false, null));
 $evidenceData['kod'] = 'prvnizaznam'
 $evidenceData['nazev'] = 'První kontaktní adresa'
 $evidenceItemId = $client->save($evidenceData, null, $dryRun, $uriParameters);

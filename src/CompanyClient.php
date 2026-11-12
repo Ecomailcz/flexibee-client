@@ -15,17 +15,7 @@ class CompanyClient extends Client
 
     public function __construct(Config $config, ?HttpClient $httpClient = null)
     {
-        parent::__construct(
-            $config->getUrl(),
-            $config->getCompany(),
-            $config->getUser(),
-            $config->getPassword(),
-            self::EVIDENCE,
-            $config->verifySSLCertificate(),
-            $config->getAuthSessionId(),
-            $config->debugMode(),
-            $httpClient,
-        );
+        parent::__construct($config->withEvidence(self::EVIDENCE), $httpClient);
     }
 
     public function backup(): Response
