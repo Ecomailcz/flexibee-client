@@ -45,12 +45,13 @@ class Client
         bool $verifySSLCertificate,
         ?string $authSessionId = null,
         bool $debugMode = false,
+        ?HttpClient $httpClient = null,
     )
     {
         $this->config = new Config($url, $company, $user, $password, $evidence, $verifySSLCertificate, $authSessionId, $debugMode);
         $this->queryBuilder = new UrlBuilder($this->config);
         $this->responseHydrator = new ResponseHydrator($this->config);
-        $this->httpClient = new HttpClient();
+        $this->httpClient = $httpClient ?? new HttpClient();
     }
 
     public function isAllowedChangesApi(): bool
