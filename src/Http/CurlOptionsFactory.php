@@ -40,15 +40,12 @@ final class CurlOptionsFactory
     private const TIMEOUT_SECONDS = 25;
 
     /**
-     * @param array<mixed> $postFields
-     * @param array<mixed> $queryParameters
-     * @param array<int, string> $headers
      * @return array<int, mixed>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
-    public function create(string $url, Method $httpMethod, array $postFields, array $queryParameters, array $headers, Config $config): array
+    public function create(CurlRequest $request, Config $config): array
     {
-        if ($url === '') {
+        if ($request->url === '') {
             throw new EcomailFlexibeeRequestFail('Request URL must not be empty.');
         }
 
@@ -56,23 +53,25 @@ final class CurlOptionsFactory
         $options = [
             CURLINFO_HEADER_OUT => $config->debugMode(),
             CURLOPT_CONNECTTIMEOUT => self::CONNECT_TIMEOUT_SECONDS,
-            CURLOPT_CUSTOMREQUEST => $httpMethod->value,
+            CURLOPT_CUSTOMREQUEST => $request->httpMethod->value,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_SSL_VERIFYHOST => $verifySSLCertificate ? 2 : 0,
             CURLOPT_SSL_VERIFYPEER => $verifySSLCertificate,
             CURLOPT_TIMEOUT => self::TIMEOUT_SECONDS,
-            CURLOPT_URL => $url,
+            CURLOPT_URL => $request->url,
             CURLOPT_USERAGENT => self::USER_AGENT,
         ] + $this->createAuthenticationOptions($config);
 
-        if (count($postFields) > 0) {
-            $options[CURLOPT_POSTFIELDS] = $this->encodePostFields($postFields);
+        if (count($request->postFields) > 0) {
+            $options[CURLOPT_POSTFIELDS] = $this->encodePostFields($request->postFields);
         }
 
-        if (count($queryParameters) > 0) {
-            $options[CURLOPT_POSTFIELDS] = http_build_query($queryParameters);
+        if (count($request->queryParameters) > 0) {
+            $options[CURLOPT_POSTFIELDS] = http_build_query($request->queryParameters);
         }
+
+        $headers = $request->headers;
 
         if ($config->getAuthSessionId() !== null) {
             $headers[] = sprintf('X-authSessionId: %s', $config->getAuthSessionId());

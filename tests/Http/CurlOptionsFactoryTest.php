@@ -7,6 +7,7 @@ namespace EcomailFlexibeeTest\Http;
 use EcomailFlexibee\Config;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestFail;
 use EcomailFlexibee\Http\CurlOptionsFactory;
+use EcomailFlexibee\Http\CurlRequest;
 use EcomailFlexibee\Http\Method;
 use JsonException;
 use PHPUnit\Framework\Assert;
@@ -39,7 +40,7 @@ final class CurlOptionsFactoryTest extends TestCase
             debugMode: false,
         );
 
-        $options = (new CurlOptionsFactory())->create('https://demo.flexibee.eu/c/demo/adresar.json', Method::GET, [], [], [], $config);
+        $options = (new CurlOptionsFactory())->create(new CurlRequest('https://demo.flexibee.eu/c/demo/adresar.json', Method::GET, [], [], []), $config);
 
         Assert::assertTrue($options[CURLOPT_SSL_VERIFYPEER]);
         Assert::assertSame(2, $options[CURLOPT_SSL_VERIFYHOST]);
@@ -50,7 +51,10 @@ final class CurlOptionsFactoryTest extends TestCase
         $config = new Config('https://demo.flexibee.eu', 'demo', 'user', 'pass', 'adresar', verifySSLCertificate: true, debugMode: false);
 
         try {
-            (new CurlOptionsFactory())->create('https://demo.flexibee.eu/c/demo/adresar.json', Method::PUT, ['nazev' => "\xB1\x31"], [], [], $config);
+            (new CurlOptionsFactory())->create(
+                new CurlRequest('https://demo.flexibee.eu/c/demo/adresar.json', Method::PUT, ['nazev' => "\xB1\x31"], [], []),
+                $config,
+            );
             Assert::fail('EcomailFlexibeeRequestFail was not thrown.');
         } catch (EcomailFlexibeeRequestFail $exception) {
             Assert::assertInstanceOf(JsonException::class, $exception->getPrevious());
@@ -63,14 +67,17 @@ final class CurlOptionsFactoryTest extends TestCase
 
         $this->expectException(EcomailFlexibeeRequestFail::class);
 
-        (new CurlOptionsFactory())->create('', Method::GET, [], [], [], $config);
+        (new CurlOptionsFactory())->create(new CurlRequest('', Method::GET, [], [], []), $config);
     }
 
     public function testUsesBasicAuthenticationWithoutSession(): void
     {
         $config = new Config('https://demo.flexibee.eu', 'demo', 'user', 'pass', 'adresar', verifySSLCertificate: false, debugMode: true);
 
-        $options = (new CurlOptionsFactory())->create('https://demo.flexibee.eu/c/demo/adresar.json', Method::DELETE, [], [], [], $config);
+        $options = (new CurlOptionsFactory())->create(
+            new CurlRequest('https://demo.flexibee.eu/c/demo/adresar.json', Method::DELETE, [], [], []),
+            $config,
+        );
 
         Assert::assertSame('https://demo.flexibee.eu/c/demo/adresar.json', $options[CURLOPT_URL]);
         Assert::assertSame('DELETE', $options[CURLOPT_CUSTOMREQUEST]);
@@ -96,7 +103,10 @@ final class CurlOptionsFactoryTest extends TestCase
             debugMode: false,
         );
 
-        $options = (new CurlOptionsFactory())->create('https://demo.flexibee.eu', Method::GET, [], [], ['Accept: application/json'], $config);
+        $options = (new CurlOptionsFactory())->create(
+            new CurlRequest('https://demo.flexibee.eu', Method::GET, [], [], ['Accept: application/json']),
+            $config,
+        );
 
         Assert::assertSame(0, $options[CURLOPT_HTTPAUTH]);
         Assert::assertArrayNotHasKey(CURLOPT_USERPWD, $options);
@@ -107,7 +117,10 @@ final class CurlOptionsFactoryTest extends TestCase
     {
         $config = new Config('https://demo.flexibee.eu', 'demo', 'user', 'pass', 'adresar', verifySSLCertificate: true, debugMode: false);
 
-        $options = (new CurlOptionsFactory())->create('https://demo.flexibee.eu', Method::PUT, ['adresar' => ['kod' => 'A']], [], [], $config);
+        $options = (new CurlOptionsFactory())->create(
+            new CurlRequest('https://demo.flexibee.eu', Method::PUT, ['adresar' => ['kod' => 'A']], [], []),
+            $config,
+        );
 
         Assert::assertSame('{"winstrom":{"adresar":{"kod":"A"}}}', $options[CURLOPT_POSTFIELDS]);
     }
@@ -116,14 +129,9 @@ final class CurlOptionsFactoryTest extends TestCase
     {
         $config = new Config('https://demo.flexibee.eu', 'demo', 'user', 'pass', 'adresar', verifySSLCertificate: true, debugMode: false);
 
-        $options = (new CurlOptionsFactory())->create(
-            'https://demo.flexibee.eu',
-            Method::POST,
-            ['a' => 'b'],
-            ['username' => 'u', 'password' => 'p'],
-            [],
-            $config,
-        );
+        $request = new CurlRequest('https://demo.flexibee.eu', Method::POST, ['a' => 'b'], ['username' => 'u', 'password' => 'p']);
+
+        $options = (new CurlOptionsFactory())->create($request, $config);
 
         Assert::assertSame('username=u&password=p', $options[CURLOPT_POSTFIELDS]);
     }

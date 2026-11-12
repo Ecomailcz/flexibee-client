@@ -28,7 +28,7 @@ final readonly class HttpCurlBuilder
     public function build(string $url, Method $httpMethod, array $postFields, array $queryParameters, array $headers, Config $config): CurlHandle
     {
         $ch = curl_init();
-        curl_setopt_array($ch, $this->curlOptionsFactory->create($url, $httpMethod, $postFields, $queryParameters, $headers, $config));
+        curl_setopt_array($ch, $this->curlOptionsFactory->create(new CurlRequest($url, $httpMethod, $postFields, $queryParameters, $headers), $config));
 
         return $ch;
     }
