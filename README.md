@@ -37,13 +37,7 @@ $client = new Client(new Config(
 `$debugMode` - při chybě 403 vrátí odeslané hlavičky požadavku (volitelné)
 
 ### Přechod z verze 1.x
-Konstruktor `Client` nově přijímá `Config` (a volitelně `HttpClient`) místo jednotlivých hodnot:
-```
-// 1.x
-$client = new Client($url, $company, $user, $password, $evidence, false, null);
-// 2.0
-$client = new Client(new Config($url, $company, $user, $password, $evidence, false, null));
-```
+Verze 2.0 mění způsob vytvoření klienta a další části API. Postup najdete v [UPGRADE-2.0.md](UPGRADE-2.0.md), přehled změn v [CHANGELOG.md](CHANGELOG.md).
 
 ## Vygenerování autorizačního tokenu
 ```
@@ -120,9 +114,11 @@ $client->getPropertiesForEvidence();
 ## Vytváření vlastních requestů
 Client nabízí možnost vytváření vlastních requestů. Stačí zavolat:  
 ```
-$responseData = $client->callRequest(Method $httpMethod, string $section, array $queryParameters);
+use EcomailFlexibee\Http\Method;
+
+$results = $client->callRequest(Method::GET, 'properties', $uriParameters, $postFields, $headers);
 ```
-Následně máte k dispozici data vrácená z Flexibee. Chyby jsou ošetřeny vyhozením kontrétních výjimek.
+Metoda vrací pole `EvidenceResult` s daty z Flexibee. Chyby jsou ošetřeny vyhozením konkrétních výjimek.
 
 ## Oficiální API dokumentace
 https://www.flexibee.eu/api/dokumentace/
