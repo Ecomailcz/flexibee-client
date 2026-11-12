@@ -212,4 +212,50 @@ final class ResponseFactoryTest extends TestCase
         Assert::assertFalse($response->isSuccess());
     }
 
+    public function testUploadOfPdfAttachmentIsParsedAsJson(): void
+    {
+        $response = ResponseFactory::createFromOutput(
+            'https://demo.flexibee.eu/c/demo/cenik/164/prilohy/new/faktura.pdf',
+            Method::PUT,
+            '{"winstrom":{"success":"true","results":[{"id":"5837"}]}}',
+            201,
+            CURLE_OK,
+            errorMessage: null,
+            curlInfoDebug: null,
+        );
+
+        Assert::assertNotInstanceOf(FlexibeePdfResponse::class, $response);
+        Assert::assertSame([['id' => '5837']], $response->getData());
+    }
+
+    public function testSearchFilterMentioningPdfIsParsedAsJson(): void
+    {
+        $response = ResponseFactory::createFromOutput(
+            "https://demo.flexibee.eu/c/demo/priloha/(nazSoub%20like%20'.pdf').json?limit=0",
+            Method::GET,
+            '{"winstrom":{"priloha":[]}}',
+            200,
+            CURLE_OK,
+            errorMessage: null,
+            curlInfoDebug: null,
+        );
+
+        Assert::assertNotInstanceOf(FlexibeePdfResponse::class, $response);
+    }
+
+    public function testPdfUrlWithQueryReturnsPdfResponse(): void
+    {
+        $response = ResponseFactory::createFromOutput(
+            'https://demo.flexibee.eu/c/demo/faktura-vydana/1.pdf?report-name=x',
+            Method::GET,
+            '%PDF',
+            200,
+            CURLE_OK,
+            errorMessage: null,
+            curlInfoDebug: null,
+        );
+
+        Assert::assertInstanceOf(FlexibeePdfResponse::class, $response);
+    }
+
 }
