@@ -49,6 +49,21 @@ final class ParameterValidatorTest extends TestCase
         ];
     }
 
+    public function testReportsOneMessageWhenBothRulesFail(): void
+    {
+        $this->expectException(EcomailFlexibeeInvalidRequestParameter::class);
+        $this->expectExceptionMessageMatches('/^Parameter code must have a maximum of 20 characters and must be an uppercase$/');
+
+        $this->validator->validateFlexibeeRequestCodeParameter('lowercase-code-longer-than-twenty');
+    }
+
+    public function testAcceptsUppercaseCodeWithDiacriticsAtTheLengthLimit(): void
+    {
+        $this->expectNotToPerformAssertions();
+
+        $this->validator->validateFlexibeeRequestCodeParameter('ŽLUŤOUČKÝ-KŮŇ-ÚPĚL-Á');
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
