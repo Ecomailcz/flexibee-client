@@ -182,7 +182,7 @@ final class ClientOfflineTest extends TestCase
 
     private function createClient(HttpClient $httpClient): Client
     {
-        return new Client('https://demo.flexibee.eu', 'demo', 'user', 'pass', 'adresar', verifySSLCertificate: true, httpClient: $httpClient);
+        return new Client(new ClientConfig('https://demo.flexibee.eu', 'demo', 'user', 'pass', 'adresar', verifySSLCertificate: true), $httpClient);
     }
 
     /**

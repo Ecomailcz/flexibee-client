@@ -60,4 +60,18 @@ final readonly class Config
         return $this->debugMode;
     }
 
+    public function withEvidence(string $evidence): self
+    {
+        return new self(
+            $this->url,
+            $this->company,
+            $this->user,
+            $this->password,
+            $evidence,
+            $this->verifySSLCertificate,
+            $this->authSessionId,
+            $this->debugMode,
+        );
+    }
+
 }
