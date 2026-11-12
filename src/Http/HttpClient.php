@@ -18,10 +18,10 @@ use function trim;
 
 use const CURLINFO_HTTP_CODE;
 
-final readonly class HttpClient
+class HttpClient
 {
 
-    private HttpCurlBuilder $httpCurlBuilder;
+    private readonly HttpCurlBuilder $httpCurlBuilder;
 
     public function __construct() {
         $this->httpCurlBuilder = new HttpCurlBuilder();

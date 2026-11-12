@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace EcomailFlexibee;
 
+use EcomailFlexibee\Http\HttpClient;
 use EcomailFlexibee\Http\Method;
 use EcomailFlexibee\Http\Response\Response;
 
@@ -12,7 +13,7 @@ class CompanyClient extends Client
 
     private const EVIDENCE = 'c';
 
-    public function __construct(Config $config)
+    public function __construct(Config $config, ?HttpClient $httpClient = null)
     {
         parent::__construct(
             $config->getUrl(),
@@ -22,7 +23,8 @@ class CompanyClient extends Client
             self::EVIDENCE,
             $config->verifySSLCertificate(),
             $config->getAuthSessionId(),
-            );
+            httpClient: $httpClient,
+        );
     }
 
     public function backup(): Response
