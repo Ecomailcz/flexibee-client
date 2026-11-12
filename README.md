@@ -16,7 +16,10 @@ Podporované verze PHP: 8.2, 8.3, 8.4, 8.5.
 </div>
 
 ## Sponsored by
-[![Downloads](https://ecomail.cz/images/logo@2.png)](https://ecomail.cz)
+
+<a href="https://ecomail.cz/">
+    <img src="ecomail-logo.svg" alt="Ecomail — sponzor tohoto balíčku" width="240">
+</a>
 
 ## Instalace přes composer
 ```composer require ecomailcz/flexibee-client```
