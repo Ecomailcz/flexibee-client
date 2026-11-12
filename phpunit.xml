@@ -2,10 +2,14 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd" beStrictAboutTestsThatDoNotTestAnything="false" bootstrap="vendor/autoload.php" colors="true" failOnRisky="true" failOnWarning="true" beStrictAboutChangesToGlobalState="true" beStrictAboutCoversAnnotation="true" beStrictAboutOutputDuringTests="true" beStrictAboutTodoAnnotatedTests="true" verbose="false">
   <coverage processUncoveredFiles="true">
     <include>
-      <directory suffix=".php">../src</directory>
+      <directory suffix=".php">src</directory>
     </include>
   </coverage>
+  <php>
+    <!-- ecomailcz/purl and rakit/validation emit PHP 8.4+ deprecations at runtime; fix belongs upstream. -->
+    <ini name="error_reporting" value="E_ALL &amp; ~E_DEPRECATED"/>
+  </php>
   <testsuite name="FlexiBeeClient">
-    <directory suffix="Test.php">.</directory>
+    <directory suffix="Test.php">tests</directory>
   </testsuite>
 </phpunit>

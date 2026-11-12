@@ -13,9 +13,15 @@ use EcomailFlexibee\Http\Response\Response;
 use EcomailFlexibee\Http\ResponseHydrator;
 use EcomailFlexibee\Http\UrlBuilder;
 use EcomailFlexibee\Result\EvidenceResult;
+
 use function array_filter;
 use function array_merge;
 use function count;
+use function is_array;
+use function is_int;
+use function is_numeric;
+use function is_scalar;
+use function is_string;
 use function mb_strtolower;
 use function sprintf;
 
@@ -23,12 +29,23 @@ class Client
 {
 
     protected UrlBuilder $queryBuilder;
+
     protected HttpClient $httpClient;
+
     protected Config $config;
 
-    private ResponseHydrator $responseHydrator;
+    private readonly ResponseHydrator $responseHydrator;
 
-    public function __construct(string $url, string $company, string $user, string $password, string $evidence, bool $verifySSLCertificate, ?string $authSessionId = null, bool $debugMode = false)
+    public function __construct(
+        string $url,
+        string $company,
+        string $user,
+        string $password,
+        string $evidence,
+        bool $verifySSLCertificate,
+        ?string $authSessionId = null,
+        bool $debugMode = false,
+    )
     {
         $this->config = new Config($url, $company, $user, $password, $evidence, $verifySSLCertificate, $authSessionId, $debugMode);
         $this->queryBuilder = new UrlBuilder($this->config);
@@ -101,12 +118,16 @@ class Client
      */
     public function getCompany(): array
     {
+        $companies = $this->getCompanies()->getData()['companies'] ?? [];
         $result = array_filter(
-            $this->getCompanies()->getData()['companies'],
-            fn (array $data): bool => mb_strtolower($data['dbNazev']) === mb_strtolower($this->config->getCompany()),
+            is_array($companies) ? $companies : [],
+            fn (mixed $data): bool => is_array($data)
+                && isset($data['dbNazev'])
+                && is_string($data['dbNazev'])
+                && mb_strtolower($data['dbNazev']) === mb_strtolower($this->config->getCompany()),
         );
 
-        if (isset($result['company'])) {
+        if (isset($result['company']) && is_array($result['company'])) {
             return $result['company'];
         }
 
@@ -128,8 +149,8 @@ class Client
             Method::POST,
             [],
             [
-                'username' => $this->config->getUser(),
                 'password' => $this->config->getPassword(),
+                'username' => $this->config->getUser(),
             ],
             [
                 'Content-Type: application/x-www-form-urlencoded',
@@ -166,19 +187,19 @@ class Client
     }
 
     /**
-     * @param array $uriParameters
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
+     * @param array<string> $uriParameters
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
     public function findById(int $id, array $uriParameters = []): EvidenceResult
     {
         try {
             return $this->getById($id, $uriParameters);
-        } catch (EcomailFlexibeeNoEvidenceResult $exception) {
+        } catch (EcomailFlexibeeNoEvidenceResult) {
             return new EvidenceResult([]);
         }
     }
@@ -205,7 +226,7 @@ class Client
                 [],
                 $this->config,
             ) ,
-            true,
+            throwException: true,
         );
     }
 
@@ -230,7 +251,7 @@ class Client
                 [],
                 $this->config,
             ),
-            true,
+            throwException: true,
         );
     }
 
@@ -248,7 +269,7 @@ class Client
     {
         try {
             return $this->getByCode($code, $uriParameters);
-        } catch (EcomailFlexibeeNoEvidenceResult $exception) {
+        } catch (EcomailFlexibeeNoEvidenceResult) {
             return new EvidenceResult([]);
         }
     }
@@ -276,55 +297,39 @@ class Client
             ? array_merge($uriParameters, ['dry-run' => 'true'])
             : $uriParameters;
         /** @var \EcomailFlexibee\Result\EvidenceResult $response */
-        $response = $this->callRequest(Method::PUT, null, $uriParameters, $postData, [])[0];
+        $response = $this->callRequest(Method::PUT, queryFilterOrId: null, uriParameters: $uriParameters, postFields: $postData, headers: [])[0];
         $data = $response->getData();
-
-        if (
-            isset($data['created'])
-            && (int) $data['created'] === 0
-            && isset($data['updated'])
-            && (int) $data['updated'] === 0
-        ) {
-            $errorMessage = sprintf('(%d) %s', $data['status_code'], $data['message']);
-
-            throw new EcomailFlexibeeSaveFailed($errorMessage);
-        }
-
-        if (isset($data['success']) && $data['success'] !== 'true' && isset($data['message'])) {
-            throw new EcomailFlexibeeSaveFailed($data['message']);
-        }
+        $this->throwWhenNotSaved($data);
 
         return new FlexibeeResponse(
             200,
-            null,
-            true,
-            null,
-            count($data),
-            null,
-            $response->getData(),
-            [],
+            version: null,
+            success: true,
+            rowCount: count($data),
+            data: $response->getData(),
+            statistics: [],
         );
     }
 
     public function getUserRelations(int $objectId): EvidenceResult
     {
-        return new EvidenceResult(
-            $this->getById($objectId, ['relations' => 'uzivatelske-vazby'])->getData()[0]['uzivatelske-vazby'],
-        );
+        $relations = $this->getFirstEvidenceItem($objectId, ['relations' => 'uzivatelske-vazby'])['uzivatelske-vazby'] ?? null;
+
+        return new EvidenceResult(is_array($relations) ? $relations : []);
     }
 
     public function addUserRelation(int $objectAId, int $objectBId, float $price, int $relationTypeId, ?string $description = null): void
     {
-        $objectBData = $this->getById($objectBId, [])->getData()[0];
+        $objectBCode = $this->getFirstEvidenceItem($objectBId, [])['kod'] ?? null;
         $relationData = [
             'id' => $objectAId,
             'uzivatelske-vazby' => [
                 'uzivatelska-vazba' => [
-                    'vazbaTyp' => $relationTypeId,
                     'cena' => $price,
-                    'popis' => $description,
                     'evidenceType' => $this->config->getEvidence(),
-                    'object' => sprintf('code:%s', $objectBData['kod']),
+                    'object' => sprintf('code:%s', is_scalar($objectBCode) ? $objectBCode : ''),
+                    'popis' => $description,
+                    'vazbaTyp' => $relationTypeId,
                 ],
             ],
         ];
@@ -366,7 +371,7 @@ class Client
             $this->config,
         );
 
-       return $response->getRowCount();
+        return $response->getRowCount();
     }
 
     /**
@@ -444,7 +449,7 @@ class Client
     /**
      * @param array<mixed> $uriParameters
      * @param array<mixed> $postFields
-     * @param array<string> $headers
+     * @param array<int, string> $headers
      * @return array<\EcomailFlexibee\Result\EvidenceResult>
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
@@ -453,7 +458,7 @@ class Client
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
-    public function callRequest(Method $httpMethod, int|string|null $queryFilterOrId, array $uriParameters, array $postFields, array $headers): array
+    public function callRequest(Method $httpMethod, null|int|string $queryFilterOrId, array $uriParameters, array $postFields, array $headers): array
     {
         $response = $this->httpClient->request(
             $this->queryBuilder->createUri($queryFilterOrId, $uriParameters),
@@ -500,6 +505,42 @@ class Client
             [],
             $this->config,
         );
+    }
+
+    /**
+     * @param array<mixed> $data
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed
+     */
+    private function throwWhenNotSaved(array $data): void
+    {
+        if ($this->isZero($data['created'] ?? null) && $this->isZero($data['updated'] ?? null)) {
+            $statusCode = $data['status_code'] ?? 0;
+            $message = $data['message'] ?? '';
+
+            throw new EcomailFlexibeeSaveFailed(
+                sprintf('(%d) %s', is_int($statusCode) ? $statusCode : 0, is_string($message) ? $message : ''),
+            );
+        }
+
+        if (isset($data['success'], $data['message']) && $data['success'] !== 'true' && is_string($data['message'])) {
+            throw new EcomailFlexibeeSaveFailed($data['message']);
+        }
+    }
+
+    private function isZero(mixed $value): bool
+    {
+        return is_numeric($value) && (int) $value === 0;
+    }
+
+    /**
+     * @param array<string> $uriParameters
+     * @return array<mixed>
+     */
+    private function getFirstEvidenceItem(int $id, array $uriParameters): array
+    {
+        $item = $this->getById($id, $uriParameters)->getData()[0] ?? null;
+
+        return is_array($item) ? $item : [];
     }
 
 }

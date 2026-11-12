@@ -9,35 +9,32 @@ use EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestFail;
 use EcomailFlexibee\Http\Method;
-use EcomailFlexibee\Result\EvidenceResult;
 use Faker\Factory;
 use Faker\Generator;
+use Iterator;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
+
 use function count;
 use function mb_substr;
 use function uniqid;
 
+/**
+ * @group integration
+ */
 final class ClientTest extends TestCase
 {
 
     private Client $client;
+
     private Generator $faker;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->faker = Factory::create();
-        $this->client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, Config::EVIDENCE, false, null);
-    }
 
     public function testGetCompanies(): void
     {
         /** @var array<mixed> $companies */
         $companies = $this->client->getCompanies()->getData();
         Assert::assertArrayHasKey('companies', $companies);
-        Assert::assertTrue(count($companies) > 0);
+        Assert::assertNotEmpty($companies['companies']);
     }
 
     public function testGetCompany(): void
@@ -55,7 +52,7 @@ final class ClientTest extends TestCase
 
     public function testInvalidAuthorization(): void
     {
-        $client = new Client(Config::HOST, Config::COMPANY, 'xxx', 'xxx', Config::EVIDENCE, false, null);
+        $client = new Client(Config::HOST, Config::COMPANY, 'xxx', 'xxx', Config::EVIDENCE, verifySSLCertificate: false);
         $this->expectException(EcomailFlexibeeInvalidAuthorization::class);
         $client->findById($this->faker->numberBetween());
     }
@@ -66,7 +63,15 @@ final class ClientTest extends TestCase
         Assert::assertArrayHasKey('refreshToken', $authToken);
         Assert::assertArrayHasKey('authSessionId', $authToken);
         Assert::assertArrayHasKey('csrfToken', $authToken);
-        $client = new Client(Config::HOST, Config::COMPANY, 'xxx', 'xxx', Config::EVIDENCE, false, $authToken['authSessionId']);
+        $client = new Client(
+            Config::HOST,
+            Config::COMPANY,
+            'xxx',
+            'xxx',
+            Config::EVIDENCE,
+            verifySSLCertificate: false,
+            authSessionId: $this->getString($authToken, 'authSessionId'),
+        );
         Assert::assertNotEmpty($client->allInEvidence());
     }
 
@@ -77,11 +82,12 @@ final class ClientTest extends TestCase
 
     public function testInvalidGetAuthToken(): void
     {
-        $client = new Client(Config::HOST, Config::COMPANY, 'xxx', 'xxx', Config::EVIDENCE, false, null);
+        $client = new Client(Config::HOST, Config::COMPANY, 'xxx', 'xxx', Config::EVIDENCE, verifySSLCertificate: false);
         $flexibeeResponse = $client->getAuthAndRefreshToken();
         Assert::assertFalse($flexibeeResponse->isSuccess());
         $data = $flexibeeResponse->getData();
         Assert::assertArrayHasKey('errors', $data);
+        Assert::assertIsArray($data['errors']);
         Assert::assertArrayHasKey('reason', $data['errors']);
     }
 
@@ -91,7 +97,7 @@ final class ClientTest extends TestCase
             return;
         }
 
-        $response = $this->client->getAllApiChanges(null);
+        $response = $this->client->getAllApiChanges(fromVersion: null);
         Assert::assertTrue($response->isSuccess());
         $data = $response->getData();
         Assert::assertArrayHasKey('changes', $data);
@@ -99,18 +105,21 @@ final class ClientTest extends TestCase
         Assert::assertTrue($response->isSuccess());
     }
 
-    public function testCRUDForCustomIds(): void
+    public function testCrudForCustomIds(): void
     {
         $evidenceData = [
             'nazev' => $this->faker->firstName,
         ];
-        $id = (int) $this->client->save($evidenceData, null)->getData()[0]['id'];
-        $code = $this->client->getById($id)->getData()[0]['kod'];
+        $id = $this->getInt($this->getFirstItem($this->client->save($evidenceData, id: null)->getData()), 'id');
+        $code = $this->getString($this->getFirstItem($this->client->getById($id)->getData()), 'kod');
         $evidenceItem = $this->client->getByCode($code);
         Assert::assertCount(1, $evidenceItem->getData());
-        Assert::assertEquals($id, (int) $evidenceItem->getData()[0]['id']);
+        Assert::assertSame($id, $this->getInt($this->getFirstItem($evidenceItem->getData()), 'id'));
         $evidenceItemFull = $this->client->getByCode($code, ['detail' => 'full']);
-        Assert::assertNotEquals(count($evidenceItem->getData()[0]), count($evidenceItemFull->getData()[0]));
+        Assert::assertNotCount(
+            count($this->getFirstItem($evidenceItem->getData())),
+            $this->getFirstItem($evidenceItemFull->getData()),
+        );
         $this->client->deleteByCode($code);
         Assert::assertCount(0, $this->client->findByCode($code)->getData());
     }
@@ -120,11 +129,11 @@ final class ClientTest extends TestCase
         $evidenceData = [
             'nazev' => $this->faker->firstName,
         ];
-        $id = (int) $this->client->save($evidenceData, null)->getData()[0]['id'];
+        $id = $this->getInt($this->getFirstItem($this->client->save($evidenceData, id: null)->getData()), 'id');
         $evidenceData = $this->client->getById($id, ['detail' => 'custom:id,email,kontakty(primarni,email)'])->getData()[0];
         Assert::assertEquals([
-            'id' => $id,
             'email' => '',
+            'id' => $id,
             'kontakty' => [],
         ],
             $evidenceData,
@@ -144,15 +153,15 @@ final class ClientTest extends TestCase
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      * @throws \EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed
      */
-    public function testCRUDOperations(string $evidence, array $evidenceData, array $expectedDataAfterUpdate): void
+    public function testCrudOperations(string $evidence, array $evidenceData, array $expectedDataAfterUpdate): void
     {
-        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, $evidence, false, null);
-        $addressBookId = (int) $client->save($evidenceData, null)->getData()[0]['id'];
+        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, $evidence, verifySSLCertificate: false);
+        $addressBookId = $this->getInt($this->getFirstItem($client->save($evidenceData, id: null)->getData()), 'id');
         $client->save($expectedDataAfterUpdate, $addressBookId);
-        $addressBookRefreshed = $client->getById($addressBookId);
+        $addressBookRefreshed = $this->getFirstItem($client->getById($addressBookId)->getData());
 
         foreach ($expectedDataAfterUpdate as $key => $value) {
-            Assert::assertEquals($value, $addressBookRefreshed->getData()[0][$key]);
+            Assert::assertEquals($value, $addressBookRefreshed[$key]);
         }
 
         Assert::assertNotEmpty($client->getPdfById($addressBookId, []));
@@ -165,40 +174,39 @@ final class ClientTest extends TestCase
         $client->getById($addressBookId);
         $this->expectException(EcomailFlexibeeRequestFail::class);
         $evidenceData = [];
-        $this->client->save($evidenceData, null);
+        $this->client->save($evidenceData, id: null);
     }
 
     /**
-     * @return array<array<mixed>>
+     * @return \Iterator<int, array{string, array<string, string>, array<string, string>}>
      */
-    public function getEvidences(): array
+    public function getEvidences(): Iterator
     {
         $faker = Factory::create();
         $code = mb_substr($faker->uuid, 0, 20);
         $name = $faker->userName;
 
-        return [
+        yield [
+            'adresar',
             [
-                'adresar',
-                [
-                    'kod' => $code,
-                    'nazev' => $name,
-                ],
-                [
-                    'nazev' => 'Adresar edited',
-                ],
+                'kod' => $code,
+                'nazev' => $name,
             ],
             [
-                'faktura-vydana',
-                [
-                    'kod' => $code,
-                    'typDokl' => 'code:FAKTURA',
-                    'cisDosle' => '1234',
-                    'eetTypK' => 'eetTyp.ne',
-                ],
-                [
-                    'cisDosle' => '1234',
-                ],
+                'nazev' => 'Adresar edited',
+            ],
+        ];
+
+        yield [
+            'faktura-vydana',
+            [
+                'cisDosle' => '1234',
+                'eetTypK' => 'eetTyp.ne',
+                'kod' => $code,
+                'typDokl' => 'code:FAKTURA',
+            ],
+            [
+                'cisDosle' => '1234',
             ],
         ];
     }
@@ -218,7 +226,7 @@ final class ClientTest extends TestCase
 
     public function testSearchInEvidence(): void
     {
-        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false, null);
+        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', verifySSLCertificate: false);
         $result = $client->searchInEvidence('(kod neq \'JAN\')', []);
         Assert::assertTrue(count($result) > 0);
         $this->expectException(EcomailFlexibeeRequestFail::class);
@@ -227,42 +235,45 @@ final class ClientTest extends TestCase
 
     public function testSearchInEvidencePaginated(): void
     {
-        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false, null);
+        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', verifySSLCertificate: false);
         $result = $client->searchInEvidencePaginated('(kod neq \'JAN\')', []);
         Assert::assertIsInt($result['row_count']);
         Assert::assertTrue($result['row_count'] > 0);
-        Assert::assertTrue(count($result['data']) > 0);
+        Assert::assertIsArray($result['data']);
+        Assert::assertNotEmpty($result['data']);
         $this->expectException(EcomailFlexibeeRequestFail::class);
         $client->searchInEvidencePaginated('kod neq \'JAN\'', []);
     }
 
     public function testFindLastInEvidence(): void
     {
-        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false, null);
-        $result = $client->findLastInEvidence(true);
+        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', verifySSLCertificate: false);
+        $result = $client->findLastInEvidence(fullDetail: true);
+        Assert::assertIsArray($result->getData()['faktura-vydana']);
         Assert::assertCount(1, $result->getData()['faktura-vydana']);
     }
 
     public function testSearchInEvidenceWithInvalidUrl(): void
     {
-        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false, null);
+        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'faktura-vydana', verifySSLCertificate: false);
         $this->expectException(EcomailFlexibeeRequestFail::class);
         $client->searchInEvidence(' bla.json', []);
     }
 
     public function testDryRunRequest(): void
     {
-        $response = $this->client->save(['kod' => uniqid(), 'nazev' => 'SDSDXXXXX'], null, true);
-        $firstItem = $response->getData()[0];
-        Assert::assertArrayHasKey('content', $firstItem);
-        Assert::assertArrayHasKey(Config::EVIDENCE, $firstItem['content']);
-        Assert::assertTrue((int) $firstItem['content'][Config::EVIDENCE]['id'] < 0);
+        $response = $this->client->save(['kod' => uniqid(), 'nazev' => 'SDSDXXXXX'], id: null, dryRun: true);
+        $content = $this->getFirstItem($response->getData())['content'] ?? null;
+        Assert::assertIsArray($content);
+        Assert::assertArrayHasKey(Config::EVIDENCE, $content);
+        Assert::assertIsArray($content[Config::EVIDENCE]);
+        Assert::assertLessThan(0, $this->getInt($content[Config::EVIDENCE], 'id'));
     }
 
     public function testMakeCustomRequest(): void
     {
         $results = $this->client->callRequest(
-            Method::get(Method::GET),
+            Method::GET,
             'properties',
             [],
             [],
@@ -275,62 +286,74 @@ final class ClientTest extends TestCase
         Assert::assertArrayHasKey('properties', $data->getData());
     }
 
-    public function testRunBackendProcesses(): void
-    {
-        $this->markTestSkipped('Live tests is disabled here');
-        $client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, 'pokladni-pohyb', false);
-        $results = $client->callRequest(Method::get(Method::POST), 'automaticke-parovani', [], [], []);
-
-        foreach ($results as $result) {
-            $this->checkResponseStructure($result);
-        }
-    }
-
     public function testUnknownCompany(): void
     {
-        $client = new Client(Config::HOST, 'xxx', Config::USERNAME, Config::PASSWORD, 'faktura-vydana', false);
+        $client = new Client(Config::HOST, 'xxx', Config::USERNAME, Config::PASSWORD, 'faktura-vydana', verifySSLCertificate: false);
         $this->expectException(EcomailFlexibeeRequestFail::class);
-        $client->save([], null);
-
+        $client->save([], id: null);
     }
 
     public function testCreateSameEvidenceRecord(): void
     {
         $code = uniqid();
         $data = [
-            'nazev' => $code,
             'kod' => $code,
+            'nazev' => $code,
         ];
-        $this->client->save($data, null);
+        $this->client->save($data, id: null);
         $this->expectException(EcomailFlexibeeRequestFail::class);
         $this->expectExceptionCode(400);
-        $this->client->save($data, null);
+        $this->client->save($data, id: null);
     }
 
     public function testGetPropertiesForEvidence(): void
     {
         $responseData = $this->client->getPropertiesForEvidence()->getData();
         Assert::assertArrayHasKey('properties', $responseData);
+        Assert::assertIsArray($responseData['properties']);
         Assert::assertArrayHasKey('property', $responseData['properties']);
     }
 
-    private function checkResponseStructure(EvidenceResult $result): void
+    protected function setUp(): void
     {
-        $requiredKeys = [
-            'created',
-            'updated',
-            'deleted',
-            'skipped',
-            'failed',
-            'status_code',
-            'message',
-            'version',
-            'row_count',
-        ];
+        parent::setUp();
 
-        foreach ($requiredKeys as $requiredKey) {
-            Assert::assertArrayHasKey($requiredKey, $result->getData());
-        }
+        $this->faker = Factory::create();
+        $this->client = new Client(Config::HOST, Config::COMPANY, Config::USERNAME, Config::PASSWORD, Config::EVIDENCE, verifySSLCertificate: false);
+    }
+
+    /**
+     * @param array<mixed> $data
+     * @return array<mixed>
+     */
+    private function getFirstItem(array $data): array
+    {
+        $item = $data[0] ?? null;
+        Assert::assertIsArray($item);
+
+        return $item;
+    }
+
+    /**
+     * @param array<mixed> $data
+     */
+    private function getString(array $data, string $key): string
+    {
+        $value = $data[$key] ?? null;
+        Assert::assertIsString($value);
+
+        return $value;
+    }
+
+    /**
+     * @param array<mixed> $data
+     */
+    private function getInt(array $data, string $key): int
+    {
+        $value = $data[$key] ?? null;
+        Assert::assertIsNumeric($value);
+
+        return (int) $value;
     }
 
 }

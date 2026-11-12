@@ -9,13 +9,17 @@ use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestFail;
 use EcomailFlexibee\Http\Response\Response;
 use EcomailFlexibee\Result\EvidenceResult;
+
+use function array_filter;
 use function array_map;
 use function count;
+use function is_array;
+use function is_string;
 
 class ResponseHydrator
 {
 
-    public function __construct(private Config $config)
+    public function __construct(private readonly Config $config)
     {
     }
 
@@ -25,35 +29,12 @@ class ResponseHydrator
      */
     public function convertResponseToEvidenceResults(Response $response): array
     {
-        $data = $response->getData();
-        $hasErrors = isset($data[0], $data[0]['errors']);
+        $data = $this->getDataOrThrowRequestFail($response);
+        $evidenceData = $this->getEvidenceData($data);
 
-        if ($hasErrors || (isset($data['success']) && $data['success'] === 'false')) {
-
-            if ($hasErrors && !isset($data['message'])) {
-                $data['message'] = '';
-
-                foreach ($data[0]['errors'] as $errors) {
-                    $data['message'] .= "\n" . $errors['message'];
-                }
-            }
-
-            throw new EcomailFlexibeeRequestFail($data['message'], $response->getStatusCode());
-        }
-
-        if (!isset($data[$this->config->getEvidence()])) {
-            if (count($data) === 0) {
-                $data = $response->getStatistics();
-                $data['status_code'] = $response->getStatusCode();
-                $data['message'] = $response->getMessage();
-                $data['version'] = $response->getVersion();
-                $data['row_count'] = $response->getRowCount();
-            }
-
-            return [new EvidenceResult($data)];
-        }
-
-        return array_map(static fn (array $data) => new EvidenceResult($data), $data[$this->config->getEvidence()]);
+        return $evidenceData === null
+            ? [new EvidenceResult($this->getDataOrStatistics($response, $data))]
+            : $this->createEvidenceResults($evidenceData);
     }
 
     /**
@@ -62,40 +43,14 @@ class ResponseHydrator
      */
     public function convertResponseToPaginatedEvidenceResults(Response $response): array
     {
-        $data = $response->getData();
-        $hasErrors = isset($data[0], $data[0]['errors']);
-
-        if ($hasErrors || (isset($data['success']) && $data['success'] === 'false')) {
-
-            if ($hasErrors && !isset($data['message'])) {
-                $data['message'] = '';
-
-                foreach ($data[0]['errors'] as $errors) {
-                    $data['message'] .= "\n" . $errors['message'];
-                }
-            }
-
-            throw new EcomailFlexibeeRequestFail($data['message'], $response->getStatusCode());
-        }
-
-        if (!isset($data[$this->config->getEvidence()])) {
-            if (count($data) === 0) {
-                $data = $response->getStatistics();
-                $data['status_code'] = $response->getStatusCode();
-                $data['message'] = $response->getMessage();
-                $data['version'] = $response->getVersion();
-                $data['row_count'] = $response->getRowCount();
-            }
-
-            return [
-                'row_count' => $response->getRowCount(),
-                'data' => [new EvidenceResult($data)],
-            ];
-        }
+        $data = $this->getDataOrThrowRequestFail($response);
+        $evidenceData = $this->getEvidenceData($data);
 
         return [
+            'data' => $evidenceData === null
+                ? [new EvidenceResult($this->getDataOrStatistics($response, $data))]
+                : $this->createEvidenceResults($evidenceData),
             'row_count' => $response->getRowCount(),
-            'data' => array_map(static fn (array $data) => new EvidenceResult($data), $data[$this->config->getEvidence()]),
         ];
     }
 
@@ -103,7 +58,9 @@ class ResponseHydrator
     {
         $data = $response->getData();
 
-        if ($response->getStatusCode() === 404 || !isset($data[$this->config->getEvidence()])) {
+        $evidenceData = $this->getEvidenceData($data);
+
+        if ($response->getStatusCode() === 404 || $evidenceData === null) {
             if ($throwException) {
                 throw new EcomailFlexibeeNoEvidenceResult();
             }
@@ -113,7 +70,88 @@ class ResponseHydrator
                 : new EvidenceResult([]);
         }
 
-        return new EvidenceResult($data[$this->config->getEvidence()]);
+        return new EvidenceResult($evidenceData);
+    }
+
+    /**
+     * @return array<mixed>
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
+     */
+    private function getDataOrThrowRequestFail(Response $response): array
+    {
+        $data = $response->getData();
+        $errors = isset($data[0]) && is_array($data[0]) && isset($data[0]['errors']) && is_array($data[0]['errors'])
+            ? $data[0]['errors']
+            : null;
+
+        if ($errors === null && (!isset($data['success']) || $data['success'] !== 'false')) {
+            return $data;
+        }
+
+        $message = $data['message'] ?? null;
+
+        throw new EcomailFlexibeeRequestFail(
+            is_string($message) ? $message : $this->createErrorMessage($errors ?? []),
+            $response->getStatusCode(),
+        );
+    }
+
+    /**
+     * @param array<mixed> $errors
+     */
+    private function createErrorMessage(array $errors): string
+    {
+        $message = '';
+
+        foreach ($errors as $error) {
+            if (is_array($error) && isset($error['message']) && is_string($error['message'])) {
+                $message .= "\n" . $error['message'];
+            }
+        }
+
+        return $message;
+    }
+
+    /**
+     * @param array<mixed> $data
+     * @return array<mixed>
+     */
+    private function getDataOrStatistics(Response $response, array $data): array
+    {
+        if (count($data) !== 0) {
+            return $data;
+        }
+
+        $data = $response->getStatistics();
+        $data['status_code'] = $response->getStatusCode();
+        $data['message'] = $response->getMessage();
+        $data['version'] = $response->getVersion();
+        $data['row_count'] = $response->getRowCount();
+
+        return $data;
+    }
+
+    /**
+     * @param array<mixed> $data
+     * @return array<mixed>|null
+     */
+    private function getEvidenceData(array $data): ?array
+    {
+        $evidenceData = $data[$this->config->getEvidence()] ?? null;
+
+        return is_array($evidenceData) ? $evidenceData : null;
+    }
+
+    /**
+     * @param array<mixed> $evidenceData
+     * @return array<\EcomailFlexibee\Result\EvidenceResult>
+     */
+    private function createEvidenceResults(array $evidenceData): array
+    {
+        return array_map(
+            static fn (array $item): EvidenceResult => new EvidenceResult($item),
+            array_filter($evidenceData, is_array(...)),
+        );
     }
 
 }

@@ -1,4 +1,8 @@
 parameters:
     level: max
-    checkMissingIterableValueType: false
-    treatPhpDocTypesAsCertain: false
+    phpVersion:
+        min: 80200
+        max: 80599
+    paths:
+        - src
+        - tests

@@ -4,18 +4,18 @@ declare(strict_types = 1);
 
 namespace EcomailFlexibee\Result;
 
-final class EvidenceResult
+final readonly class EvidenceResult
 {
 
     /**
-     * @param array $data
+     * @param array<mixed> $data
      */
     public function __construct(private array $data)
     {
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function getData(): array
     {

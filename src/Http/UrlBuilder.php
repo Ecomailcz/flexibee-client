@@ -11,6 +11,7 @@ use Purl\ParserInterface;
 use Purl\Path;
 use Purl\Query;
 use Purl\Url;
+
 use function array_merge;
 use function http_build_query;
 use function sprintf;
@@ -18,11 +19,11 @@ use function sprintf;
 class UrlBuilder extends Url
 {
 
-    private string $company;
+    private readonly string $company;
 
-    private string $evidence;
+    private readonly string $evidence;
 
-    private ParameterValidator $validator;
+    private readonly ParameterValidator $validator;
 
     public function __construct(Config $config, ?ParserInterface $parser = null)
     {
@@ -148,7 +149,7 @@ class UrlBuilder extends Url
     /**
      * @param array<mixed> $uriParams
      */
-    public function createUri(int|string|null $filterQueryOrId, array $uriParams): string
+    public function createUri(null|int|string $filterQueryOrId, array $uriParams): string
     {
         if ($filterQueryOrId === null) {
             $this->setPath($this->buildPathForOnlyEvidence());

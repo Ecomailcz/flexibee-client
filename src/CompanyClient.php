@@ -29,7 +29,7 @@ class CompanyClient extends Client
     {
         return $this->httpClient->request(
             $this->queryBuilder->createBackupUrl(),
-            Method::get(Method::GET),
+            Method::GET,
             [],
             [],
             [],
@@ -41,7 +41,7 @@ class CompanyClient extends Client
     {
         return $this->httpClient->request(
             $this->queryBuilder->createRestoreUrl($companyName),
-            Method::get(Method::PUT),
+            Method::PUT,
             [$data],
             [],
             [],

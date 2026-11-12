@@ -4,7 +4,10 @@ Jednoduchý cURL client, který se stará o správné složení requestu do syst
 [![License](https://poser.pugx.org/ecomailcz/flexibee-client/license?format=flat)](https://packagist.org/packages/ecomailcz/flexibee-client)
 [![Latest version](https://img.shields.io/packagist/v/ecomailcz/flexibee-client.svg?colorB=007EC6)](https://packagist.org/packages/ecomailcz/flexibee-client)
 [![Downloads](https://img.shields.io/packagist/dt/ecomailcz/flexibee-client.svg?colorB=007EC6)](https://packagist.org/packages/ecomailcz/flexibee-client)
-![PHPStan](https://img.shields.io/badge/style-level%207-brightgreen.svg?&label=phpstan)
+![PHPStan](https://img.shields.io/badge/style-level%20max-brightgreen.svg?&label=phpstan)
+
+Podporované verze PHP: 8.2, 8.3, 8.4, 8.5.
+
 ## Sponsored by
 [![Downloads](https://ecomail.cz/images/logo@2.png)](https://ecomail.cz)
 
