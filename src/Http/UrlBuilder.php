@@ -13,6 +13,7 @@ use function array_merge;
 use function http_build_query;
 use function ltrim;
 use function parse_url;
+use function rawurlencode;
 use function sprintf;
 use function str_replace;
 
@@ -71,7 +72,7 @@ class UrlBuilder
 
     public function createRestoreUrl(string $companyName): string
     {
-        return $this->createUrl(sprintf('/c/%s/restore?name=%s', $this->company, $companyName));
+        return $this->createUrl(sprintf('/c/%s/restore?name=%s', $this->company, rawurlencode($companyName)));
     }
 
     /**

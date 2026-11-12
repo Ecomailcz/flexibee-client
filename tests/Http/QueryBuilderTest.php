@@ -128,6 +128,14 @@ final class QueryBuilderTest extends TestCase
         yield 'user without password' => ['https://user@host.cz', 'https://user@host.cz/c/demo.json'];
     }
 
+    public function testEncodesCompanyNameInRestoreUrl(): void
+    {
+        Assert::assertSame(
+            'https://demo.flexibee.eu/c/demo/restore?name=a%26b%23c%20d',
+            $this->urlBuilder->createRestoreUrl('a&b#c d'),
+        );
+    }
+
     public function testRejectsBaseUrlWithoutSchemeOrHost(): void
     {
         $this->expectException(EcomailFlexibeeRequestFail::class);
