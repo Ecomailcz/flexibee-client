@@ -49,4 +49,13 @@ final class CurlOptionsFactoryTest extends TestCase
         }
     }
 
+    public function testRejectsAnEmptyUrl(): void
+    {
+        $config = new Config('https://demo.flexibee.eu', 'demo', 'user', 'pass', 'adresar', verifySSLCertificate: true, debugMode: false);
+
+        $this->expectException(EcomailFlexibeeRequestFail::class);
+
+        (new CurlOptionsFactory())->create('', Method::GET, [], [], [], $config);
+    }
+
 }
