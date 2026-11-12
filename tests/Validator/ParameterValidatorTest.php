@@ -52,7 +52,9 @@ final class ParameterValidatorTest extends TestCase
     public function testReportsOneMessageWhenBothRulesFail(): void
     {
         $this->expectException(EcomailFlexibeeInvalidRequestParameter::class);
-        $this->expectExceptionMessageMatches('/^Parameter code must have a maximum of 20 characters and must be an uppercase$/');
+        $this->expectExceptionMessageMatches(
+            '/^Parameter code must have a maximum of 20 characters, must be an uppercase and must not contain an apostrophe$/',
+        );
 
         $this->validator->validateFlexibeeRequestCodeParameter('lowercase-code-longer-than-twenty');
     }
@@ -62,6 +64,13 @@ final class ParameterValidatorTest extends TestCase
         $this->expectNotToPerformAssertions();
 
         $this->validator->validateFlexibeeRequestCodeParameter('ŽLUŤOUČKÝ-KŮŇ-ÚPĚL-Á');
+    }
+
+    public function testRejectsCodeWithApostrophe(): void
+    {
+        $this->expectException(EcomailFlexibeeInvalidRequestParameter::class);
+
+        $this->validator->validateFlexibeeRequestCodeParameter("A') OR (1=1");
     }
 
     protected function setUp(): void
