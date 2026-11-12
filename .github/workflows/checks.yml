@@ -58,8 +58,8 @@ jobs:
       - name: Tests
         run: composer test
 
-  min-php:
-    name: Runtime on supported PHP ${{ matrix.php }}
+  runtime:
+    name: Runtime (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
