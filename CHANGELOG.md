@@ -13,11 +13,13 @@ Návod pro přechod: [UPGRADE-2.0.md](UPGRADE-2.0.md).
 - Data k odeslání, která nejdou převést na JSON (např. neplatné UTF-8), vyhodí `EcomailFlexibeeRequestFail`. Verze 1.4 v takovém případě tiše odeslala požadavek bez platného těla. Základní URL bez schématu nebo hostitele je odmítnuta při vytvoření klienta.
 
 ### Nové
+- `Client::findByCodes()` načte více záznamů evidence podle seznamu kódů jedním requestem (#43).
 - `Client` a `CompanyClient` přijímají volitelný `HttpClient`.
 - `Config::debugMode()` a `Config::withEvidence()`.
 - Výchozí timeouty požadavků (5 s spojení, 25 s celkem).
 
 ### Opravy
+- Kód záznamu s apostrofem je odmítnut výjimkou `EcomailFlexibeeInvalidRequestParameter`. Dříve mohl změnit význam filtru `(kod eq '…')`.
 - Ověření TLS certifikátu se při přihlášení přes session nevypíná, pokud je `$verifySSLCertificate` zapnuté.
 - Název firmy v URL pro obnovu zálohy je zakódovaný (`&` nebo `#` v názvu už nerozbije URL).
 

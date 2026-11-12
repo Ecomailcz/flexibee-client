@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace EcomailFlexibeeTest\Http;
 
 use EcomailFlexibee\Config;
+use EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestFail;
 use EcomailFlexibee\Http\UrlBuilder;
 use EcomailFlexibeeTest\Config as TestConfig;
@@ -27,6 +28,21 @@ final class QueryBuilderTest extends TestCase
             'https://demo.flexibee.eu/c/demo/adresar/(kod%20eq%20\'CODE:TEST\').json?limit=0&test=1',
             $this->urlBuilder->createUriByCodeOnly('CODE:TEST', ['test' => true]),
         );
+    }
+
+    public function testCreateUriByCodes(): void
+    {
+        Assert::assertSame(
+            "https://demo.flexibee.eu/c/demo/adresar/(kod%20in%20('A','CODE:TEST')).json?limit=0&detail=custom%3Aid",
+            $this->urlBuilder->createUriByCodes(['A', 'CODE:TEST'], ['detail' => 'custom:id']),
+        );
+    }
+
+    public function testCreateUriByCodesValidatesEveryCode(): void
+    {
+        $this->expectException(EcomailFlexibeeInvalidRequestParameter::class);
+
+        $this->urlBuilder->createUriByCodes(['A', 'lowercase'], []);
     }
 
     public function testCreateUriByEvidenceOnly(): void

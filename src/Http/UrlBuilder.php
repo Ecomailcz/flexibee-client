@@ -9,8 +9,10 @@ use EcomailFlexibee\Enum\SearchQueryOperator;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestFail;
 use EcomailFlexibee\Validator\ParameterValidator;
 
+use function array_map;
 use function array_merge;
 use function http_build_query;
+use function implode;
 use function ltrim;
 use function parse_url;
 use function rawurlencode;
@@ -113,6 +115,22 @@ class UrlBuilder
         $this->validator->validateFlexibeeRequestCodeParameter($code);
 
         return $this->createUrl($this->buildPathWithIdOrFilter(sprintf('(kod eq \'%s\')', $code)), $uriParameters);
+    }
+
+    /**
+     * @param list<string> $codes
+     * @param array<mixed> $uriParameters
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
+     */
+    public function createUriByCodes(array $codes, array $uriParameters): string
+    {
+        foreach ($codes as $code) {
+            $this->validator->validateFlexibeeRequestCodeParameter($code);
+        }
+
+        $quotedCodes = array_map(static fn (string $code): string => sprintf("'%s'", $code), $codes);
+
+        return $this->createUrl($this->buildPathWithIdOrFilter(sprintf('(kod in (%s))', implode(',', $quotedCodes))), $uriParameters);
     }
 
     /**
