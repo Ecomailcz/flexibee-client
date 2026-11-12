@@ -1,6 +1,6 @@
 <div align="left">
     <picture>
-        <img src="logo.svg" alt="FlexiBee PHP HTTP client: geometrický symbol podle loga ABRA FlexiBee v zelené Ecomailu" width="720">
+        <img src="logo.svg" alt="FlexiBee PHP HTTP client: symbol ABRA FlexiBee v původních šedých a zlatých barvách" width="720">
     </picture>
 
 <h1>FlexiBee - PHP HTTP client</h1>
