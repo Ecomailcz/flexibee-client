@@ -1,4 +1,10 @@
-# FlexiBee - PHP HTTP client
+<div align="left">
+    <picture>
+        <img src="logo.svg" alt="FlexiBee PHP HTTP client: včela a šipky pro požadavky a odpovědi API" width="720">
+    </picture>
+
+<h1>FlexiBee - PHP HTTP client</h1>
+
 Jednoduchý cURL client, který se stará o správné složení requestu do systému Flexibee a následné vrácení výsledků.
 
 [![License](https://poser.pugx.org/ecomailcz/flexibee-client/license?format=flat)](https://packagist.org/packages/ecomailcz/flexibee-client)
@@ -7,6 +13,7 @@ Jednoduchý cURL client, který se stará o správné složení requestu do syst
 ![PHPStan](https://img.shields.io/badge/style-level%20max-brightgreen.svg?&label=phpstan)
 
 Podporované verze PHP: 8.2, 8.3, 8.4, 8.5.
+</div>
 
 ## Sponsored by
 [![Downloads](https://ecomail.cz/images/logo@2.png)](https://ecomail.cz)
