@@ -62,6 +62,27 @@ $evidenceItemId = $client->save($evidenceData, null, $dryRun, $uriParameters);
 Pokud vše proběhne v pořádku, vratí se třída `\EcomailFlexibee\Http\Response\Response:class` s daty ze systému Flexibee. Nastane-li chyba, vyhodí se výjimka
 `EcomailFlexibeeRequestFail::class`. Pro editaci záznamu stačí vyplnit druhý parametr `$id`.
 
+## Položky dokladu (faktury, objednávky, …)
+Položky dokladu (`polozkyDokladu`) nejde ukládat samostatně. Přímý import, např. přes evidenci `faktura-vydana/123/polozkyDokladu`, FlexiBee odmítne hláškou *Import není povolen* (`EcomailFlexibeeRequestFail`). Položky se ukládají vždy přes nadřazený doklad:
+```
+$client = new Client(new Config('https://demo.flexibee.eu', 'demo', 'winstrom', 'winstrom', 'faktura-vydana', false, null));
+
+$client->save([
+    'polozkyDokladu' => [
+        [/* pole nové položky */],
+        ['id' => 14, /* změněná pole existující položky */],
+    ],
+], $invoiceId);
+```
+Pokud mají na dokladu zůstat jen uvedené položky a ostatní se mají smazat, přidejte `'polozkyDokladu@removeAll' => 'true'`. Název kolekce `polozkyDokladu` platí pro všechny typy dokladů. Špatný název FlexiBee tiše ignoruje.
+
+Dostupná pole položky vrátí `getPropertiesForEvidence()` na klientovi pro evidenci položek (např. `faktura-vydana-polozka`).
+
+Dokumentace FlexiBee: [Import evidencí přes API](https://podpora.flexibee.eu/cs/articles/3421990-import-evidenci-pres-api), [Výmaz zanořené evidence](https://podpora.flexibee.eu/cs/articles/3852838-vymazani-zanorene-evidence-prostrednictvim-json-formatu).
+
+## Ladění požadavků
+S `$debugMode = true` v `Config` obsahuje výjimka `EcomailFlexibeeForbidden` (HTTP 403) odeslané hlavičky požadavku. U ostatních chyb obsahuje výjimka `EcomailFlexibeeRequestFail` chybovou hlášku z FlexiBee (kód, atribut, cestu a text chyby). Odeslaná data požadavku jsou pole předané do `save()` zabalené do `{"winstrom": {"<evidence>": ...}}`.
+
 ## Vrácení záznamu dle parametrů
 Nalezení záznamu dle id s vyhozením výjimky, pokud záznam neexistuje  
 ```
