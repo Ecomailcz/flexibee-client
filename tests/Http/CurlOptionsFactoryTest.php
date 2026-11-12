@@ -136,4 +136,15 @@ final class CurlOptionsFactoryTest extends TestCase
         Assert::assertSame('username=u&password=p', $options[CURLOPT_POSTFIELDS]);
     }
 
+    public function testSendsRawBodyAsIs(): void
+    {
+        $config = new Config('https://demo.flexibee.eu', 'demo', 'user', 'pass', 'cenik', verifySSLCertificate: true);
+        $request = new CurlRequest('https://demo.flexibee.eu', Method::PUT, headers: ['Content-Type: text/plain'], body: 'raw bytes');
+
+        $options = (new CurlOptionsFactory())->create($request, $config);
+
+        Assert::assertSame('raw bytes', $options[CURLOPT_POSTFIELDS]);
+        Assert::assertSame(['Content-Type: text/plain'], $options[CURLOPT_HTTPHEADER]);
+    }
+
 }

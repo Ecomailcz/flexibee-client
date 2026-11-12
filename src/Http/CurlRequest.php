@@ -18,6 +18,7 @@ final readonly class CurlRequest
         public array $postFields = [],
         public array $queryParameters = [],
         public array $headers = [],
+        public ?string $body = null,
     )
     {
     }

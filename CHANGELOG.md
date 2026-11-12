@@ -13,6 +13,7 @@ Návod pro přechod: [UPGRADE-2.0.md](UPGRADE-2.0.md).
 - Data k odeslání, která nejdou převést na JSON (např. neplatné UTF-8), vyhodí `EcomailFlexibeeRequestFail`. Verze 1.4 v takovém případě tiše odeslala požadavek bez platného těla. Základní URL bez schématu nebo hostitele je odmítnuta při vytvoření klienta.
 
 ### Nové
+- Přílohy záznamů: `getAttachments()`, `getAttachmentContent()`, `addAttachment()` a `deleteAttachment()` (#31). `HttpClient::send()` odešle `CurlRequest` včetně binárního těla.
 - `Client::findByCodes()` načte více záznamů evidence podle seznamu kódů jedním requestem (#43).
 - `Client` a `CompanyClient` přijímají volitelný `HttpClient`.
 - `Config::debugMode()` a `Config::withEvidence()`.

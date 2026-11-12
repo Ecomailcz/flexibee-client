@@ -7,9 +7,12 @@ namespace EcomailFlexibeeTest;
 use EcomailFlexibee\Client;
 use EcomailFlexibee\Config as ClientConfig;
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
+use EcomailFlexibee\Exception\EcomailFlexibeeRequestFail;
 use EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed;
+use EcomailFlexibee\Http\CurlRequest;
 use EcomailFlexibee\Http\HttpClient;
 use EcomailFlexibee\Http\Method;
+use EcomailFlexibee\Http\Response\FlexibeeAttachmentResponse;
 use EcomailFlexibee\Http\Response\FlexibeeResponse;
 use EcomailFlexibee\Result\EvidenceResult;
 use Mockery;
@@ -200,6 +203,72 @@ final class ClientOfflineTest extends TestCase
         $response = new FlexibeeResponse(200, version: null, success: true, rowCount: 12, data: []);
 
         Assert::assertSame(12, $this->createClient($this->respondWithResponse($response))->countInEvidence());
+    }
+
+    public function testGetAttachmentsReturnsAttachmentsOfTheRecord(): void
+    {
+        $httpClient = Mockery::mock(HttpClient::class);
+        $httpClient->shouldReceive('request')
+            ->once()
+            ->with('https://demo.flexibee.eu/c/demo/adresar/7/prilohy.json', Method::GET, [], [], [], Mockery::type(ClientConfig::class))
+            ->andReturn($this->createResponse(['priloha' => [['id' => '14']]]));
+
+        Assert::assertEquals([new EvidenceResult(['id' => '14'])], $this->createClient($httpClient)->getAttachments(7));
+    }
+
+    public function testGetAttachmentContentReturnsTheBinaryContent(): void
+    {
+        $client = $this->createClient($this->respondWithResponse(new FlexibeeAttachmentResponse("\x89PNG")));
+
+        Assert::assertSame("\x89PNG", $client->getAttachmentContent(7, 14));
+    }
+
+    public function testGetAttachmentContentThrowsWhenTheAttachmentIsMissing(): void
+    {
+        $client = $this->createClient($this->respondWith([], statusCode: 404));
+
+        $this->expectException(EcomailFlexibeeNoEvidenceResult::class);
+
+        $client->getAttachmentContent(7, 99);
+    }
+
+    public function testAddAttachmentUploadsRawContentAndReturnsTheNewId(): void
+    {
+        $httpClient = Mockery::mock(HttpClient::class);
+        $httpClient->shouldReceive('send')
+            ->once()
+            ->with(
+                Mockery::on(static fn (CurlRequest $request): bool => $request->url === 'https://demo.flexibee.eu/c/demo/adresar/7/prilohy/new/invoice.txt'
+                    && $request->httpMethod === Method::PUT
+                    && $request->headers === ['Content-Type: text/plain', 'Accept: application/json']
+                    && $request->body === 'content'
+                    && $request->postFields === []),
+                Mockery::type(ClientConfig::class),
+            )
+            ->andReturn($this->createResponse([['id' => '5837', 'ref' => '/c/demo/adresar/7/prilohy/5837.json']], statusCode: 201));
+
+        Assert::assertSame(5_837, $this->createClient($httpClient)->addAttachment(7, 'invoice.txt', 'content', 'text/plain'));
+    }
+
+    public function testAddAttachmentThrowsWhenTheResponseHasNoId(): void
+    {
+        $httpClient = Mockery::mock(HttpClient::class);
+        $httpClient->shouldReceive('send')->andReturn($this->createResponse([]));
+
+        $this->expectException(EcomailFlexibeeRequestFail::class);
+
+        $this->createClient($httpClient)->addAttachment(7, 'invoice.txt', 'content', 'text/plain');
+    }
+
+    public function testDeleteAttachmentSendsDeleteToTheAttachmentDetail(): void
+    {
+        $httpClient = Mockery::mock(HttpClient::class);
+        $httpClient->shouldReceive('request')
+            ->once()
+            ->with('https://demo.flexibee.eu/c/demo/adresar/7/prilohy/14.json', Method::DELETE, [], [], [], Mockery::type(ClientConfig::class))
+            ->andReturn($this->createResponse([]));
+
+        $this->createClient($httpClient)->deleteAttachment(7, 14);
     }
 
     private function createClient(HttpClient $httpClient): Client

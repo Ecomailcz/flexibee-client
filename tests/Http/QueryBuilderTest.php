@@ -160,6 +160,19 @@ final class QueryBuilderTest extends TestCase
         new UrlBuilder(new Config('user:secret@demo.flexibee.eu', 'demo', 'u', 'p', 'adresar', verifySSLCertificate: false));
     }
 
+    public function testCreatesAttachmentUrls(): void
+    {
+        $urlBuilder = new UrlBuilder(new Config(TestConfig::HOST, TestConfig::COMPANY, 'u', 'p', 'cenik', verifySSLCertificate: false));
+
+        Assert::assertSame('https://demo.flexibee.eu/c/demo/cenik/164/prilohy.json', $urlBuilder->createAttachmentsUrl(164));
+        Assert::assertSame('https://demo.flexibee.eu/c/demo/cenik/164/prilohy/15/content', $urlBuilder->createAttachmentContentUrl(164, 15));
+        Assert::assertSame('https://demo.flexibee.eu/c/demo/cenik/164/prilohy/15.json', $urlBuilder->createAttachmentUrl(164, 15));
+        Assert::assertSame(
+            'https://demo.flexibee.eu/c/demo/cenik/164/prilohy/new/m%C3%B4j%20s%C3%BAbor%23%3F.txt',
+            $urlBuilder->createNewAttachmentUrl(164, 'môj súbor#?.txt'),
+        );
+    }
+
     protected function setUp(): void
     {
         parent::setUp();

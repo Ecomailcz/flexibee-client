@@ -21,14 +21,12 @@ final readonly class HttpCurlBuilder
     }
 
     /**
-     * @param array<mixed> $postFields
-     * @param array<mixed> $queryParameters
-     * @param array<int, string> $headers
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
-    public function build(string $url, Method $httpMethod, array $postFields, array $queryParameters, array $headers, Config $config): CurlHandle
+    public function build(CurlRequest $request, Config $config): CurlHandle
     {
         $ch = curl_init();
-        curl_setopt_array($ch, $this->curlOptionsFactory->create(new CurlRequest($url, $httpMethod, $postFields, $queryParameters, $headers), $config));
+        curl_setopt_array($ch, $this->curlOptionsFactory->create($request, $config));
 
         return $ch;
     }

@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace EcomailFlexibeeTest\Http;
 
 use EcomailFlexibee\Config;
+use EcomailFlexibee\Http\CurlRequest;
 use EcomailFlexibee\Http\HttpClient;
 use EcomailFlexibee\Http\Method;
 use PHPUnit\Framework\Assert;
@@ -27,6 +28,13 @@ final class HttpClientTest extends TestCase
     public function testDebugModeDoesNotBreakTheRequest(): void
     {
         $response = (new HttpClient())->request($this->getFixtureUrl(), Method::GET, [], [], [], $this->createConfig(debugMode: true));
+
+        Assert::assertSame(['@version' => '1.0', 'adresar' => [['id' => '1']]], $response->getData());
+    }
+
+    public function testSendsCurlRequest(): void
+    {
+        $response = (new HttpClient())->send(new CurlRequest($this->getFixtureUrl(), Method::GET), $this->createConfig(debugMode: false));
 
         Assert::assertSame(['@version' => '1.0', 'adresar' => [['id' => '1']]], $response->getData());
     }

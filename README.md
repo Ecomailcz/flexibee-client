@@ -113,6 +113,16 @@ $client->deleteById($id, $dryRun);
 $client->deleteByCode($code, $dryRun);
 ```
 
+## Přílohy
+Přílohy záznamu evidence (podle id záznamu):
+```
+$attachments = $client->getAttachments($evidenceItemId);              // pole EvidenceResult (id, nazSoub, contentType, …)
+$content = $client->getAttachmentContent($evidenceItemId, $attachmentId); // binární obsah přílohy
+$attachmentId = $client->addAttachment($evidenceItemId, 'faktura.pdf', $content, 'application/pdf');
+$client->deleteAttachment($evidenceItemId, $attachmentId);
+```
+Existující přílohu FlexiBee neumí změnit, je potřeba ji smazat a nahrát znovu. Dokumentace FlexiBee: [Přílohy](https://podpora.flexibee.eu/cs/articles/4722200-prilohy).
+
 ## Generování PDF
 Systém Flexibee umožňuje vrátit vygenerované faktury.
 ```
