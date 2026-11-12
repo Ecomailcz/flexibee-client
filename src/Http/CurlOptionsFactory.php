@@ -46,7 +46,7 @@ final class CurlOptionsFactory
      */
     public function create(string $url, Method $httpMethod, array $postFields, array $queryParameters, array $headers, Config $config): array
     {
-        $verifySSLCertificate = $config->verifySSLCertificate() && $config->getAuthSessionId() === null;
+        $verifySSLCertificate = $config->verifySSLCertificate();
         $options = [
             CURLOPT_CONNECTTIMEOUT => self::CONNECT_TIMEOUT_SECONDS,
             CURLOPT_CUSTOMREQUEST => $httpMethod->value,
