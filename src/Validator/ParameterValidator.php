@@ -5,30 +5,25 @@ declare(strict_types = 1);
 namespace EcomailFlexibee\Validator;
 
 use EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter;
-use Rakit\Validation\Validator;
 
-final class ParameterValidator extends Validator
+use function mb_strlen;
+use function mb_strtoupper;
+
+final class ParameterValidator
 {
 
+    private const CODE_MAX_LENGTH = 20;
+
+    /**
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidRequestParameter
+     */
     public function validateFlexibeeRequestCodeParameter(string $code): void
     {
-        $validation = $this->make(
-            [
-                'code' => $code,
-            ],
-            [
-                'code' => 'max:20|uppercase',
-            ],
-            [
-                'code' => 'Parameter code must have a maximum of 20 characters and must be an uppercase',
-            ],
-        );
-
-        $validation->validate();
-
-        if ($validation->fails()) {
-            throw new EcomailFlexibeeInvalidRequestParameter($validation);
+        if (mb_strlen($code) <= self::CODE_MAX_LENGTH && mb_strtoupper($code) === $code) {
+            return;
         }
+
+        throw new EcomailFlexibeeInvalidRequestParameter('Parameter code must have a maximum of 20 characters and must be an uppercase');
     }
 
 }

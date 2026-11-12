@@ -10,8 +10,7 @@
 		"ext-json": "*",
 		"ext-mbstring": "*",
 		"ext-simplexml": "*",
-		"ecomailcz/purl": "^2.0",
-		"rakit/validation": "^1.4"
+		"ecomailcz/purl": "^2.0"
 	},
 	"require-dev": {
 		"brianium/paratest": "^6.10.0",
