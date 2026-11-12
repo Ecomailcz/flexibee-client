@@ -5,7 +5,9 @@ declare(strict_types = 1);
 namespace EcomailFlexibee;
 
 use EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult;
+use EcomailFlexibee\Exception\EcomailFlexibeeRequestFail;
 use EcomailFlexibee\Exception\EcomailFlexibeeSaveFailed;
+use EcomailFlexibee\Http\CurlRequest;
 use EcomailFlexibee\Http\HttpClient;
 use EcomailFlexibee\Http\Method;
 use EcomailFlexibee\Http\Response\FlexibeeResponse;
@@ -260,6 +262,90 @@ class Client
         } catch (EcomailFlexibeeNoEvidenceResult) {
             return new EvidenceResult([]);
         }
+    }
+
+    /**
+     * @return array<\EcomailFlexibee\Result\EvidenceResult>
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
+     */
+    public function getAttachments(int $id): array
+    {
+        return $this->responseHydrator->convertResponseToAttachments(
+            $this->httpClient->request($this->queryBuilder->createAttachmentsUrl($id), Method::GET, [], [], [], $this->config),
+        );
+    }
+
+    /**
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNoEvidenceResult
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
+     */
+    public function getAttachmentContent(int $id, int $attachmentId): string
+    {
+        $content = $this->httpClient->request(
+            $this->queryBuilder->createAttachmentContentUrl($id, $attachmentId),
+            Method::GET,
+            [],
+            [],
+            [],
+            $this->config,
+        )->getData()['attachmentContent'] ?? null;
+
+        if (!is_string($content)) {
+            throw new EcomailFlexibeeNoEvidenceResult();
+        }
+
+        return $content;
+    }
+
+    /**
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
+     */
+    public function addAttachment(int $id, string $fileName, string $content, string $contentType): int
+    {
+        $response = $this->httpClient->send(
+            new CurlRequest(
+                $this->queryBuilder->createNewAttachmentUrl($id, $fileName),
+                Method::PUT,
+                headers: [sprintf('Content-Type: %s', $contentType), 'Accept: application/json'],
+                body: $content,
+            ),
+            $this->config,
+        );
+        $result = $response->getData()[0] ?? null;
+
+        if (is_array($result) && isset($result['id']) && is_numeric($result['id'])) {
+            return (int) $result['id'];
+        }
+
+        throw new EcomailFlexibeeRequestFail('FlexiBee did not return the ID of the new attachment.');
+    }
+
+    /**
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
+     */
+    public function deleteAttachment(int $id, int $attachmentId): void
+    {
+        $this->httpClient->request($this->queryBuilder->createAttachmentUrl($id, $attachmentId), Method::DELETE, [], [], [], $this->config);
     }
 
     /**

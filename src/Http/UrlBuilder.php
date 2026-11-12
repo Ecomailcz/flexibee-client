@@ -117,6 +117,26 @@ class UrlBuilder
         return $this->createUrl($this->buildPathWithIdOrFilter(sprintf('(kod eq \'%s\')', $code)), $uriParameters);
     }
 
+    public function createAttachmentsUrl(int $id): string
+    {
+        return $this->createUrl(sprintf('%s.json', $this->buildAttachmentsPath($id)));
+    }
+
+    public function createAttachmentUrl(int $id, int $attachmentId): string
+    {
+        return $this->createUrl(sprintf('%s/%d.json', $this->buildAttachmentsPath($id), $attachmentId));
+    }
+
+    public function createAttachmentContentUrl(int $id, int $attachmentId): string
+    {
+        return $this->createUrl(sprintf('%s/%d/content', $this->buildAttachmentsPath($id), $attachmentId));
+    }
+
+    public function createNewAttachmentUrl(int $id, string $fileName): string
+    {
+        return $this->createUrl(sprintf('%s/new/%s', $this->buildAttachmentsPath($id), rawurlencode($fileName)));
+    }
+
     /**
      * @param list<string> $codes
      * @param array<mixed> $uriParameters
@@ -181,6 +201,11 @@ class UrlBuilder
     private function buildPathWithIdOrFilter(string|int $filterQueryOrId, string $format = 'json'): string
     {
         return sprintf('c/%s/%s/%s.%s', $this->company, $this->evidence, $filterQueryOrId, $format);
+    }
+
+    private function buildAttachmentsPath(int $id): string
+    {
+        return sprintf('c/%s/%s/%d/prilohy', $this->company, $this->evidence, $id);
     }
 
     private function buildPathForOnlyEvidence(): string

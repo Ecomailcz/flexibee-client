@@ -19,6 +19,8 @@ use function is_string;
 class ResponseHydrator
 {
 
+    private const ATTACHMENTS_KEY = 'priloha';
+
     public function __construct(private readonly Config $config)
     {
     }
@@ -52,6 +54,17 @@ class ResponseHydrator
                 : $this->createEvidenceResults($evidenceData),
             'row_count' => $response->getRowCount(),
         ];
+    }
+
+    /**
+     * @return array<\EcomailFlexibee\Result\EvidenceResult>
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
+     */
+    public function convertResponseToAttachments(Response $response): array
+    {
+        $attachments = $this->getDataOrThrowRequestFail($response)[self::ATTACHMENTS_KEY] ?? [];
+
+        return is_array($attachments) ? $this->createEvidenceResults($attachments) : [];
     }
 
     public function convertResponseToEvidenceResult(Response $response, bool $throwException): EvidenceResult

@@ -10,6 +10,7 @@ use EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization;
 use EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed;
 use EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestFail;
+use EcomailFlexibee\Http\Response\FlexibeeAttachmentResponse;
 use EcomailFlexibee\Http\Response\FlexibeeBackupResponse;
 use EcomailFlexibee\Http\Response\FlexibeePdfResponse;
 use EcomailFlexibee\Http\Response\FlexibeeResponse;
@@ -25,6 +26,7 @@ use function mb_stripos;
 use function mb_strpos;
 use function reset;
 use function sprintf;
+use function str_ends_with;
 
 use const CURLE_OK;
 
@@ -56,15 +58,25 @@ final class ResponseFactory
             throw new EcomailFlexibeeConnectionFail(sprintf('cURL error (%s): %s', $errorNumber, $errorMessage));
         }
 
+        return self::createBinaryResponse($url, $httpMethod, $responseContent, $statusCode)
+            ?? self::createFromJson($responseContent, $statusCode, $curlInfoDebug);
+    }
+
+    private static function createBinaryResponse(string $url, Method $httpMethod, string $responseContent, int $statusCode): ?FlexibeeResponse
+    {
         if (mb_strpos($url, '.pdf') !== false) {
             return new FlexibeePdfResponse($responseContent);
         }
 
-        if ($httpMethod === Method::GET && mb_stripos($url, '/backup') !== false) {
+        if ($httpMethod !== Method::GET) {
+            return null;
+        }
+
+        if (mb_stripos($url, '/backup') !== false) {
             return new FlexibeeBackupResponse($responseContent);
         }
 
-        return self::createFromJson($responseContent, $statusCode, $curlInfoDebug);
+        return $statusCode === 200 && str_ends_with($url, '/content') ? new FlexibeeAttachmentResponse($responseContent) : null;
     }
 
     /**

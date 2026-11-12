@@ -11,6 +11,7 @@ use EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed;
 use EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestFail;
 use EcomailFlexibee\Http\Method;
+use EcomailFlexibee\Http\Response\FlexibeeAttachmentResponse;
 use EcomailFlexibee\Http\Response\FlexibeeBackupResponse;
 use EcomailFlexibee\Http\Response\FlexibeePdfResponse;
 use EcomailFlexibee\Http\ResponseFactory;
@@ -177,6 +178,38 @@ final class ResponseFactoryTest extends TestCase
             errorMessage: null,
             curlInfoDebug: null,
         );
+    }
+
+    public function testAttachmentContentUrlReturnsAttachmentResponse(): void
+    {
+        $response = ResponseFactory::createFromOutput(
+            'https://demo.flexibee.eu/c/demo/cenik/164/prilohy/15/content',
+            Method::GET,
+            "\x89PNG",
+            200,
+            CURLE_OK,
+            errorMessage: null,
+            curlInfoDebug: null,
+        );
+
+        Assert::assertInstanceOf(FlexibeeAttachmentResponse::class, $response);
+        Assert::assertSame(['attachmentContent' => "\x89PNG"], $response->getData());
+    }
+
+    public function testMissingAttachmentContentIsParsedAsJson(): void
+    {
+        $response = ResponseFactory::createFromOutput(
+            'https://demo.flexibee.eu/c/demo/cenik/164/prilohy/99/content',
+            Method::GET,
+            '{"winstrom":{"success":"false","message":"Not found"}}',
+            404,
+            CURLE_OK,
+            errorMessage: null,
+            curlInfoDebug: null,
+        );
+
+        Assert::assertNotInstanceOf(FlexibeeAttachmentResponse::class, $response);
+        Assert::assertFalse($response->isSuccess());
     }
 
 }

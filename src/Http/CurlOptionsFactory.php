@@ -63,12 +63,10 @@ final class CurlOptionsFactory
             CURLOPT_USERAGENT => self::USER_AGENT,
         ] + $this->createAuthenticationOptions($config);
 
-        if (count($request->postFields) > 0) {
-            $options[CURLOPT_POSTFIELDS] = $this->encodePostFields($request->postFields);
-        }
+        $postFields = $this->createPostFields($request);
 
-        if (count($request->queryParameters) > 0) {
-            $options[CURLOPT_POSTFIELDS] = http_build_query($request->queryParameters);
+        if ($postFields !== null) {
+            $options[CURLOPT_POSTFIELDS] = $postFields;
         }
 
         $headers = $request->headers;
@@ -110,6 +108,22 @@ final class CurlOptionsFactory
         } catch (JsonException $exception) {
             throw new EcomailFlexibeeRequestFail('Request data cannot be encoded to JSON.', 0, $exception);
         }
+    }
+
+    /**
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
+     */
+    private function createPostFields(CurlRequest $request): ?string
+    {
+        if (count($request->queryParameters) > 0) {
+            return http_build_query($request->queryParameters);
+        }
+
+        if ($request->body !== null) {
+            return $request->body;
+        }
+
+        return count($request->postFields) > 0 ? $this->encodePostFields($request->postFields) : null;
     }
 
 }

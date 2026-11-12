@@ -133,6 +133,30 @@ final class ResponseHydratorTest extends TestCase
         Assert::assertEquals(new EvidenceResult([]), $result);
     }
 
+    public function testAttachmentsAreReadFromThePrilohaCollection(): void
+    {
+        $response = $this->createResponse(['priloha' => [['id' => '14', 'nazSoub' => 'a.jpg'], ['id' => '15', 'nazSoub' => 'b.jpg']]]);
+
+        $results = $this->createHydrator()->convertResponseToAttachments($response);
+
+        Assert::assertEquals(
+            [new EvidenceResult(['id' => '14', 'nazSoub' => 'a.jpg']), new EvidenceResult(['id' => '15', 'nazSoub' => 'b.jpg'])],
+            $results,
+        );
+    }
+
+    public function testRecordWithoutAttachmentsHasNoAttachments(): void
+    {
+        Assert::assertSame([], $this->createHydrator()->convertResponseToAttachments($this->createResponse([])));
+    }
+
+    public function testFailedAttachmentsResponseThrowsRequestFail(): void
+    {
+        $this->expectException(EcomailFlexibeeRequestFail::class);
+
+        $this->createHydrator()->convertResponseToAttachments($this->createResponse(['success' => 'false', 'message' => 'Denied']));
+    }
+
     private function createHydrator(): ResponseHydrator
     {
         return new ResponseHydrator(

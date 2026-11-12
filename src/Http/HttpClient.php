@@ -40,8 +40,20 @@ class HttpClient
      */
     public function request(string $url, Method $httpMethod, array $postFields, array $queryParameters, array $headers, Config $config): FlexibeeResponse
     {
+        return $this->send(new CurlRequest($url, $httpMethod, $postFields, $queryParameters, $headers), $config);
+    }
 
-        $ch = $this->httpCurlBuilder->build($url, $httpMethod, $postFields, $queryParameters, $headers, $config);
+    /**
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
+     */
+    public function send(CurlRequest $request, Config $config): FlexibeeResponse
+    {
+        $ch = $this->httpCurlBuilder->build($request, $config);
 
         $output = curl_exec($ch);
         $output = is_string($output) ? $output : null;
@@ -52,8 +64,8 @@ class HttpClient
         $statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
         return ResponseFactory::createFromOutput(
-            $url,
-            $httpMethod,
+            $request->url,
+            $request->httpMethod,
             $output,
             $statusCode,
             curl_errno($ch),

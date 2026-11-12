@@ -64,5 +64,6 @@ Následující změny se týkají jen kódu, který tyto třídy používá nebo
 - `EcomailFlexibee\Http\UrlBuilder` už nedědí z `Purl\Url`. Zděděné metody (`setPath()`, `setQuery()`, `getUrl()` …) nejsou k dispozici a konstruktor nepřijímá `Purl\ParserInterface`.
 - `EcomailFlexibee\Validator\ParameterValidator` už nedědí z `Rakit\Validation\Validator`.
 - `EcomailFlexibee\Http\ResponseFactory::createFromOutput()` má navíc parametr `?string $curlInfoDebug`.
+- `EcomailFlexibee\Http\HttpCurlBuilder::build()` přijímá `CurlRequest` a `Config` místo samostatných parametrů. `HttpClient::request()` zůstává beze změny.
 - `EcomailFlexibee\Config` a `EcomailFlexibee\Result\EvidenceResult` jsou `readonly` třídy.
 - Název firmy v `UrlBuilder::createRestoreUrl()` se v URL kóduje (`rawurlencode()`).
