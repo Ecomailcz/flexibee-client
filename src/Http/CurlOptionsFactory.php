@@ -6,6 +6,7 @@ namespace EcomailFlexibee\Http;
 
 use EcomailFlexibee\Config;
 use EcomailFlexibee\Exception\EcomailFlexibeeRequestFail;
+use JsonException;
 
 use function count;
 use function http_build_query;
@@ -43,6 +44,7 @@ final class CurlOptionsFactory
      * @param array<mixed> $queryParameters
      * @param array<int, string> $headers
      * @return array<int, mixed>
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
      */
     public function create(string $url, Method $httpMethod, array $postFields, array $queryParameters, array $headers, Config $config): array
     {
@@ -64,7 +66,7 @@ final class CurlOptionsFactory
         }
 
         if (count($postFields) > 0) {
-            $options[CURLOPT_POSTFIELDS] = json_encode(['winstrom' => $postFields], JSON_THROW_ON_ERROR);
+            $options[CURLOPT_POSTFIELDS] = $this->encodePostFields($postFields);
         }
 
         if (count($queryParameters) > 0) {
@@ -95,6 +97,19 @@ final class CurlOptionsFactory
             CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
             CURLOPT_USERPWD => sprintf('%s:%s', $config->getUser(), $config->getPassword()),
         ];
+    }
+
+    /**
+     * @param array<mixed> $postFields
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
+     */
+    private function encodePostFields(array $postFields): string
+    {
+        try {
+            return json_encode(['winstrom' => $postFields], JSON_THROW_ON_ERROR);
+        } catch (JsonException $exception) {
+            throw new EcomailFlexibeeRequestFail('Request data cannot be encoded to JSON.', 0, $exception);
+        }
     }
 
 }
