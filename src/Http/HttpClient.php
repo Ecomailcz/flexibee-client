@@ -4,8 +4,10 @@ declare(strict_types = 1);
 
 namespace EcomailFlexibee\Http;
 
+use CurlHandle;
 use EcomailFlexibee\Config;
 use EcomailFlexibee\Http\Response\FlexibeeResponse;
+
 use function curl_errno;
 use function curl_error;
 use function curl_exec;
@@ -13,9 +15,10 @@ use function curl_getinfo;
 use function is_string;
 use function mb_strlen;
 use function trim;
+
 use const CURLINFO_HTTP_CODE;
 
-final class HttpClient
+final readonly class HttpClient
 {
 
     private HttpCurlBuilder $httpCurlBuilder;
@@ -24,17 +27,17 @@ final class HttpClient
         $this->httpCurlBuilder = new HttpCurlBuilder();
     }
 
-	/**
-	 * @param array $postFields
-	 * @param array $queryParameters
-	 * @param array $headers
-	 * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
-	 * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
-	 * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
-	 * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
-	 * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
-	 * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
-	 */
+    /**
+     * @param array<mixed> $postFields
+     * @param array<mixed> $queryParameters
+     * @param array<int, string> $headers
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeConnectionFail
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeForbidden
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeInvalidAuthorization
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeMethodNotAllowed
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeNotAcceptableRequest
+     * @throws \EcomailFlexibee\Exception\EcomailFlexibeeRequestFail
+     */
     public function request(string $url, Method $httpMethod, array $postFields, array $queryParameters, array $headers, Config $config): FlexibeeResponse
     {
 
@@ -55,8 +58,19 @@ final class HttpClient
             $statusCode,
             curl_errno($ch),
             $errorMessage,
-            $config->debugMode() ? json_encode(curl_getinfo($ch, CURLINFO_HEADER_OUT)) : null
+            $this->getDebugInfo($ch, $config),
         );
+    }
+
+    private function getDebugInfo(CurlHandle $ch, Config $config): ?string
+    {
+        if (!$config->debugMode()) {
+            return null;
+        }
+
+        $debugInfo = json_encode(curl_getinfo($ch, CURLINFO_HEADER_OUT));
+
+        return $debugInfo === false ? null : $debugInfo;
     }
 
 }

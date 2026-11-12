@@ -9,7 +9,7 @@ class FlexibeePdfResponse extends FlexibeeResponse
 
     public function __construct(string $pdfContent)
     {
-        parent::__construct(200, null, true, null,0,null, [
+        parent::__construct(200, version: null, success: true,rowCount: 0, data: [
             'pdfContent' => $pdfContent,
         ]);
     }

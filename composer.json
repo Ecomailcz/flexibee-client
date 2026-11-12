@@ -18,25 +18,26 @@
 		"ergebnis/composer-normalize": "^2.34.0",
 		"fzaninotto/faker": "^1.9",
 		"mockery/mockery": "^1.6.4",
-		"phing/phing": "^2.17.4",
-		"php-parallel-lint/php-parallel-lint": "^1.3.2",
+		"pekral/ai-olympus": "^0.4",
+		"pekral/phpcs-rules": "dev-master",
+		"pekral/phpstan-rules": "dev-master",
+		"pekral/rector-rules": "dev-master",
 		"phpstan/extension-installer": "^1.3.1",
-		"phpstan/phpstan": "^1.10.26",
-		"phpstan/phpstan-deprecation-rules": "^1.1.3",
-		"phpstan/phpstan-phpunit": "^1.3.13",
-		"phpstan/phpstan-strict-rules": "^1.5.1",
+		"phpstan/phpstan": "^2.1",
+		"phpstan/phpstan-deprecation-rules": "^2.0",
+		"phpstan/phpstan-phpunit": "^2.0",
 		"phpunit/phpunit": "^9.6.10",
-		"slevomat/coding-standard": "^6.0 || ^7.2.1"
+		"rector/rector": "^2.8"
 	},
 	"minimum-stability": "dev",
 	"prefer-stable": true,
 	"autoload": {
 		"psr-4": {
-			"EcomailFlexibee\\": [
-				"src/"
-			],
 			"EcomailFlexibeeTest\\": [
 				"tests/"
+			],
+			"EcomailFlexibee\\": [
+				"src/"
 			]
 		}
 	},
@@ -47,10 +48,39 @@
 	},
 	"config": {
 		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true,
 			"ergebnis/composer-normalize": true,
-			"phpstan/extension-installer": true,
-			"dealerdirect/phpcodesniffer-composer-installer": true
+			"pekral/ai-olympus": true,
+			"phpstan/extension-installer": true
 		},
 		"sort-packages": true
+	},
+	"scripts": {
+		"ai-olympus:install": "vendor/bin/ai-olympus install --force",
+		"analyse": "vendor/bin/phpstan analyse --memory-limit=2G --no-progress",
+		"build": [
+			"@fix",
+			"@check"
+		],
+		"check": [
+			"@composer-normalize-check",
+			"@phpcs-check",
+			"@rector-check",
+			"@analyse",
+			"@test"
+		],
+		"composer-normalize-check": "@composer normalize --dry-run",
+		"fix": [
+			"@composer normalize",
+			"@rector-fix",
+			"@phpcs-fix"
+		],
+		"phpcs-check": "vendor/bin/phpcs --standard=ruleset.xml src tests",
+		"phpcs-fix": "vendor/bin/phpcbf --standard=ruleset.xml src tests || true",
+		"rector-check": "vendor/bin/rector process --dry-run",
+		"rector-fix": "vendor/bin/rector process",
+		"security-audit": "@composer audit",
+		"test": "vendor/bin/paratest --exclude-group=integration",
+		"test:integration": "vendor/bin/paratest --group=integration"
 	}
 }

@@ -1,0 +1,91 @@
+name: Checks
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  checks:
+    name: Checks (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.4', '8.5']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: curl, json, mbstring, simplexml
+          coverage: none
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.json') }}
+          restore-keys: |
+            ${{ runner.os }}-php-${{ matrix.php }}-composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Security audit
+        run: composer security-audit
+
+      - name: Composer normalize
+        run: composer composer-normalize-check
+
+      - name: PHP CodeSniffer
+        run: composer phpcs-check
+
+      - name: Rector
+        run: composer rector-check
+
+      - name: PHPStan
+        run: composer analyse
+
+      - name: Tests
+        run: composer test
+
+  min-php:
+    name: Runtime on supported PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.3']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: curl, json, mbstring, simplexml
+          coverage: none
+
+      - name: Validate composer.json
+        run: composer validate --strict --no-check-lock
+
+      # The development tools (pekral/*, PHPStan 2, Rector 2) require PHP 8.4+, so composer --no-dev
+      # still fails to resolve require-dev here. Resolve a dev-free manifest instead, so this step
+      # verifies exactly what a consumer on PHP 8.2 / 8.3 installs.
+      - name: Verify runtime dependencies resolve
+        run: |
+          php -r '$c = json_decode(file_get_contents("composer.json"), true); unset($c["require-dev"], $c["scripts"], $c["autoload-dev"]); file_put_contents("composer.runtime.json", json_encode($c, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));'
+          COMPOSER=composer.runtime.json composer update --no-interaction --no-progress --prefer-dist --no-plugins
+
+      - name: Lint shipped sources
+        run: find src -name '*.php' -print0 | xargs -0 -n1 php -l

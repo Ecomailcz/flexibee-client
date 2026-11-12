@@ -16,12 +16,12 @@ interface Response
     public function getStatusCode(): int;
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function getData(): array;
 
     /**
-     * @return array<string>
+     * @return array<mixed>
      */
     public function getStatistics(): array;
 

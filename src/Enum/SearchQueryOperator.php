@@ -4,52 +4,47 @@ declare(strict_types = 1);
 
 namespace EcomailFlexibee\Enum;
 
-use function array_keys;
-use function array_values;
+use function array_map;
 use function implode;
 use function preg_match_all;
 use function preg_replace;
 use function preg_split;
 use function str_replace;
+use function strtr;
 use function urldecode;
 
 class SearchQueryOperator
 {
 
     /**
-     * @var array<mixed>
+     * @var array<string, string>
      */
     private static array $operators = [
-        '==' => ' eq ',
+        '!=' => ' neq ',
+        '<' => ' lt ',
         '<=' => ' lte ',
         '<>' => ' neq ',
-        '>=' => ' gte ',
-        '!=' => ' neq ',
         '=' => ' eq ',
-        '<' => ' lt ',
+        '==' => ' eq ',
         '>' => ' gt ',
+        '>=' => ' gte ',
     ];
 
     public static function convertOperatorsInQuery(string $query): string
     {
         $query = urldecode($query);
-        /** @var array<string> $queryExploded */
         $queryExploded = preg_split('/\s+/', $query);
 
-        foreach($queryExploded as &$part) {
-            $toReplace = [];
+        $converted = array_map(static function (string $part): string {
             preg_match_all('/[^\'](?=(?:[^\']*\'[^"]*\'[^\']*|[^\'])*$)/', $part, $matches);
+            $text = implode('', $matches[0]);
 
-            if (isset($matches[0])) {
-                $text = implode('', $matches[0]);
-                $toReplace[$text] = str_replace(array_keys(self::$operators), array_values(self::$operators), $text);
-            }
-
-            $part = str_replace(array_keys($toReplace), array_values($toReplace), $part);
-        }
+            // strtr() always replaces the longest operator first ("<=" before "<"), independent of key order.
+            return str_replace($text, strtr($text, self::$operators), $part);
+        }, $queryExploded === false ? [] : $queryExploded);
 
         /** @var string $result */
-        $result = preg_replace('/\s+/', ' ', implode(' ',$queryExploded));
+        $result = preg_replace('/\s+/', ' ', implode(' ', $converted));
 
         return $result;
     }
