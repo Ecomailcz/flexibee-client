@@ -135,7 +135,7 @@ class UrlBuilder
         $parts = parse_url($url);
 
         if ($parts === false || !isset($parts['scheme'], $parts['host'])) {
-            throw new EcomailFlexibeeRequestFail(sprintf('FlexiBee URL "%s" must contain a scheme and a host.', $url));
+            throw new EcomailFlexibeeRequestFail('FlexiBee URL must contain a scheme and a host.');
         }
 
         $userInfo = isset($parts['user'])

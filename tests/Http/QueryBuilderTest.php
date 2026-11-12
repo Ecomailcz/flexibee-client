@@ -139,9 +139,9 @@ final class QueryBuilderTest extends TestCase
     public function testRejectsBaseUrlWithoutSchemeOrHost(): void
     {
         $this->expectException(EcomailFlexibeeRequestFail::class);
-        $this->expectExceptionMessage('FlexiBee URL "demo.flexibee.eu" must contain a scheme and a host.');
+        $this->expectExceptionMessage('FlexiBee URL must contain a scheme and a host.');
 
-        new UrlBuilder(new Config('demo.flexibee.eu', 'demo', 'u', 'p', 'adresar', verifySSLCertificate: false));
+        new UrlBuilder(new Config('user:secret@demo.flexibee.eu', 'demo', 'u', 'p', 'adresar', verifySSLCertificate: false));
     }
 
     protected function setUp(): void
